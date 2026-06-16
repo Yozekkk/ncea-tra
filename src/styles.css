@@ -135,9 +135,11 @@
 @utility fade-up {
   animation: fade-up 0.7s ease-out both;
 }
-@utility blink-caret::after {
-  content: "▌";
-  animation: blink 1s steps(1) infinite;
-  color: var(--neon-cyan);
-  margin-left: 2px;
+@utility blink-caret {
+  &::after {
+    content: "▌";
+    animation: blink 1s steps(1) infinite;
+    color: var(--neon-cyan);
+    margin-left: 2px;
+  }
 }

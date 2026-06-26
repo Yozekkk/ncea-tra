@@ -242,9 +242,12 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
                 <Icon className="w-5 h-5 text-white/70" /> <span className="font-medium">{label}</span>
               </button>
             ))}
-            <a href={DISCORD} className="mt-4 inline-flex items-center justify-center gap-2 h-12 rounded-2xl gradient-btn font-medium">
-              <I.Discord className="w-5 h-5" /> Discord
-            </a>
+            <button onClick={() => { copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`); }} className="mt-4 inline-flex items-center justify-center gap-2 h-12 rounded-2xl gradient-btn font-medium">
+              <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+            </button>
+            <button onClick={() => { copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`); }} className="inline-flex items-center justify-center gap-2 h-12 rounded-2xl ring-1 ring-white/15 font-medium">
+              <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+            </button>
           </div>
         </div>
       )}

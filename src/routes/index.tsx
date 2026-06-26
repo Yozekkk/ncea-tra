@@ -166,7 +166,7 @@ const SERVER_VERSIONS: { id: string; label: string; mult: number; note?: string 
   { id: "1.20.6", label: "1.20.6", mult: 1.05 },
   { id: "1.21", label: "1.21", mult: 1.1 },
   { id: "1.21.4", label: "1.21.4", mult: 1.15, note: "latest" },
-] as const;
+];
 
 // Ядра / платформы
 type CoreKind = "vanilla" | "bukkit" | "modded" | "hybrid" | "proxy";

@@ -608,19 +608,16 @@ function Contact() {
                 Напишите нам в Discord или Telegram — поможем с регистрацией, подберём ивент, ответим за считанные минуты.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href={TELEGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
-                  <I.Telegram className="w-4 h-4" /> Написать в Telegram
-                </a>
-                <a href={DISCORD} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
-                  <I.Discord className="w-4 h-4" /> Discord
-                </a>
+                <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
+                  <I.Telegram className="w-4 h-4" /> Telegram {TELEGRAM_TAG}
+                </button>
+                <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                  <I.Discord className="w-4 h-4" /> Discord {DISCORD_TAG}
+                </button>
               </div>
-              <button
-                onClick={() => copy("@yozekkk", "Тег @yozekkk скопирован")}
-                className="mt-4 text-sm text-white/50 hover:text-white transition"
-              >
-                или скопируйте Discord-тег <span className="text-brand-orange font-mono">@yozekkk</span>
-              </button>
+              <div className="mt-4 text-sm text-white/50">
+                Клик по кнопке копирует тег.
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[

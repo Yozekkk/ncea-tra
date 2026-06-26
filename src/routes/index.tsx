@@ -260,7 +260,7 @@ function StatusPill() {
   return (
     <span className="inline-flex items-center gap-2 h-8 pl-2 pr-3 rounded-full bg-white/3 ring-1 ring-white/10 text-xs text-white/70">
       <span className="relative inline-flex w-2 h-2 rounded-full bg-emerald-400 pulse-dot" />
-      Все системы онлайн
+      Внесено в ЕРФ
     </span>
   );
 }

@@ -212,14 +212,14 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
         </nav>
 
         <div className="flex items-center gap-2">
-          <a href={DISCORD} target="_blank" rel="noreferrer"
+          <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)}
             className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full gradient-btn text-sm font-medium">
             <I.Discord className="w-4 h-4" /> Discord
-          </a>
-          <a href={TELEGRAM} target="_blank" rel="noreferrer"
-            className="hidden sm:inline-flex items-center h-10 px-4 rounded-full ring-1 ring-white/15 text-sm text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-            Войти
-          </a>
+          </button>
+          <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)}
+            className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full ring-1 ring-white/15 text-sm text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+            <I.Telegram className="w-4 h-4" /> Telegram
+          </button>
           <button onClick={() => setOpen(true)} className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-full ring-1 ring-white/10 bg-white/3">
             <I.Menu className="w-5 h-5" />
           </button>

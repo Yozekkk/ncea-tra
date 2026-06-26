@@ -659,8 +659,8 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
           </div>
           <FooterCol title="Главное" items={NAV.map((n) => ({ label: n.label, onClick: () => onNav(n.id) }))} />
           <FooterCol title="Соц. сети" items={[
-            { label: "Telegram", href: TELEGRAM },
-            { label: "Discord", href: DISCORD },
+            { label: `Telegram ${TELEGRAM_TAG}`, onClick: () => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`) },
+            { label: `Discord ${DISCORD_TAG}`, onClick: () => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`) },
           ]} />
           <FooterCol title="Документы" items={[
             { label: "Устав", href: "#" },

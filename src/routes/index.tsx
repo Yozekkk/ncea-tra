@@ -515,10 +515,10 @@ function Events() {
           <aside className="glass-card p-6 lg:p-8 h-fit lg:sticky lg:top-24">
             <div className="text-[11px] tracking-widest uppercase text-white/40">Итого</div>
             <div className="mt-2 font-display font-extrabold text-5xl">
-              {total.toLocaleString("ru-RU")} <span className="gradient-text">Ɐ</span>
+              {total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
             </div>
             <div className="text-white/55 text-sm mt-2">
-              ≈ {usd} $ <span className="text-white/35">· 100 Ɐ = 1 $</span>
+              ≈ {usd} $ <span className="text-white/35">· 100 ₳ = 1 $</span>
             </div>
             <div className="text-white/45 text-xs mt-1">
               Расчёт в Аргентах — внутриигровой валюте Нова-Люминис.
@@ -530,12 +530,12 @@ function Events() {
                 {cats.map((c) => (
                   <li key={c.id} className="flex items-center justify-between gap-3">
                     <span>{c.label} · {values[c.id]} {c.unit}</span>
-                    <span className="font-display font-semibold text-white/85">{(values[c.id] * c.pricePerUnit).toLocaleString("ru-RU")} Ɐ</span>
+                    <span className="font-display font-semibold text-white/85">{(values[c.id] * c.pricePerUnit).toLocaleString("ru-RU")} ₳</span>
                   </li>
                 ))}
                 <li className="flex items-center justify-between gap-3 pt-2 mt-1 border-t border-white/5">
                   <span>Защита · {ddos === "basic" ? "Базовая" : "Расширенная"}</span>
-                  <span className="font-display font-semibold text-white/85">{ddosTotal.toLocaleString("ru-RU")} Ɐ</span>
+                  <span className="font-display font-semibold text-white/85">{ddosTotal.toLocaleString("ru-RU")} ₳</span>
                 </li>
               </ul>
             </div>

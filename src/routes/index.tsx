@@ -626,6 +626,225 @@ function Events() {
   );
 }
 
+function Plugins() {
+  const [count, setCount] = useState(3);
+  const [versionId, setVersionId] = useState<string>("1.20.1");
+  const [coreId, setCoreId] = useState<string>("paper");
+  const [genreId, setGenreId] = useState<string>("survival");
+  const [rush, setRush] = useState(false);
+
+  const version = SERVER_VERSIONS.find((v) => v.id === versionId)!;
+  const core = SERVER_CORES.find((c) => c.id === coreId)!;
+  const genre = SERVER_GENRES.find((g) => g.id === genreId)!;
+
+  // объёмная скидка: больше плагинов — дешевле за штуку
+  const bulk = count >= 10 ? 0.8 : count >= 5 ? 0.9 : 1.0;
+  const base = Math.round(count * PLUGIN_BASE_PRICE * bulk);
+  const subtotal = Math.round(base * core.mult * genre.mult * version.mult);
+  const rushFee = rush ? Math.round(subtotal * 0.3) : 0;
+  const total = subtotal + rushFee;
+  const usd = (total / ARG_PER_USD).toFixed(2);
+
+  const CORE_GROUPS: { kind: CoreKind; label: string }[] = [
+    { kind: "bukkit", label: "Bukkit / Spigot / Paper" },
+    { kind: "modded", label: "Modded" },
+    { kind: "hybrid", label: "Hybrid (Forge + Bukkit)" },
+    { kind: "proxy", label: "Proxy" },
+    { kind: "vanilla", label: "Vanilla" },
+  ];
+
+  return (
+    <section id="plugins" className="relative py-24 lg:py-32">
+      <Blob className="bg-brand-red/20 w-[500px] h-[500px] -top-10 right-[-160px]" />
+      <Blob className="bg-brand-orange/15 w-[420px] h-[420px] bottom-[-80px] left-[-120px]" />
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <SectionHead kicker="Услуга" title="Сборка плагинов" accent="под ваш сервер" />
+          <p className="text-white/45 max-w-sm text-sm">
+            Подберём, настроим и протестируем стек плагинов под ваше ядро, версию и жанр.
+          </p>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
+          {/* left config */}
+          <div className="flex flex-col gap-4">
+            {/* count */}
+            <div className="glass-card p-6 lg:p-8">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 1</div>
+                  <h3 className="font-display font-bold text-xl mt-1">Количество плагинов</h3>
+                  <div className="text-white/45 text-xs mt-1">
+                    {count >= 10 ? "−20% объёмная скидка" : count >= 5 ? "−10% объёмная скидка" : "от 1 до 30 шт."}
+                  </div>
+                </div>
+                <div className="font-display font-bold text-3xl">
+                  {count} <span className="text-white/45 text-sm font-normal">шт.</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                className="brand-range w-full mt-5"
+                min={1}
+                max={30}
+                step={1}
+                value={count}
+                onChange={(e) => setCount(+e.target.value)}
+              />
+            </div>
+
+            {/* version */}
+            <div className="glass-card p-6 lg:p-8">
+              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 2</div>
+              <h3 className="font-display font-bold text-xl mt-1">Версия сервера</h3>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {SERVER_VERSIONS.map((v) => {
+                  const active = versionId === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      onClick={() => setVersionId(v.id)}
+                      className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                        active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                      }`}
+                    >
+                      <span className="font-display font-semibold">{v.label}</span>
+                      {v.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{v.note}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* core */}
+            <div className="glass-card p-6 lg:p-8">
+              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 3</div>
+              <h3 className="font-display font-bold text-xl mt-1">Ядро сервера</h3>
+              <div className="mt-5 flex flex-col gap-4">
+                {CORE_GROUPS.map((g) => {
+                  const items = SERVER_CORES.filter((c) => c.kind === g.kind);
+                  if (!items.length) return null;
+                  return (
+                    <div key={g.kind}>
+                      <div className="text-[11px] tracking-widest uppercase text-white/35 mb-2">{g.label}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {items.map((c) => {
+                          const active = coreId === c.id;
+                          return (
+                            <button
+                              key={c.id}
+                              onClick={() => setCoreId(c.id)}
+                              className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                                active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                              }`}
+                            >
+                              <span className="font-display font-semibold">{c.label}</span>
+                              {c.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{c.note}</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* genre */}
+            <div className="glass-card p-6 lg:p-8">
+              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 4</div>
+              <h3 className="font-display font-bold text-xl mt-1">Жанр сервера</h3>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {SERVER_GENRES.map((g) => {
+                  const active = genreId === g.id;
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => setGenreId(g.id)}
+                      className={`inline-flex items-center h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                        active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                      }`}
+                    >
+                      <span className="font-display font-semibold">{g.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* rush */}
+            <div className="glass-card p-6 lg:p-8">
+              <div className="flex items-start gap-4 justify-between">
+                <div>
+                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 5</div>
+                  <h3 className="font-display font-bold text-xl mt-1">Срочная сборка</h3>
+                  <div className="text-white/55 text-sm mt-1">До 48 часов вместо 5–7 дней. +30% к стоимости.</div>
+                </div>
+                <button
+                  onClick={() => setRush((r) => !r)}
+                  className={`relative w-14 h-8 rounded-full ring-1 transition-all ${rush ? "bg-brand-red/30 ring-brand-red" : "bg-white/5 ring-white/15"}`}
+                >
+                  <span className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${rush ? "left-7" : "left-1"}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* right totals */}
+          <aside className="glass-card p-6 lg:p-8 h-fit lg:sticky lg:top-24">
+            <div className="text-[11px] tracking-widest uppercase text-white/40">Итого</div>
+            <div className="mt-2 font-display font-extrabold text-5xl">
+              {total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
+            </div>
+            <div className="text-white/55 text-sm mt-2">
+              ≈ {usd} $ <span className="text-white/35">· 100 ₳ = 1 $</span>
+            </div>
+            <div className="text-white/45 text-xs mt-1">
+              Цена в Аргентах — валюте Нова-Люминис.
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 text-sm text-white/65 leading-relaxed">
+              <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Конфигурация</div>
+              <ul className="flex flex-col gap-1.5">
+                <li className="flex items-center justify-between gap-3">
+                  <span>Плагины · {count} шт. {bulk < 1 && <span className="text-brand-orange">(скидка ×{bulk})</span>}</span>
+                  <span className="font-display font-semibold text-white/85">{base.toLocaleString("ru-RU")} ₳</span>
+                </li>
+                <li className="flex items-center justify-between gap-3">
+                  <span>Ядро · {core.label}</span>
+                  <span className="text-white/60">×{core.mult}</span>
+                </li>
+                <li className="flex items-center justify-between gap-3">
+                  <span>Жанр · {genre.label}</span>
+                  <span className="text-white/60">×{genre.mult}</span>
+                </li>
+                <li className="flex items-center justify-between gap-3">
+                  <span>Версия · {version.label}</span>
+                  <span className="text-white/60">×{version.mult}</span>
+                </li>
+                <li className="flex items-center justify-between gap-3 pt-2 mt-1 border-t border-white/5">
+                  <span>Срочность</span>
+                  <span className="font-display font-semibold text-white/85">{rushFee.toLocaleString("ru-RU")} ₳</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3">
+              <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
+                <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+              </button>
+              <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 function ReviewCard({ name, avatar, text }: { name: string; avatar: string; text: string }) {
   return (
     <div className="shrink-0 w-[320px] glass-card p-5">

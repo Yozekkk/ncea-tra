@@ -634,7 +634,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
               Ивент-агентство и оператор Minecraft-сервера. Губерния Нова-Люминис, ТРА.
             </p>
             <div className="mt-4 text-white/40 text-xs">
-              ИНН: 0000 0000 0000 · hello@ncea.tra
+              Внесено в ЕРФ
             </div>
           </div>
           <FooterCol title="Главное" items={NAV.map((n) => ({ label: n.label, onClick: () => onNav(n.id) }))} />

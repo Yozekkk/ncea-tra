@@ -260,7 +260,7 @@ function StatusPill() {
   return (
     <span className="inline-flex items-center gap-2 h-8 pl-2 pr-3 rounded-full bg-white/3 ring-1 ring-white/10 text-xs text-white/70">
       <span className="relative inline-flex w-2 h-2 rounded-full bg-emerald-400 pulse-dot" />
-      Все системы онлайн
+      Внесено в ЕРФ
     </span>
   );
 }
@@ -299,8 +299,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
 
           <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
             {[
-              { k: "120+", v: "проведённых ивентов" },
-              { k: "8 000+", v: "уникальных игроков" },
+              { k: "1+", v: "проведённых ивентов" },
+              { k: "5+", v: "уникальных игроков" },
               { k: "24/7", v: "поддержка сервера" },
               { k: "99.9%", v: "аптайм" },
             ].map((s) => (
@@ -634,7 +634,7 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
               Ивент-агентство и оператор Minecraft-сервера. Губерния Нова-Люминис, ТРА.
             </p>
             <div className="mt-4 text-white/40 text-xs">
-              ИНН: 0000 0000 0000 · hello@ncea.tra
+              Внесено в ЕРФ
             </div>
           </div>
           <FooterCol title="Главное" items={NAV.map((n) => ({ label: n.label, onClick: () => onNav(n.id) }))} />

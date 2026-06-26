@@ -6,8 +6,8 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const DISCORD = "#";
-const TELEGRAM = "#";
+const DISCORD_TAG = "@yozekkk";
+const TELEGRAM_TAG = "@lisiy_bob";
 const DESIGNER = "@yozekkk";
 
 /* ---------- tiny inline icons (stroke = currentColor) ---------- */

@@ -154,7 +154,7 @@ const DDOS_EXTENDED_PRICE = 2500; // Аргенты
 const PLUGIN_BASE_PRICE = 750; // ₳
 
 // Версии сервера (актуальные стабильные + LTS)
-const SERVER_VERSIONS = [
+const SERVER_VERSIONS: { id: string; label: string; mult: number; note?: string }[] = [
   { id: "1.7.10", label: "1.7.10", mult: 1.3, note: "legacy" },
   { id: "1.8.9", label: "1.8.9", mult: 1.15, note: "PvP legacy" },
   { id: "1.12.2", label: "1.12.2", mult: 1.2, note: "modded LTS" },

@@ -6,8 +6,8 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const DISCORD = "#";
-const TELEGRAM = "#";
+const DISCORD_TAG = "@yozekkk";
+const TELEGRAM_TAG = "@lisiy_bob";
 const DESIGNER = "@yozekkk";
 
 /* ---------- tiny inline icons (stroke = currentColor) ---------- */
@@ -134,14 +134,18 @@ const TYPES = [
 
 const CATEGORIES = {
   tournaments: [
-    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16 },
-    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3 },
+    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 80 },
+    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1500 },
   ],
   contests: [
-    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12 },
-    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5 },
+    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 120 },
+    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 900 },
   ],
 } as const;
+
+// 100 Аргентов = 1 $
+const ARG_PER_USD = 100;
+const DDOS_EXTENDED_PRICE = 2500; // Аргенты
 
 const REVIEWS_ROW1 = [
   { name: "_Luminis_", avatar: "L", text: "Турнир был организован безупречно — задержек ноль, судейство справедливое." },
@@ -212,14 +216,14 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
         </nav>
 
         <div className="flex items-center gap-2">
-          <a href={DISCORD} target="_blank" rel="noreferrer"
+          <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)}
             className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full gradient-btn text-sm font-medium">
             <I.Discord className="w-4 h-4" /> Discord
-          </a>
-          <a href={TELEGRAM} target="_blank" rel="noreferrer"
-            className="hidden sm:inline-flex items-center h-10 px-4 rounded-full ring-1 ring-white/15 text-sm text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-            Войти
-          </a>
+          </button>
+          <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)}
+            className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full ring-1 ring-white/15 text-sm text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+            <I.Telegram className="w-4 h-4" /> Telegram
+          </button>
           <button onClick={() => setOpen(true)} className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-full ring-1 ring-white/10 bg-white/3">
             <I.Menu className="w-5 h-5" />
           </button>
@@ -242,9 +246,12 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
                 <Icon className="w-5 h-5 text-white/70" /> <span className="font-medium">{label}</span>
               </button>
             ))}
-            <a href={DISCORD} className="mt-4 inline-flex items-center justify-center gap-2 h-12 rounded-2xl gradient-btn font-medium">
-              <I.Discord className="w-5 h-5" /> Discord
-            </a>
+            <button onClick={() => { copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`); }} className="mt-4 inline-flex items-center justify-center gap-2 h-12 rounded-2xl gradient-btn font-medium">
+              <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+            </button>
+            <button onClick={() => { copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`); }} className="inline-flex items-center justify-center gap-2 h-12 rounded-2xl ring-1 ring-white/15 font-medium">
+              <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+            </button>
           </div>
         </div>
       )}
@@ -389,10 +396,12 @@ function Events() {
   );
   const [ddos, setDdos] = useState<"basic" | "extended">("basic");
 
-  const total =
-    type === "tournaments" ? 0 : Math.round((values.build || 0) * 50 + (values.season || 0) * 120);
+  const itemsTotal = cats.reduce((sum, c) => sum + (values[c.id] || 0) * c.pricePerUnit, 0);
+  const ddosTotal = ddos === "extended" ? DDOS_EXTENDED_PRICE : 0;
+  const total = itemsTotal + ddosTotal;
+  const usd = (total / ARG_PER_USD).toFixed(2);
 
-  const summary = cats.map((c) => `${c.label}: ${values[c.id]} ${c.unit}`).join(" • ");
+  
 
   return (
     <section id="events" className="relative py-24 lg:py-32">
@@ -506,24 +515,38 @@ function Events() {
           <aside className="glass-card p-6 lg:p-8 h-fit lg:sticky lg:top-24">
             <div className="text-[11px] tracking-widest uppercase text-white/40">Итого</div>
             <div className="mt-2 font-display font-extrabold text-5xl">
-              {total === 0 ? "0 ₽" : `от ${total.toLocaleString("ru-RU")} ₽`}
+              {total.toLocaleString("ru-RU")} <span className="gradient-text">Ɐ</span>
             </div>
-            <div className="text-white/45 text-xs mt-2">
-              {type === "tournaments" ? "Турниры — бесплатно для участников" : "Расчёт ориентировочный"}
+            <div className="text-white/55 text-sm mt-2">
+              ≈ {usd} $ <span className="text-white/35">· 100 Ɐ = 1 $</span>
+            </div>
+            <div className="text-white/45 text-xs mt-1">
+              Расчёт в Аргентах — внутриигровой валюте Нова-Люминис.
             </div>
 
             <div className="mt-6 rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 text-sm text-white/65 leading-relaxed">
               <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Конфигурация</div>
-              {summary} • Защита: {ddos === "basic" ? "Базовая" : "Расширенная"}
+              <ul className="flex flex-col gap-1.5">
+                {cats.map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-3">
+                    <span>{c.label} · {values[c.id]} {c.unit}</span>
+                    <span className="font-display font-semibold text-white/85">{(values[c.id] * c.pricePerUnit).toLocaleString("ru-RU")} Ɐ</span>
+                  </li>
+                ))}
+                <li className="flex items-center justify-between gap-3 pt-2 mt-1 border-t border-white/5">
+                  <span>Защита · {ddos === "basic" ? "Базовая" : "Расширенная"}</span>
+                  <span className="font-display font-semibold text-white/85">{ddosTotal.toLocaleString("ru-RU")} Ɐ</span>
+                </li>
+              </ul>
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
-              <a href={TELEGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
-                <I.Telegram className="w-5 h-5" /> Записаться в Telegram
-              </a>
-              <a href={DISCORD} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
-                <I.Discord className="w-5 h-5" /> Discord
-              </a>
+              <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
+                <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+              </button>
+              <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+              </button>
             </div>
           </aside>
         </div>
@@ -585,19 +608,16 @@ function Contact() {
                 Напишите нам в Discord или Telegram — поможем с регистрацией, подберём ивент, ответим за считанные минуты.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href={TELEGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
-                  <I.Telegram className="w-4 h-4" /> Написать в Telegram
-                </a>
-                <a href={DISCORD} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
-                  <I.Discord className="w-4 h-4" /> Discord
-                </a>
+                <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
+                  <I.Telegram className="w-4 h-4" /> Telegram {TELEGRAM_TAG}
+                </button>
+                <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                  <I.Discord className="w-4 h-4" /> Discord {DISCORD_TAG}
+                </button>
               </div>
-              <button
-                onClick={() => copy("@yozekkk", "Тег @yozekkk скопирован")}
-                className="mt-4 text-sm text-white/50 hover:text-white transition"
-              >
-                или скопируйте Discord-тег <span className="text-brand-orange font-mono">@yozekkk</span>
-              </button>
+              <div className="mt-4 text-sm text-white/50">
+                Клик по кнопке копирует тег.
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -639,8 +659,8 @@ function Footer({ onNav }: { onNav: (id: string) => void }) {
           </div>
           <FooterCol title="Главное" items={NAV.map((n) => ({ label: n.label, onClick: () => onNav(n.id) }))} />
           <FooterCol title="Соц. сети" items={[
-            { label: "Telegram", href: TELEGRAM },
-            { label: "Discord", href: DISCORD },
+            { label: `Telegram ${TELEGRAM_TAG}`, onClick: () => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`) },
+            { label: `Discord ${DISCORD_TAG}`, onClick: () => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`) },
           ]} />
           <FooterCol title="Документы" items={[
             { label: "Устав", href: "#" },

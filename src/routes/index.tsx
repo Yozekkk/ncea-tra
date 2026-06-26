@@ -401,7 +401,7 @@ function Events() {
   const total = itemsTotal + ddosTotal;
   const usd = (total / ARG_PER_USD).toFixed(2);
 
-  const summary = cats.map((c) => `${c.label}: ${values[c.id]} ${c.unit}`).join(" • ");
+  
 
   return (
     <section id="events" className="relative py-24 lg:py-32">

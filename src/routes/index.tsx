@@ -134,14 +134,18 @@ const TYPES = [
 
 const CATEGORIES = {
   tournaments: [
-    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16 },
-    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3 },
+    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 80 },
+    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1500 },
   ],
   contests: [
-    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12 },
-    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5 },
+    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 120 },
+    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 900 },
   ],
 } as const;
+
+// 100 Аргентов = 1 $
+const ARG_PER_USD = 100;
+const DDOS_EXTENDED_PRICE = 2500; // Аргенты
 
 const REVIEWS_ROW1 = [
   { name: "_Luminis_", avatar: "L", text: "Турнир был организован безупречно — задержек ноль, судейство справедливое." },

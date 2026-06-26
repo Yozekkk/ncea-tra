@@ -396,8 +396,10 @@ function Events() {
   );
   const [ddos, setDdos] = useState<"basic" | "extended">("basic");
 
-  const total =
-    type === "tournaments" ? 0 : Math.round((values.build || 0) * 50 + (values.season || 0) * 120);
+  const itemsTotal = cats.reduce((sum, c) => sum + (values[c.id] || 0) * c.pricePerUnit, 0);
+  const ddosTotal = ddos === "extended" ? DDOS_EXTENDED_PRICE : 0;
+  const total = itemsTotal + ddosTotal;
+  const usd = (total / ARG_PER_USD).toFixed(2);
 
   const summary = cats.map((c) => `${c.label}: ${values[c.id]} ${c.unit}`).join(" • ");
 

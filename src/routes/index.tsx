@@ -515,24 +515,38 @@ function Events() {
           <aside className="glass-card p-6 lg:p-8 h-fit lg:sticky lg:top-24">
             <div className="text-[11px] tracking-widest uppercase text-white/40">Итого</div>
             <div className="mt-2 font-display font-extrabold text-5xl">
-              {total === 0 ? "0 ₽" : `от ${total.toLocaleString("ru-RU")} ₽`}
+              {total.toLocaleString("ru-RU")} <span className="gradient-text">Ɐ</span>
             </div>
-            <div className="text-white/45 text-xs mt-2">
-              {type === "tournaments" ? "Турниры — бесплатно для участников" : "Расчёт ориентировочный"}
+            <div className="text-white/55 text-sm mt-2">
+              ≈ {usd} $ <span className="text-white/35">· 100 Ɐ = 1 $</span>
+            </div>
+            <div className="text-white/45 text-xs mt-1">
+              Расчёт в Аргентах — внутриигровой валюте Нова-Люминис.
             </div>
 
             <div className="mt-6 rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 text-sm text-white/65 leading-relaxed">
               <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Конфигурация</div>
-              {summary} • Защита: {ddos === "basic" ? "Базовая" : "Расширенная"}
+              <ul className="flex flex-col gap-1.5">
+                {cats.map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-3">
+                    <span>{c.label} · {values[c.id]} {c.unit}</span>
+                    <span className="font-display font-semibold text-white/85">{(values[c.id] * c.pricePerUnit).toLocaleString("ru-RU")} Ɐ</span>
+                  </li>
+                ))}
+                <li className="flex items-center justify-between gap-3 pt-2 mt-1 border-t border-white/5">
+                  <span>Защита · {ddos === "basic" ? "Базовая" : "Расширенная"}</span>
+                  <span className="font-display font-semibold text-white/85">{ddosTotal.toLocaleString("ru-RU")} Ɐ</span>
+                </li>
+              </ul>
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
-              <a href={TELEGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
-                <I.Telegram className="w-5 h-5" /> Записаться в Telegram
-              </a>
-              <a href={DISCORD} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
-                <I.Discord className="w-5 h-5" /> Discord
-              </a>
+              <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
+                <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+              </button>
+              <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+              </button>
             </div>
           </aside>
         </div>

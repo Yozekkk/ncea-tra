@@ -148,6 +148,76 @@ const CATEGORIES = {
 const ARG_PER_USD = 100;
 const DDOS_EXTENDED_PRICE = 2500; // Аргенты
 
+/* ---------- plugin build config data ---------- */
+
+// База за один плагин
+const PLUGIN_BASE_PRICE = 750; // ₳
+
+// Версии сервера (актуальные стабильные + LTS)
+const SERVER_VERSIONS = [
+  { id: "1.7.10", label: "1.7.10", mult: 1.3, note: "legacy" },
+  { id: "1.8.9", label: "1.8.9", mult: 1.15, note: "PvP legacy" },
+  { id: "1.12.2", label: "1.12.2", mult: 1.2, note: "modded LTS" },
+  { id: "1.16.5", label: "1.16.5", mult: 1.05 },
+  { id: "1.18.2", label: "1.18.2", mult: 1.0 },
+  { id: "1.19.4", label: "1.19.4", mult: 1.0 },
+  { id: "1.20.1", label: "1.20.1", mult: 1.0, note: "популярная" },
+  { id: "1.20.4", label: "1.20.4", mult: 1.0 },
+  { id: "1.20.6", label: "1.20.6", mult: 1.05 },
+  { id: "1.21", label: "1.21", mult: 1.1 },
+  { id: "1.21.4", label: "1.21.4", mult: 1.15, note: "latest" },
+] as const;
+
+// Ядра / платформы
+type CoreKind = "vanilla" | "bukkit" | "modded" | "hybrid" | "proxy";
+const SERVER_CORES: { id: string; label: string; kind: CoreKind; mult: number; note?: string }[] = [
+  { id: "vanilla", label: "Vanilla", kind: "vanilla", mult: 1.4, note: "без API" },
+  { id: "craftbukkit", label: "CraftBukkit", kind: "bukkit", mult: 1.05 },
+  { id: "spigot", label: "Spigot", kind: "bukkit", mult: 1.0 },
+  { id: "paper", label: "Paper", kind: "bukkit", mult: 1.0, note: "рекомендуем" },
+  { id: "purpur", label: "Purpur", kind: "bukkit", mult: 1.0 },
+  { id: "pufferfish", label: "Pufferfish", kind: "bukkit", mult: 1.05 },
+  { id: "folia", label: "Folia", kind: "bukkit", mult: 1.6, note: "регионы потоков" },
+  { id: "leaf", label: "Leaf", kind: "bukkit", mult: 1.1 },
+  { id: "leaves", label: "Leaves", kind: "bukkit", mult: 1.1 },
+  { id: "sponge", label: "Sponge", kind: "bukkit", mult: 1.3 },
+  { id: "forge", label: "Forge", kind: "modded", mult: 1.4 },
+  { id: "neoforge", label: "NeoForge", kind: "modded", mult: 1.4 },
+  { id: "fabric", label: "Fabric", kind: "modded", mult: 1.35 },
+  { id: "quilt", label: "Quilt", kind: "modded", mult: 1.4 },
+  { id: "mohist", label: "Mohist", kind: "hybrid", mult: 1.55, note: "Forge + Bukkit" },
+  { id: "arclight", label: "Arclight", kind: "hybrid", mult: 1.55, note: "Forge + Bukkit" },
+  { id: "magma", label: "Magma", kind: "hybrid", mult: 1.6 },
+  { id: "catserver", label: "CatServer", kind: "hybrid", mult: 1.6 },
+  { id: "velocity", label: "Velocity", kind: "proxy", mult: 1.25, note: "прокси" },
+  { id: "bungeecord", label: "BungeeCord", kind: "proxy", mult: 1.2, note: "прокси" },
+  { id: "waterfall", label: "Waterfall", kind: "proxy", mult: 1.2, note: "прокси" },
+];
+
+// Жанры серверов
+const SERVER_GENRES = [
+  { id: "survival", label: "Survival", mult: 1.0 },
+  { id: "vanilla_plus", label: "Vanilla+", mult: 1.0 },
+  { id: "hub", label: "Lobby / Hub", mult: 0.85 },
+  { id: "creative", label: "Creative", mult: 0.9 },
+  { id: "skyblock", label: "SkyBlock", mult: 1.2 },
+  { id: "anarchy", label: "Anarchy", mult: 1.05 },
+  { id: "faction", label: "Faction", mult: 1.3 },
+  { id: "towny", label: "Towny", mult: 1.35 },
+  { id: "prison", label: "Prison", mult: 1.4 },
+  { id: "economy", label: "Economy", mult: 1.4 },
+  { id: "minigames", label: "Minigames", mult: 1.5 },
+  { id: "bedwars", label: "BedWars", mult: 1.5 },
+  { id: "skywars", label: "SkyWars", mult: 1.45 },
+  { id: "hungergames", label: "HungerGames", mult: 1.5 },
+  { id: "pvp", label: "PvP-арена", mult: 1.3 },
+  { id: "rpg", label: "RPG", mult: 1.8 },
+  { id: "mmo", label: "MMO", mult: 2.0 },
+  { id: "roleplay", label: "Roleplay / RP", mult: 1.75 },
+  { id: "hardcore", label: "Hardcore", mult: 1.15 },
+  { id: "techmodded", label: "Tech / Modded", mult: 1.6 },
+];
+
 const REVIEWS_ROW1 = [
   { name: "_Luminis_", avatar: "L", text: "Турнир был организован безупречно — задержек ноль, судейство справедливое." },
   { name: "PixelDuke", avatar: "P", text: "Строительный конкурс прошёл на одном дыхании. Атмосфера — топ." },

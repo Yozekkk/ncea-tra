@@ -1026,6 +1026,7 @@ function HomePage() {
         <WhyWe />
         <PromoBanner />
         <Events />
+        <Plugins />
         <Reviews />
         <Contact />
       </main>

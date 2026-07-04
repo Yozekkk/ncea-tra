@@ -151,7 +151,7 @@ const DDOS_EXTENDED_PRICE = 1875; // Аргенты
 /* ---------- plugin build config data ---------- */
 
 // База за один плагин
-const PLUGIN_BASE_PRICE = 550; // ₳
+const PLUGIN_BASE_PRICE = 50; // ₳ (1 плагин = 0.5 $)
 const PLUGIN_MAX = 72;
 
 // Версии сервера (актуальные стабильные + LTS)

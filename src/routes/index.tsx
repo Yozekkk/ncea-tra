@@ -139,8 +139,8 @@ const CATEGORIES = {
     { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 850 },
   ],
   contests: [
-    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 90 },
-    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 675 },
+    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 70 },
+    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 520 },
   ],
 } as const;
 

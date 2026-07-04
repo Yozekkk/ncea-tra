@@ -135,8 +135,8 @@ const TYPES = [
 
 const CATEGORIES = {
   tournaments: [
-    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 60 },
-    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1125 },
+    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 45 },
+    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 850 },
   ],
   contests: [
     { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 90 },

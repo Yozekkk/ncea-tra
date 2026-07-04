@@ -135,12 +135,12 @@ const TYPES = [
 
 const CATEGORIES = {
   tournaments: [
-    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 60 },
-    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1125 },
+    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 45 },
+    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 850 },
   ],
   contests: [
-    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 90 },
-    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 675 },
+    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 70 },
+    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 520 },
   ],
 } as const;
 
@@ -151,7 +151,7 @@ const DDOS_EXTENDED_PRICE = 1875; // Аргенты
 /* ---------- plugin build config data ---------- */
 
 // База за один плагин
-const PLUGIN_BASE_PRICE = 550; // ₳
+const PLUGIN_BASE_PRICE = 50; // ₳ (1 плагин = 0.5 $)
 const PLUGIN_MAX = 72;
 
 // Версии сервера (актуальные стабильные + LTS)

@@ -135,23 +135,24 @@ const TYPES = [
 
 const CATEGORIES = {
   tournaments: [
-    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 80 },
-    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1500 },
+    { id: "pvp", label: "PvP-турниры", Icon: I.Sword, unit: "уч.", min: 4, max: 64, step: 2, def: 16, pricePerUnit: 60 },
+    { id: "quests", label: "Квесты", Icon: I.Compass, unit: "глав", min: 1, max: 10, step: 1, def: 3, pricePerUnit: 1125 },
   ],
   contests: [
-    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 120 },
-    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 900 },
+    { id: "build", label: "Строительные конкурсы", Icon: I.Hammer, unit: "блоков×100", min: 1, max: 50, step: 1, def: 12, pricePerUnit: 90 },
+    { id: "season", label: "Сезонные ивенты", Icon: I.Gift, unit: "дней", min: 1, max: 14, step: 1, def: 5, pricePerUnit: 675 },
   ],
 } as const;
 
 // 100 Аргентов = 1 $
 const ARG_PER_USD = 100;
-const DDOS_EXTENDED_PRICE = 2500; // Аргенты
+const DDOS_EXTENDED_PRICE = 1875; // Аргенты
 
 /* ---------- plugin build config data ---------- */
 
 // База за один плагин
-const PLUGIN_BASE_PRICE = 750; // ₳
+const PLUGIN_BASE_PRICE = 550; // ₳
+const PLUGIN_MAX = 72;
 
 // Версии сервера (актуальные стабильные + LTS)
 const SERVER_VERSIONS: { id: string; label: string; mult: number; note?: string }[] = [
@@ -638,7 +639,18 @@ function Plugins() {
   const genre = SERVER_GENRES.find((g) => g.id === genreId)!;
 
   // объёмная скидка: больше плагинов — дешевле за штуку
-  const bulk = count >= 10 ? 0.8 : count >= 5 ? 0.9 : 1.0;
+  const bulk =
+    count >= 40 ? 0.6 : count >= 20 ? 0.7 : count >= 10 ? 0.8 : count >= 5 ? 0.9 : 1.0;
+  const bulkLabel =
+    count >= 40
+      ? "−40% объёмная скидка"
+      : count >= 20
+      ? "−30% объёмная скидка"
+      : count >= 10
+      ? "−20% объёмная скидка"
+      : count >= 5
+      ? "−10% объёмная скидка"
+      : `от 1 до ${PLUGIN_MAX} шт.`;
   const base = Math.round(count * PLUGIN_BASE_PRICE * bulk);
   const subtotal = Math.round(base * core.mult * genre.mult * version.mult);
   const rushFee = rush ? Math.round(subtotal * 0.3) : 0;
@@ -674,9 +686,7 @@ function Plugins() {
                 <div>
                   <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 1</div>
                   <h3 className="font-display font-bold text-xl mt-1">Количество плагинов</h3>
-                  <div className="text-white/45 text-xs mt-1">
-                    {count >= 10 ? "−20% объёмная скидка" : count >= 5 ? "−10% объёмная скидка" : "от 1 до 30 шт."}
-                  </div>
+                  <div className="text-white/45 text-xs mt-1">{bulkLabel}</div>
                 </div>
                 <div className="font-display font-bold text-3xl">
                   {count} <span className="text-white/45 text-sm font-normal">шт.</span>
@@ -686,7 +696,7 @@ function Plugins() {
                 type="range"
                 className="brand-range w-full mt-5"
                 min={1}
-                max={30}
+                max={PLUGIN_MAX}
                 step={1}
                 value={count}
                 onChange={(e) => setCount(+e.target.value)}

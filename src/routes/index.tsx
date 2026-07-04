@@ -364,7 +364,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
           </h1>
           <p className="mt-6 text-white/60 text-base lg:text-lg max-w-2xl">
             NovaCraft Event Agency — организация и проведение PvP-турниров, строительных конкурсов,
-            квестов и сезонных ивентов на собственном Minecraft-сервере. Губерния Нова-Люминис.
+            квестов и сезонных ивентов. Также настройка Minecraft-серверов. Прописка Губерния Нова-Люминис.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button onClick={() => onNav("whywe")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">

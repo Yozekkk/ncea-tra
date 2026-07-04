@@ -807,7 +807,7 @@ function Plugins() {
               {total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
             </div>
             <div className="text-white/55 text-sm mt-2">
-              ≈ {usd} $ <span className="text-white/35">· 100 ₳ = 1 $</span>
+              ≈ {usd} $
             </div>
             <div className="text-white/45 text-xs mt-1">
               Цена в Аргентах — валюте Нова-Люминис.

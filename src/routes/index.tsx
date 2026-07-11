@@ -124,6 +124,7 @@ const NAV = [
   { id: "whywe", label: "Почему мы", Icon: I.Star },
   { id: "events", label: "Ивенты", Icon: I.Cube },
   { id: "plugins", label: "Плагины", Icon: I.Service },
+  { id: "custom", label: "Разработка", Icon: I.Hammer },
   { id: "team", label: "Команда", Icon: I.Group },
   { id: "contact", label: "Контакты", Icon: I.Chat },
 ];
@@ -627,7 +628,474 @@ function Events() {
   );
 }
 
+/* ---------- custom plugin development ---------- */
+
+type Complexity = "simple" | "medium" | "hard" | "very_hard";
+const COMPLEXITY: Record<Complexity, { label: string; price: number; desc: string; tone: string }> = {
+  simple:    { label: "Простая",       price: 300,  desc: "1–2 команды, лёгкая логика",           tone: "text-emerald-300" },
+  medium:    { label: "Средняя",       price: 700,  desc: "GUI, конфиг, события",                 tone: "text-sky-300" },
+  hard:      { label: "Сложная",       price: 1500, desc: "Многомодульная система, интеграции",   tone: "text-brand-orange" },
+  very_hard: { label: "Очень сложная", price: 3000, desc: "Крупная механика, кастомная логика",   tone: "text-brand-red" },
+};
+
+const CUSTOM_EXTRAS: { id: string; label: string; add: number; desc: string }[] = [
+  { id: "api",          label: "Открытое API",          add: 0.08, desc: "точки расширения для сторонних плагинов" },
+  { id: "web",          label: "Веб-панель",            add: 0.15, desc: "React/HTMX панель управления" },
+  { id: "db",           label: "Интеграция с БД",       add: 0.10, desc: "MySQL / PostgreSQL / MongoDB" },
+  { id: "placeholders", label: "PlaceholderAPI",        add: 0.05, desc: "плейсхолдеры для скорборда/чата" },
+  { id: "i18n",         label: "Мультиязычность",       add: 0.08, desc: "RU / EN / другие языки" },
+  { id: "metrics",      label: "Метрики / аналитика",   add: 0.07, desc: "bStats + собственный трекинг" },
+  { id: "discord",      label: "Discord-бот",           add: 0.12, desc: "двусторонняя связь через JDA" },
+  { id: "tests",        label: "Юнит-тесты",            add: 0.10, desc: "покрытие ключевой логики" },
+];
+
+const URGENCY_OPTS = [
+  { id: "normal", label: "Обычно", note: "2–3 недели",  mult: 1.0 },
+  { id: "fast",   label: "Быстро", note: "7 дней",      mult: 1.25 },
+  { id: "rush",   label: "Срочно", note: "72 часа",     mult: 1.6 },
+];
+
+const FIXES_OPTS = [
+  { id: "none", label: "Без поддержки", add: 0.0 },
+  { id: "m1",   label: "1 месяц",       add: 0.05 },
+  { id: "m3",   label: "3 месяца",      add: 0.12 },
+  { id: "m6",   label: "6 месяцев",     add: 0.25 },
+];
+
+type CustomPlugin = { id: string; name: string; complexity: Complexity };
+type CustomState = {
+  plugins: CustomPlugin[];
+  versionIds: string[];
+  coreId: string;
+  multiVersion: boolean;
+  sourceCode: boolean;
+  documentation: boolean;
+  fixes: string;
+  urgency: string;
+  extras: string[];
+};
+
+function makeCustomState(overrides?: Partial<CustomState>): CustomState {
+  return {
+    plugins: [{ id: "p1", name: "Плагин #1", complexity: "medium" }],
+    versionIds: ["1.20.1"],
+    coreId: "paper",
+    multiVersion: false,
+    sourceCode: false,
+    documentation: true,
+    fixes: "m1",
+    urgency: "normal",
+    extras: [],
+    ...overrides,
+  };
+}
+
+function computeCustom(s: CustomState) {
+  const core = SERVER_CORES.find((c) => c.id === s.coreId) ?? SERVER_CORES[3];
+  const versions = s.versionIds
+    .map((id) => SERVER_VERSIONS.find((v) => v.id === id))
+    .filter((v): v is (typeof SERVER_VERSIONS)[number] => Boolean(v));
+  const vMult = versions.length ? Math.max(...versions.map((v) => v.mult)) : 1;
+  const baseSum = s.plugins.reduce((sum, p) => sum + COMPLEXITY[p.complexity].price, 0);
+
+  let extraAdd = 0;
+  if (s.sourceCode) extraAdd += 0.2;
+  if (s.documentation) extraAdd += 0.15;
+  extraAdd += FIXES_OPTS.find((f) => f.id === s.fixes)?.add ?? 0;
+  for (const eid of s.extras) {
+    const e = CUSTOM_EXTRAS.find((x) => x.id === eid);
+    if (e) extraAdd += e.add;
+  }
+
+  const extraVersions = Math.max(0, s.versionIds.length - 1);
+  const multiVerMult = 1 + extraVersions * 0.12 + (s.multiVersion ? 0.2 : 0);
+
+  const urg = URGENCY_OPTS.find((u) => u.id === s.urgency) ?? URGENCY_OPTS[0];
+  const subtotal = baseSum * core.mult * vMult * multiVerMult * (1 + extraAdd);
+  const total = Math.round(subtotal * urg.mult);
+  return { total, baseSum, core, versions, vMult, multiVerMult, extraAdd, urg };
+}
+
+const CORE_GROUPS_ALL: { kind: CoreKind; label: string }[] = [
+  { kind: "bukkit", label: "Bukkit / Spigot / Paper" },
+  { kind: "modded", label: "Modded" },
+  { kind: "hybrid", label: "Hybrid (Forge + Bukkit)" },
+  { kind: "proxy",  label: "Proxy" },
+  { kind: "vanilla",label: "Vanilla" },
+];
+
+/* ---------- reusable custom-plugins form ---------- */
+function CustomPluginForm({
+  state,
+  setState,
+  compact = false,
+}: {
+  state: CustomState;
+  setState: (updater: (s: CustomState) => CustomState) => void;
+  compact?: boolean;
+}) {
+  const addPlugin = () =>
+    setState((s) => ({
+      ...s,
+      plugins: [
+        ...s.plugins,
+        { id: `p${Date.now()}`, name: `Плагин #${s.plugins.length + 1}`, complexity: "medium" },
+      ],
+    }));
+  const removePlugin = (id: string) =>
+    setState((s) => ({ ...s, plugins: s.plugins.filter((p) => p.id !== id) }));
+  const setPlugin = (id: string, patch: Partial<CustomPlugin>) =>
+    setState((s) => ({ ...s, plugins: s.plugins.map((p) => (p.id === id ? { ...p, ...patch } : p)) }));
+  const toggleVersion = (id: string) =>
+    setState((s) => ({
+      ...s,
+      versionIds: s.versionIds.includes(id)
+        ? s.versionIds.filter((v) => v !== id)
+        : [...s.versionIds, id],
+    }));
+  const toggleExtra = (id: string) =>
+    setState((s) => ({
+      ...s,
+      extras: s.extras.includes(id) ? s.extras.filter((e) => e !== id) : [...s.extras, id],
+    }));
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* plugins list */}
+      <div className="glass-card p-6 lg:p-8">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-[11px] tracking-widest uppercase text-white/40">Плагины</div>
+            <h3 className="font-display font-bold text-xl mt-1">Список и сложность</h3>
+            <div className="text-white/45 text-xs mt-1">Добавьте плагины — для каждого выберите сложность.</div>
+          </div>
+          <button
+            onClick={addPlugin}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-full gradient-btn text-sm font-medium"
+          >
+            + плагин
+          </button>
+        </div>
+        <div className="mt-5 flex flex-col gap-3">
+          {state.plugins.map((p, idx) => (
+            <div key={p.id} className="rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 fade-up">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10 text-white/50 text-xs font-display font-bold">
+                  {idx + 1}
+                </span>
+                <input
+                  value={p.name}
+                  onChange={(e) => setPlugin(p.id, { name: e.target.value })}
+                  className="flex-1 bg-transparent outline-none text-sm font-display font-semibold placeholder:text-white/25"
+                  placeholder={`Плагин #${idx + 1}`}
+                />
+                {state.plugins.length > 1 && (
+                  <button
+                    onClick={() => removePlugin(p.id)}
+                    className="w-8 h-8 inline-flex items-center justify-center rounded-full ring-1 ring-white/10 text-white/50 hover:text-brand-red hover:ring-brand-red transition"
+                    aria-label="Удалить"
+                  >
+                    <I.Close className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(Object.keys(COMPLEXITY) as Complexity[]).map((k) => {
+                  const opt = COMPLEXITY[k];
+                  const active = p.complexity === k;
+                  return (
+                    <button
+                      key={k}
+                      onClick={() => setPlugin(p.id, { complexity: k })}
+                      className={`rounded-xl p-3 text-left ring-1 transition-all duration-300 ${
+                        active ? "ring-brand-red bg-white/5" : "ring-white/10 bg-white/3 hover:ring-white/30"
+                      }`}
+                    >
+                      <div className={`text-xs font-display font-semibold ${opt.tone}`}>{opt.label}</div>
+                      <div className="text-white/40 text-[10px] mt-0.5">{opt.price} ₳</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* versions */}
+      <div className="glass-card p-6 lg:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-[11px] tracking-widest uppercase text-white/40">Версии</div>
+            <h3 className="font-display font-bold text-xl mt-1">Версии Minecraft</h3>
+            <div className="text-white/45 text-xs mt-1">
+              Можно выбрать несколько — цена вырастет за счёт поддержки.
+            </div>
+          </div>
+          <label className="inline-flex items-center gap-3 text-sm text-white/70">
+            <span>Мультиверсия</span>
+            <button
+              onClick={() => setState((s) => ({ ...s, multiVersion: !s.multiVersion }))}
+              className={`relative w-12 h-7 rounded-full ring-1 transition-all ${
+                state.multiVersion ? "bg-brand-red/30 ring-brand-red" : "bg-white/5 ring-white/15"
+              }`}
+              aria-pressed={state.multiVersion}
+            >
+              <span
+                className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-all ${
+                  state.multiVersion ? "left-6" : "left-1"
+                }`}
+              />
+            </button>
+          </label>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {SERVER_VERSIONS.map((v) => {
+            const active = state.versionIds.includes(v.id);
+            return (
+              <button
+                key={v.id}
+                onClick={() => toggleVersion(v.id)}
+                className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                  active
+                    ? "ring-brand-red bg-white/5 text-white"
+                    : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                }`}
+              >
+                <span className="font-display font-semibold">{v.label}</span>
+                {v.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{v.note}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* core */}
+      <div className="glass-card p-6 lg:p-8">
+        <div className="text-[11px] tracking-widest uppercase text-white/40">Ядро</div>
+        <h3 className="font-display font-bold text-xl mt-1">Целевая платформа</h3>
+        <div className="mt-5 flex flex-col gap-4">
+          {CORE_GROUPS_ALL.map((g) => {
+            const items = SERVER_CORES.filter((c) => c.kind === g.kind);
+            if (!items.length) return null;
+            return (
+              <div key={g.kind}>
+                <div className="text-[11px] tracking-widest uppercase text-white/35 mb-2">{g.label}</div>
+                <div className="flex flex-wrap gap-2">
+                  {items.map((c) => {
+                    const active = state.coreId === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => setState((s) => ({ ...s, coreId: c.id }))}
+                        className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                          active
+                            ? "ring-brand-red bg-white/5 text-white"
+                            : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                        }`}
+                      >
+                        <span className="font-display font-semibold">{c.label}</span>
+                        {c.note && (
+                          <span className="text-[10px] uppercase tracking-widest text-white/40">{c.note}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* deliverables */}
+      <div className="glass-card p-6 lg:p-8">
+        <div className="text-[11px] tracking-widest uppercase text-white/40">Поставка</div>
+        <h3 className="font-display font-bold text-xl mt-1">Что войдёт в сдачу</h3>
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { id: "sourceCode",    title: "Исходный код",  desc: "полные исходники + git-репозиторий", key: "sourceCode" as const },
+            { id: "documentation", title: "Документация",  desc: "README, API, конфиги",              key: "documentation" as const },
+          ].map((o) => {
+            const active = state[o.key];
+            return (
+              <button
+                key={o.id}
+                onClick={() => setState((s) => ({ ...s, [o.key]: !s[o.key] }))}
+                className={`rounded-2xl p-5 text-left transition-all duration-300 ring-1 ${
+                  active ? "ring-brand-red bg-white/5" : "ring-white/10 bg-white/3 hover:ring-white/30"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-display font-semibold">{o.title}</div>
+                  <span
+                    className={`inline-block w-2.5 h-2.5 rounded-full ${active ? "bg-brand-red" : "bg-white/15"}`}
+                  />
+                </div>
+                <div className="text-white/45 text-xs mt-1">{o.desc}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-5">
+          <div className="text-[11px] tracking-widest uppercase text-white/35 mb-2">Бесплатные исправления</div>
+          <div className="flex flex-wrap gap-2">
+            {FIXES_OPTS.map((f) => {
+              const active = state.fixes === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setState((s) => ({ ...s, fixes: f.id }))}
+                  className={`inline-flex items-center h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                    active
+                      ? "ring-brand-red bg-white/5 text-white"
+                      : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                  }`}
+                >
+                  <span className="font-display font-semibold">{f.label}</span>
+                  {f.add > 0 && (
+                    <span className="ml-2 text-[10px] uppercase tracking-widest text-white/40">
+                      +{Math.round(f.add * 100)}%
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* urgency */}
+      <div className="glass-card p-6 lg:p-8">
+        <div className="text-[11px] tracking-widest uppercase text-white/40">Срочность</div>
+        <h3 className="font-display font-bold text-xl mt-1">Сроки выполнения</h3>
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {URGENCY_OPTS.map((u) => {
+            const active = state.urgency === u.id;
+            return (
+              <button
+                key={u.id}
+                onClick={() => setState((s) => ({ ...s, urgency: u.id }))}
+                className={`rounded-2xl p-5 text-left transition-all duration-300 ring-1 ${
+                  active ? "ring-brand-red bg-white/5" : "ring-white/10 bg-white/3 hover:ring-white/30"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-display font-semibold">{u.label}</div>
+                  <span
+                    className={`inline-block w-2.5 h-2.5 rounded-full ${active ? "bg-brand-red" : "bg-white/15"}`}
+                  />
+                </div>
+                <div className="text-white/45 text-xs mt-1">{u.note}</div>
+                <div className="text-brand-orange text-[11px] mt-2 font-display font-semibold">
+                  ×{u.mult.toFixed(2)}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* extras */}
+      {!compact && (
+        <div className="glass-card p-6 lg:p-8">
+          <div className="text-[11px] tracking-widest uppercase text-white/40">Дополнительно</div>
+          <h3 className="font-display font-bold text-xl mt-1">Расширенные функции</h3>
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {CUSTOM_EXTRAS.map((e) => {
+              const active = state.extras.includes(e.id);
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => toggleExtra(e.id)}
+                  className={`rounded-2xl p-4 text-left transition-all duration-300 ring-1 ${
+                    active ? "ring-brand-red bg-white/5" : "ring-white/10 bg-white/3 hover:ring-white/30"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="font-display font-semibold text-sm">{e.label}</div>
+                    <span className="text-white/50 text-[11px]">+{Math.round(e.add * 100)}%</span>
+                  </div>
+                  <div className="text-white/45 text-xs mt-1">{e.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {compact && (
+        <div className="glass-card p-6 lg:p-8">
+          <div className="text-[11px] tracking-widest uppercase text-white/40">Дополнительно</div>
+          <h3 className="font-display font-bold text-xl mt-1">Быстрые опции</h3>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {CUSTOM_EXTRAS.map((e) => {
+              const active = state.extras.includes(e.id);
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => toggleExtra(e.id)}
+                  className={`inline-flex items-center gap-2 h-9 px-3 rounded-full text-xs transition-all duration-300 ring-1 ${
+                    active
+                      ? "ring-brand-red bg-white/5 text-white"
+                      : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                  }`}
+                >
+                  <span className="font-display font-semibold">{e.label}</span>
+                  <span className="text-white/40">+{Math.round(e.add * 100)}%</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CustomTotalsCard({ state, title = "Кастомная разработка" }: { state: CustomState; title?: string }) {
+  const r = computeCustom(state);
+  const usd = (r.total / ARG_PER_USD).toFixed(2);
+  return (
+    <div className="rounded-2xl bg-white/3 ring-1 ring-white/10 p-5">
+      <div className="text-[11px] tracking-widest uppercase text-white/40">{title}</div>
+      <div className="mt-2 font-display font-extrabold text-3xl">
+        {r.total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
+      </div>
+      <div className="text-white/55 text-xs mt-1">≈ {usd} $</div>
+      <ul className="mt-4 flex flex-col gap-1.5 text-xs text-white/65">
+        <li className="flex justify-between gap-3">
+          <span>База · {state.plugins.length} шт.</span>
+          <span className="font-display font-semibold text-white/85">{r.baseSum.toLocaleString("ru-RU")} ₳</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Ядро · {r.core.label}</span>
+          <span className="text-white/60">×{r.core.mult}</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Версии · {state.versionIds.length || "—"}</span>
+          <span className="text-white/60">×{(r.vMult * r.multiVerMult).toFixed(2)}</span>
+        </li>
+        <li className="flex justify-between gap-3">
+          <span>Опции</span>
+          <span className="text-white/60">+{Math.round(r.extraAdd * 100)}%</span>
+        </li>
+        <li className="flex justify-between gap-3 pt-2 mt-1 border-t border-white/5">
+          <span>Срочность · {r.urg.label}</span>
+          <span className="text-white/60">×{r.urg.mult}</span>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
 function Plugins() {
+  const [tab, setTab] = useState<"stack" | "custom">("stack");
+  const [useCustom, setUseCustom] = useState(false);
+  const [customState, setCustomState] = useState<CustomState>(() => makeCustomState());
+
+  // stack (готовая сборка)
   const [count, setCount] = useState(3);
   const [versionId, setVersionId] = useState<string>("1.20.1");
   const [coreId, setCoreId] = useState<string>("paper");
@@ -638,32 +1106,21 @@ function Plugins() {
   const core = SERVER_CORES.find((c) => c.id === coreId)!;
   const genre = SERVER_GENRES.find((g) => g.id === genreId)!;
 
-  // объёмная скидка: больше плагинов — дешевле за штуку
-  const bulk =
-    count >= 40 ? 0.6 : count >= 20 ? 0.7 : count >= 10 ? 0.8 : count >= 5 ? 0.9 : 1.0;
+  const bulk = count >= 40 ? 0.6 : count >= 20 ? 0.7 : count >= 10 ? 0.8 : count >= 5 ? 0.9 : 1.0;
   const bulkLabel =
-    count >= 40
-      ? "−40% объёмная скидка"
-      : count >= 20
-      ? "−30% объёмная скидка"
-      : count >= 10
-      ? "−20% объёмная скидка"
-      : count >= 5
-      ? "−10% объёмная скидка"
-      : `от 1 до ${PLUGIN_MAX} шт.`;
+    count >= 40 ? "−40% объёмная скидка"
+    : count >= 20 ? "−30% объёмная скидка"
+    : count >= 10 ? "−20% объёмная скидка"
+    : count >= 5 ? "−10% объёмная скидка"
+    : `от 1 до ${PLUGIN_MAX} шт.`;
   const base = Math.round(count * PLUGIN_BASE_PRICE * bulk);
   const subtotal = Math.round(base * core.mult * genre.mult * version.mult);
   const rushFee = rush ? Math.round(subtotal * 0.3) : 0;
-  const total = subtotal + rushFee;
-  const usd = (total / ARG_PER_USD).toFixed(2);
+  const stackTotal = subtotal + rushFee;
 
-  const CORE_GROUPS: { kind: CoreKind; label: string }[] = [
-    { kind: "bukkit", label: "Bukkit / Spigot / Paper" },
-    { kind: "modded", label: "Modded" },
-    { kind: "hybrid", label: "Hybrid (Forge + Bukkit)" },
-    { kind: "proxy", label: "Proxy" },
-    { kind: "vanilla", label: "Vanilla" },
-  ];
+  const customTotal = useCustom ? computeCustom(customState).total : 0;
+  const total = stackTotal + customTotal;
+  const usd = (total / ARG_PER_USD).toFixed(2);
 
   return (
     <section id="plugins" className="relative py-24 lg:py-32">
@@ -671,133 +1128,199 @@ function Plugins() {
       <Blob className="bg-brand-orange/15 w-[420px] h-[420px] bottom-[-80px] left-[-120px]" />
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="flex items-end justify-between flex-wrap gap-4">
-          <SectionHead kicker="Услуга" title="Сборка плагинов" accent="под ваш сервер" />
+          <SectionHead kicker="Конфигуратор" title="Сборка плагинов" accent="под ваш сервер" />
           <p className="text-white/45 max-w-sm text-sm">
-            Подберём, настроим и протестируем стек плагинов под ваше ядро, версию и жанр.
+            Готовый стек плагинов или собственная кастомная разработка — комбинируйте под задачу.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
+        {/* Tab bar */}
+        <div className="mt-8 inline-flex items-center gap-1 rounded-full bg-white/3 ring-1 ring-white/10 p-1">
+          {([
+            { id: "stack" as const, label: "Стек плагинов" },
+            { id: "custom" as const, label: "Кастомные плагины" },
+          ]).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`inline-flex items-center gap-2 h-10 px-5 rounded-full text-sm transition-all duration-300 ${
+                tab === t.id ? "bg-white text-black" : "text-white/70 hover:text-white"
+              }`}
+            >
+              {t.label}
+              {t.id === "custom" && useCustom && (
+                <span className="inline-flex w-2 h-2 rounded-full bg-brand-red" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
           {/* left config */}
           <div className="flex flex-col gap-4">
-            {/* count */}
-            <div className="glass-card p-6 lg:p-8">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 1</div>
-                  <h3 className="font-display font-bold text-xl mt-1">Количество плагинов</h3>
-                  <div className="text-white/45 text-xs mt-1">{bulkLabel}</div>
+            {tab === "stack" && (
+              <>
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 1</div>
+                      <h3 className="font-display font-bold text-xl mt-1">Количество плагинов</h3>
+                      <div className="text-white/45 text-xs mt-1">{bulkLabel}</div>
+                    </div>
+                    <div className="font-display font-bold text-3xl">
+                      {count} <span className="text-white/45 text-sm font-normal">шт.</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    className="brand-range w-full mt-5"
+                    min={1}
+                    max={PLUGIN_MAX}
+                    step={1}
+                    value={count}
+                    onChange={(e) => setCount(+e.target.value)}
+                  />
                 </div>
-                <div className="font-display font-bold text-3xl">
-                  {count} <span className="text-white/45 text-sm font-normal">шт.</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                className="brand-range w-full mt-5"
-                min={1}
-                max={PLUGIN_MAX}
-                step={1}
-                value={count}
-                onChange={(e) => setCount(+e.target.value)}
-              />
-            </div>
 
-            {/* version */}
-            <div className="glass-card p-6 lg:p-8">
-              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 2</div>
-              <h3 className="font-display font-bold text-xl mt-1">Версия сервера</h3>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {SERVER_VERSIONS.map((v) => {
-                  const active = versionId === v.id;
-                  return (
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 2</div>
+                  <h3 className="font-display font-bold text-xl mt-1">Версия сервера</h3>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {SERVER_VERSIONS.map((v) => {
+                      const active = versionId === v.id;
+                      return (
+                        <button
+                          key={v.id}
+                          onClick={() => setVersionId(v.id)}
+                          className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                            active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                          }`}
+                        >
+                          <span className="font-display font-semibold">{v.label}</span>
+                          {v.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{v.note}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 3</div>
+                  <h3 className="font-display font-bold text-xl mt-1">Ядро сервера</h3>
+                  <div className="mt-5 flex flex-col gap-4">
+                    {CORE_GROUPS_ALL.map((g) => {
+                      const items = SERVER_CORES.filter((c) => c.kind === g.kind);
+                      if (!items.length) return null;
+                      return (
+                        <div key={g.kind}>
+                          <div className="text-[11px] tracking-widest uppercase text-white/35 mb-2">{g.label}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {items.map((c) => {
+                              const active = coreId === c.id;
+                              return (
+                                <button
+                                  key={c.id}
+                                  onClick={() => setCoreId(c.id)}
+                                  className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                                    active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                                  }`}
+                                >
+                                  <span className="font-display font-semibold">{c.label}</span>
+                                  {c.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{c.note}</span>}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 4</div>
+                  <h3 className="font-display font-bold text-xl mt-1">Жанр сервера</h3>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {SERVER_GENRES.map((g) => {
+                      const active = genreId === g.id;
+                      return (
+                        <button
+                          key={g.id}
+                          onClick={() => setGenreId(g.id)}
+                          className={`inline-flex items-center h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
+                            active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                          }`}
+                        >
+                          <span className="font-display font-semibold">{g.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="flex items-start gap-4 justify-between">
+                    <div>
+                      <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 5</div>
+                      <h3 className="font-display font-bold text-xl mt-1">Срочная сборка</h3>
+                      <div className="text-white/55 text-sm mt-1">До 48 часов вместо 5–7 дней. +30% к стоимости.</div>
+                    </div>
                     <button
-                      key={v.id}
-                      onClick={() => setVersionId(v.id)}
-                      className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
-                        active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
-                      }`}
+                      onClick={() => setRush((r) => !r)}
+                      className={`relative w-14 h-8 rounded-full ring-1 transition-all ${rush ? "bg-brand-red/30 ring-brand-red" : "bg-white/5 ring-white/15"}`}
                     >
-                      <span className="font-display font-semibold">{v.label}</span>
-                      {v.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{v.note}</span>}
+                      <span className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${rush ? "left-7" : "left-1"}`} />
                     </button>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                </div>
+              </>
+            )}
 
-            {/* core */}
-            <div className="glass-card p-6 lg:p-8">
-              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 3</div>
-              <h3 className="font-display font-bold text-xl mt-1">Ядро сервера</h3>
-              <div className="mt-5 flex flex-col gap-4">
-                {CORE_GROUPS.map((g) => {
-                  const items = SERVER_CORES.filter((c) => c.kind === g.kind);
-                  if (!items.length) return null;
-                  return (
-                    <div key={g.kind}>
-                      <div className="text-[11px] tracking-widest uppercase text-white/35 mb-2">{g.label}</div>
-                      <div className="flex flex-wrap gap-2">
-                        {items.map((c) => {
-                          const active = coreId === c.id;
-                          return (
-                            <button
-                              key={c.id}
-                              onClick={() => setCoreId(c.id)}
-                              className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
-                                active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
-                              }`}
-                            >
-                              <span className="font-display font-semibold">{c.label}</span>
-                              {c.note && <span className="text-[10px] uppercase tracking-widest text-white/40">{c.note}</span>}
-                            </button>
-                          );
-                        })}
+            {tab === "custom" && (
+              <>
+                <div className="glass-card p-6 lg:p-8 fade-up">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-[11px] tracking-widest uppercase text-white/40">Кастомная разработка</div>
+                      <h3 className="font-display font-bold text-xl mt-1">Использовать кастомные плагины</h3>
+                      <div className="text-white/55 text-sm mt-1">
+                        Стоимость подключится к общей сумме сборки сервера.
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* genre */}
-            <div className="glass-card p-6 lg:p-8">
-              <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 4</div>
-              <h3 className="font-display font-bold text-xl mt-1">Жанр сервера</h3>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {SERVER_GENRES.map((g) => {
-                  const active = genreId === g.id;
-                  return (
                     <button
-                      key={g.id}
-                      onClick={() => setGenreId(g.id)}
-                      className={`inline-flex items-center h-10 px-4 rounded-full text-sm transition-all duration-300 ring-1 ${
-                        active ? "ring-brand-red bg-white/5 text-white" : "ring-white/10 bg-white/3 text-white/70 hover:ring-white/30"
+                      onClick={() => setUseCustom((u) => !u)}
+                      className={`relative w-16 h-9 shrink-0 rounded-full ring-1 transition-all duration-300 ${
+                        useCustom ? "bg-brand-red/30 ring-brand-red" : "bg-white/5 ring-white/15"
                       }`}
+                      aria-pressed={useCustom}
                     >
-                      <span className="font-display font-semibold">{g.label}</span>
+                      <span
+                        className={`absolute top-1 w-7 h-7 rounded-full bg-white shadow-lg transition-all duration-300 ${
+                          useCustom ? "left-8" : "left-1"
+                        }`}
+                      />
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* rush */}
-            <div className="glass-card p-6 lg:p-8">
-              <div className="flex items-start gap-4 justify-between">
-                <div>
-                  <div className="text-[11px] tracking-widest uppercase text-white/40">Шаг 5</div>
-                  <h3 className="font-display font-bold text-xl mt-1">Срочная сборка</h3>
-                  <div className="text-white/55 text-sm mt-1">До 48 часов вместо 5–7 дней. +30% к стоимости.</div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setRush((r) => !r)}
-                  className={`relative w-14 h-8 rounded-full ring-1 transition-all ${rush ? "bg-brand-red/30 ring-brand-red" : "bg-white/5 ring-white/15"}`}
-                >
-                  <span className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${rush ? "left-7" : "left-1"}`} />
-                </button>
-              </div>
-            </div>
+
+                {useCustom && (
+                  <div className="fade-up">
+                    <CustomPluginForm state={customState} setState={setCustomState} compact />
+                  </div>
+                )}
+
+                {!useCustom && (
+                  <div className="glass-card p-8 text-center fade-up">
+                    <div className="text-white/45 text-sm">
+                      Включите переключатель выше — откроются параметры кастомной разработки.
+                    </div>
+                    <div className="mt-3 text-white/35 text-xs">
+                      Нужен отдельный крупный проект? Загляните в раздел «Разработка» ниже.
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* right totals */}
@@ -806,18 +1329,14 @@ function Plugins() {
             <div className="mt-2 font-display font-extrabold text-5xl">
               {total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
             </div>
-            <div className="text-white/55 text-sm mt-2">
-              ≈ {usd} $
-            </div>
-            <div className="text-white/45 text-xs mt-1">
-              Цена в Аргентах — валюте Нова-Люминис.
-            </div>
+            <div className="text-white/55 text-sm mt-2">≈ {usd} $</div>
+            <div className="text-white/45 text-xs mt-1">Цена в Аргентах — валюте Нова-Люминис.</div>
 
             <div className="mt-6 rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 text-sm text-white/65 leading-relaxed">
-              <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Конфигурация</div>
+              <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Стек плагинов</div>
               <ul className="flex flex-col gap-1.5">
                 <li className="flex items-center justify-between gap-3">
-                  <span>Плагины · {count} шт. {bulk < 1 && <span className="text-brand-orange">(скидка ×{bulk})</span>}</span>
+                  <span>Плагины · {count} шт. {bulk < 1 && <span className="text-brand-orange">(×{bulk})</span>}</span>
                   <span className="font-display font-semibold text-white/85">{base.toLocaleString("ru-RU")} ₳</span>
                 </li>
                 <li className="flex items-center justify-between gap-3">
@@ -836,6 +1355,103 @@ function Plugins() {
                   <span>Срочность</span>
                   <span className="font-display font-semibold text-white/85">{rushFee.toLocaleString("ru-RU")} ₳</span>
                 </li>
+                <li className="flex items-center justify-between gap-3 pt-2 mt-1 border-t border-white/5 font-display">
+                  <span>Подытог стека</span>
+                  <span className="font-semibold text-white/90">{stackTotal.toLocaleString("ru-RU")} ₳</span>
+                </li>
+              </ul>
+            </div>
+
+            {useCustom && (
+              <div className="mt-4 fade-up">
+                <CustomTotalsCard state={customState} title="Кастомные плагины" />
+              </div>
+            )}
+
+            <div className="mt-6 flex flex-col gap-3">
+              <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full gradient-btn font-medium">
+                <I.Telegram className="w-5 h-5" /> Telegram {TELEGRAM_TAG}
+              </button>
+              <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center justify-center gap-2 h-12 rounded-full ring-1 ring-white/15 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Discord className="w-5 h-5" /> Discord {DISCORD_TAG}
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- standalone custom plugins section ---------- */
+
+function CustomPlugins() {
+  const [state, setState] = useState<CustomState>(() =>
+    makeCustomState({
+      plugins: [
+        { id: "p1", name: "Экономика сервера", complexity: "hard" },
+        { id: "p2", name: "Кастомные предметы", complexity: "medium" },
+      ],
+      extras: ["api", "placeholders"],
+    }),
+  );
+  const r = computeCustom(state);
+  const usd = (r.total / ARG_PER_USD).toFixed(2);
+
+  return (
+    <section id="custom" className="relative py-24 lg:py-32">
+      <Blob className="bg-brand-orange/20 w-[500px] h-[500px] -top-20 left-[-140px]" />
+      <Blob className="bg-brand-red/15 w-[420px] h-[420px] bottom-[-80px] right-[-140px]" />
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <SectionHead kicker="Разработка" title="Кастомные плагины" accent="под ключ" />
+          <p className="text-white/45 max-w-sm text-sm">
+            Собственная разработка Minecraft-плагинов любой сложности — от утилит до полноценных механик.
+          </p>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
+          <CustomPluginForm state={state} setState={setState} />
+
+          <aside className="glass-card p-6 lg:p-8 h-fit lg:sticky lg:top-24">
+            <div className="text-[11px] tracking-widest uppercase text-white/40">Итого разработки</div>
+            <div className="mt-2 font-display font-extrabold text-5xl">
+              {r.total.toLocaleString("ru-RU")} <span className="gradient-text">₳</span>
+            </div>
+            <div className="text-white/55 text-sm mt-2">≈ {usd} $</div>
+            <div className="text-white/45 text-xs mt-1">
+              Расчёт в реальном времени. Цена в Аргентах — валюте Нова-Люминис.
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-white/3 ring-1 ring-white/10 p-4 text-sm text-white/65 leading-relaxed">
+              <div className="text-[11px] tracking-widest uppercase text-white/40 mb-2">Конфигурация</div>
+              <ul className="flex flex-col gap-1.5">
+                <li className="flex justify-between gap-3">
+                  <span>База · {state.plugins.length} плагин(ов)</span>
+                  <span className="font-display font-semibold text-white/85">{r.baseSum.toLocaleString("ru-RU")} ₳</span>
+                </li>
+                <li className="flex justify-between gap-3">
+                  <span>Ядро · {r.core.label}</span>
+                  <span className="text-white/60">×{r.core.mult}</span>
+                </li>
+                <li className="flex justify-between gap-3">
+                  <span>Версии · {state.versionIds.length || "—"}</span>
+                  <span className="text-white/60">×{r.vMult.toFixed(2)}</span>
+                </li>
+                {(state.multiVersion || state.versionIds.length > 1) && (
+                  <li className="flex justify-between gap-3">
+                    <span>Мультиверсия</span>
+                    <span className="text-white/60">×{r.multiVerMult.toFixed(2)}</span>
+                  </li>
+                )}
+                <li className="flex justify-between gap-3">
+                  <span>Исходники / доки / поддержка / опции</span>
+                  <span className="text-white/60">+{Math.round(r.extraAdd * 100)}%</span>
+                </li>
+                <li className="flex justify-between gap-3 pt-2 mt-1 border-t border-white/5">
+                  <span>Срочность · {r.urg.label}</span>
+                  <span className="text-white/60">×{r.urg.mult}</span>
+                </li>
               </ul>
             </div>
 
@@ -853,6 +1469,8 @@ function Plugins() {
     </section>
   );
 }
+
+
 
 
 function ReviewCard({ name, avatar, text }: { name: string; avatar: string; text: string }) {
@@ -1037,6 +1655,7 @@ function HomePage() {
         <PromoBanner />
         <Events />
         <Plugins />
+        <CustomPlugins />
         <Reviews />
         <Contact />
       </main>

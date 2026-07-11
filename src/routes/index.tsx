@@ -124,6 +124,7 @@ const NAV = [
   { id: "whywe", label: "Почему мы", Icon: I.Star },
   { id: "events", label: "Ивенты", Icon: I.Cube },
   { id: "plugins", label: "Плагины", Icon: I.Service },
+  { id: "custom", label: "Разработка", Icon: I.Hammer },
   { id: "team", label: "Команда", Icon: I.Group },
   { id: "contact", label: "Контакты", Icon: I.Chat },
 ];

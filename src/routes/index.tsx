@@ -1655,6 +1655,7 @@ function HomePage() {
         <PromoBanner />
         <Events />
         <Plugins />
+        <CustomPlugins />
         <Reviews />
         <Contact />
       </main>

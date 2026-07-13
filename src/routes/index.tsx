@@ -1600,7 +1600,7 @@ function StaffAvatar({ name, src }: { name: string; src?: string }) {
   );
 }
 
-function StaffContactRow({ label, value, href, Icon }: { label: string; value: string; href: string; Icon: (p: IconProps) => React.ReactElement }) {
+function StaffContactRow({ label, value, href, Icon }: { label: string; value: string; href: string; Icon: (p: IconProps) => ReactElement }) {
   return (
     <a
       href={href}

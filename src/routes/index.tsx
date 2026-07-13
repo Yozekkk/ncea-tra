@@ -1836,6 +1836,7 @@ function HomePage() {
         <Plugins />
         <CustomPlugins />
         <Reviews />
+        <Staff />
         <Contact />
       </main>
       <Footer onNav={nav} />

@@ -1584,7 +1584,111 @@ function Reviews() {
   );
 }
 
+function StaffAvatar({ name, src }: { name: string; src?: string }) {
+  const initials = name.replace(/[\[\]]/g, "").trim().split(/\s+/).map((s) => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "?";
+  return (
+    <div className="relative">
+      <div className="absolute -inset-0.5 rounded-full bg-linear-to-br from-brand-red to-brand-orange opacity-70 blur-[6px] group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative w-20 h-20 rounded-full overflow-hidden ring-1 ring-white/15 bg-white/5 grid place-items-center font-display font-bold text-xl text-white/80">
+        {src ? (
+          <img src={src} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <span>{initials}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StaffContactRow({ label, value, href, Icon }: { label: string; value: string; href: string; Icon: (p: IconProps) => JSX.Element }) {
+  return (
+    <a
+      href={href}
+      className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors duration-200 group/link"
+    >
+      <span className="inline-flex w-6 h-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10 text-brand-orange group-hover/link:bg-white/10 transition">
+        <Icon className="w-3.5 h-3.5" />
+      </span>
+      <span className="text-white/40">{label}:</span>
+      <span className="truncate">{value}</span>
+    </a>
+  );
+}
+
+function StaffCard({ member, index }: { member: StaffMember; index: number }) {
+  return (
+    <div
+      className="group relative overflow-hidden glass-card p-6 lg:p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_rgba(255,80,60,0.35)] animate-fade-in opacity-0"
+      style={{ animationDelay: `${index * 70}ms`, animationFillMode: "forwards" }}
+    >
+      <div className="absolute inset-x-0 -top-px h-px bg-linear-to-r from-transparent via-brand-orange/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <Blob className="bg-brand-red/20 w-[220px] h-[220px] -top-24 -right-16 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+      <div className="relative flex items-center gap-4">
+        <StaffAvatar name={member.name} src={member.avatar} />
+        <div className="min-w-0">
+          <div className="font-display font-bold text-lg lg:text-xl truncate">{member.name}</div>
+          <div className="text-brand-orange text-xs tracking-wider uppercase mt-1">{member.role}</div>
+        </div>
+      </div>
+
+      <p className="relative mt-5 text-white/60 text-sm leading-relaxed">{member.description}</p>
+
+      <div className="relative mt-5 pt-5 border-t border-white/5">
+        <div className="text-[11px] tracking-[0.3em] uppercase text-white/40 mb-3">Контакты</div>
+        <div className="flex flex-col gap-2">
+          {member.discord && <StaffContactRow label="Discord" value={member.discord.label} href={member.discord.href} Icon={I.Discord} />}
+          {member.telegram && <StaffContactRow label="Telegram" value={member.telegram.label} href={member.telegram.href} Icon={I.Telegram} />}
+          {member.email && <StaffContactRow label="Email" value={member.email.label} href={member.email.href} Icon={I.Chat} />}
+          {member.github && <StaffContactRow label="GitHub" value={member.github.label} href={member.github.href} Icon={I.Cube} />}
+          {member.link && <StaffContactRow label="Ссылка" value={member.link.label} href={member.link.href} Icon={I.Arrow} />}
+        </div>
+      </div>
+
+      <a
+        href={member.contactHref || "#"}
+        className="relative mt-6 inline-flex items-center justify-center gap-2 h-11 px-5 w-full rounded-full gradient-btn font-medium text-sm opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+      >
+        <I.Chat className="w-4 h-4" /> Связаться
+      </a>
+    </div>
+  );
+}
+
+function Staff() {
+  return (
+    <section id="staff" className="relative py-24 lg:py-32 overflow-hidden">
+      <Blob className="bg-brand-orange/20 w-[500px] h-[500px] -top-20 -left-32" />
+      <Blob className="bg-brand-red/20 w-[420px] h-[420px] bottom-10 right-[-120px]" />
+      <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
+        <SectionHead kicker="Сотрудники" title="Команда, что" accent="делает NCEA" />
+        <p className="mt-4 max-w-2xl text-white/55 text-sm lg:text-base">
+          Люди, которые поддерживают сервер, придумывают ивенты, пишут плагины и общаются с игроками каждый день.
+        </p>
+
+        <div className="mt-14 space-y-16">
+          {STAFF_GROUPS.map((group) => (
+            <div key={group.title}>
+              <div className="flex items-center gap-4">
+                <h3 className="font-display font-bold text-2xl lg:text-3xl">{group.title}</h3>
+                <div className="flex-1 h-px bg-linear-to-r from-white/10 to-transparent" />
+                <div className="text-white/40 text-xs tracking-widest uppercase">{group.members.length}</div>
+              </div>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+                {group.members.map((m, i) => (
+                  <StaffCard key={`${group.title}-${i}`} member={m} index={i} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Contact() {
+
   return (
     <section id="contact" className="relative py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">

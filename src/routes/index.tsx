@@ -130,78 +130,23 @@ const NAV = [
   { id: "contact", label: "Контакты", Icon: I.Chat },
 ];
 
-/* ---------- staff (placeholders — заполняется вручную) ---------- */
+/* ---------- staff ---------- */
 
-type StaffLink = { href: string; label: string };
 type StaffMember = {
   name: string;
   role: string;
-  description: string;
-  avatar?: string; // URL или пусто → инициалы
-  discord?: StaffLink;
-  telegram?: StaffLink;
-  email?: StaffLink;
-  github?: StaffLink;
-  link?: StaffLink; // произвольная ссылка
-  contactHref?: string; // куда ведёт кнопка «Связаться»
+  age: number;
+  timezone: string;
+  telegram: string; // без @
+  avatar?: string;
 };
 
-type StaffGroup = { title: string; members: StaffMember[] };
-
-// Плейсхолдеры — замените вручную. Добавлять/удалять сотрудников можно
-// просто редактируя этот массив: дизайн подстроится автоматически.
-const STAFF_GROUPS: StaffGroup[] = [
-  {
-    title: "Руководство",
-    members: [
-      {
-        name: "[Имя]", role: "[Роль]", description: "[Описание]",
-        discord: { href: "#", label: "[Discord]" },
-        telegram: { href: "#", label: "[Telegram]" },
-        email: { href: "#", label: "[Email]" },
-        github: { href: "#", label: "[GitHub]" },
-        link: { href: "#", label: "[Ссылка]" },
-        contactHref: "#",
-      },
-    ],
-  },
-  {
-    title: "Full-Stack разработчики",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", discord: { href: "#", label: "[Discord]" }, telegram: { href: "#", label: "[Telegram]" }, email: { href: "#", label: "[Email]" }, github: { href: "#", label: "[GitHub]" }, contactHref: "#" },
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", discord: { href: "#", label: "[Discord]" }, telegram: { href: "#", label: "[Telegram]" }, email: { href: "#", label: "[Email]" }, github: { href: "#", label: "[GitHub]" }, contactHref: "#" },
-    ],
-  },
-  {
-    title: "Технические администраторы",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", discord: { href: "#", label: "[Discord]" }, telegram: { href: "#", label: "[Telegram]" }, email: { href: "#", label: "[Email]" }, contactHref: "#" },
-    ],
-  },
-  {
-    title: "Контент-мейкеры",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", telegram: { href: "#", label: "[Telegram]" }, link: { href: "#", label: "[Ссылка]" }, contactHref: "#" },
-    ],
-  },
-  {
-    title: "Дизайнеры",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", discord: { href: "#", label: "[Discord]" }, telegram: { href: "#", label: "[Telegram]" }, link: { href: "#", label: "[Ссылка]" }, contactHref: "#" },
-    ],
-  },
-  {
-    title: "Кураторы",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", discord: { href: "#", label: "[Discord]" }, telegram: { href: "#", label: "[Telegram]" }, contactHref: "#" },
-    ],
-  },
-  {
-    title: "Рекламные менеджеры",
-    members: [
-      { name: "[Имя]", role: "[Роль]", description: "[Описание]", telegram: { href: "#", label: "[Telegram]" }, email: { href: "#", label: "[Email]" }, contactHref: "#" },
-    ],
-  },
+const STAFF: StaffMember[] = [
+  { name: "Стас", role: "Куратор", age: 16, timezone: "MSK", telegram: "Stacyhomk" },
+  { name: "TheCusinatra", role: "Fullstack разработчик", age: 15, timezone: "MSK", telegram: "TheNekitttt" },
+  { name: "Антон", role: "Fullstack разработчик", age: 16, timezone: "GMT+2", telegram: "bloodeatervampire" },
+  { name: "Степан", role: "Контент-мейкер", age: 14, timezone: "MSK", telegram: "bblsmile" },
+  { name: "renosaza", role: "Full-stack", age: 19, timezone: "MSK", telegram: "rize02" },
 ];
 
 const TYPES = [

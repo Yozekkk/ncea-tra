@@ -125,7 +125,7 @@ const NAV = [
   { id: "events", label: "Ивенты", Icon: I.Cube },
   { id: "plugins", label: "Плагины", Icon: I.Service },
   { id: "custom", label: "Разработка", Icon: I.Hammer },
-  { id: "team", label: "Команда", Icon: I.Group },
+  { id: "team", label: "Отзывы", Icon: I.Group },
   { id: "staff", label: "Сотрудники", Icon: I.Shield },
   { id: "contact", label: "Контакты", Icon: I.Chat },
 ];

@@ -1560,8 +1560,8 @@ function StaffInfoRow({ Icon, label, value }: { Icon: (p: IconProps) => ReactEle
 function StaffCard({ member, index }: { member: StaffMember; index: number }) {
   return (
     <div
-      className="group relative overflow-hidden glass-card p-6 lg:p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_rgba(255,80,60,0.35)] animate-fade-in opacity-0"
-      style={{ animationDelay: `${index * 80}ms`, animationFillMode: "forwards" }}
+      className="group relative overflow-hidden glass-card p-6 lg:p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_rgba(255,80,60,0.35)] fade-up"
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       <div className="absolute inset-x-0 -top-px h-px bg-linear-to-r from-transparent via-brand-orange/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <Blob className="bg-brand-red/20 w-[220px] h-[220px] -top-24 -right-16 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />

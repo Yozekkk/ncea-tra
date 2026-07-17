@@ -388,7 +388,14 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
             <button onClick={() => onNav("events")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
               К ивентам <I.ArrowDown className="w-4 h-4" />
             </button>
+            <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+              <I.Discord className="w-5 h-5" /> Discord
+            </button>
+            <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+              <I.Telegram className="w-5 h-5" /> Telegram
+            </button>
           </div>
+
 
           <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
             {[

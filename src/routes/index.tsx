@@ -143,8 +143,8 @@ type StaffMember = {
 
 const STAFF: StaffMember[] = [
   { name: "Стас", role: "Куратор", age: 16, timezone: "MSK", telegram: "Stacyhomk" },
-  { name: "TheCusinatra", role: "Fullstack разработчик", age: 15, timezone: "MSK", telegram: "TheNekitttt" },
-  { name: "Антон", role: "Fullstack разработчик", age: 16, timezone: "GMT+2", telegram: "bloodeatervampire" },
+  { name: "TheCusinatra", role: "FULLSTACK\u00a0", age: 15, timezone: "MSK", telegram: "TheNekitttt" },
+  { name: "Антон", role: "FULLSTACK", age: 16, timezone: "GMT+2", telegram: "bloodeatervampire" },
   { name: "Степан", role: "Контент-мейкер", age: 14, timezone: "MSK", telegram: "bblsmile" },
   { name: "renosaza", role: "Full-stack", age: 19, timezone: "MSK", telegram: "rize02" },
 ];

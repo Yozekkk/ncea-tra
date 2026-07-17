@@ -286,9 +286,9 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8 h-16 flex items-center justify-between">
-        <a href="#home" onClick={(e) => { e.preventDefault(); onNav("home"); }} className="flex items-center gap-2">
+        <a href="#home" onClick={(e) => { e.preventDefault(); onNav("home"); }} className="flex items-center gap-2 shrink-0 whitespace-nowrap">
           <span className="relative inline-flex w-8 h-8 items-center justify-center rounded-lg bg-linear-to-br from-brand-red to-brand-orange text-white font-display font-bold text-sm shadow-[0_8px_24px_-6px_rgba(255,77,77,.6)]">N</span>
-          <span className="font-display font-bold text-lg tracking-tight">
+          <span className="font-display font-bold text-lg tracking-tight whitespace-nowrap">
             NovaCraft <span className="gradient-text">Event Agency</span>
           </span>
         </a>
@@ -298,7 +298,7 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
             <button
               key={id}
               onClick={() => onNav(id)}
-              className={`group inline-flex items-center gap-2 px-4 h-10 rounded-full text-sm transition-all duration-300 ${
+              className={`group inline-flex items-center gap-2 px-4 h-10 rounded-full text-sm transition-all duration-300 whitespace-nowrap ${
                 active === id ? "bg-white text-black" : "text-white/70 hover:text-white"
               }`}
             >
@@ -309,18 +309,11 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
         </nav>
 
         <div className="flex items-center gap-2">
-          <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)}
-            className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full gradient-btn text-sm font-medium">
-            <I.Discord className="w-4 h-4" /> Discord
-          </button>
-          <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)}
-            className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full ring-1 ring-white/15 text-sm text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-            <I.Telegram className="w-4 h-4" /> Telegram
-          </button>
           <button onClick={() => setOpen(true)} className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-full ring-1 ring-white/10 bg-white/3">
             <I.Menu className="w-5 h-5" />
           </button>
         </div>
+
       </div>
 
       {/* mobile menu */}

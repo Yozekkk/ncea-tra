@@ -366,49 +366,64 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
 
       {/* pixel illustrations */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.05] grayscale select-none">
-        <div className="absolute top-32 right-10 text-[180px] leading-none">⛏</div>
         <div className="absolute bottom-20 left-10 text-[160px] leading-none">🟧</div>
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 lg:px-8 w-full">
-        <div className="max-w-3xl fade-up">
-          <StatusPill />
-          <h1 className="mt-6 font-display font-extrabold tracking-tight text-4xl sm:text-5xl lg:text-[56px] leading-[0.95]">
-            Мы создаём <span className="gradient-text">события</span>,<br />
-            которые делают игру интереснее
-          </h1>
-          <p className="mt-6 text-white/60 text-base lg:text-lg max-w-2xl">
-            NovaCraft Event Agency — организация и проведение PvP-турниров, строительных конкурсов,
-            квестов и сезонных ивентов. Также настройка Minecraft-серверов. Прописка Губерния Нова-Люминис.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button onClick={() => onNav("whywe")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
-              Узнать подробнее <I.Arrow className="w-4 h-4" />
-            </button>
-            <button onClick={() => onNav("events")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-              К ивентам <I.ArrowDown className="w-4 h-4" />
-            </button>
-            <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-              <I.Discord className="w-5 h-5" /> Discord
-            </button>
-            <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
-              <I.Telegram className="w-5 h-5" /> Telegram
-            </button>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] items-center gap-10 lg:gap-16">
+          <div className="max-w-3xl fade-up">
+            <StatusPill />
+            <h1 className="mt-6 font-display font-extrabold tracking-tight text-4xl sm:text-5xl lg:text-[56px] leading-[0.95]">
+              Мы создаём <span className="gradient-text">события</span>,<br />
+              которые делают игру интереснее
+            </h1>
+            <p className="mt-6 text-white/60 text-base lg:text-lg max-w-2xl">
+              NovaCraft Event Agency — организация и проведение PvP-турниров, строительных конкурсов,
+              квестов и сезонных ивентов. Также настройка Minecraft-серверов. Прописка Губерния Нова-Люминис.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button onClick={() => onNav("whywe")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full gradient-btn font-medium">
+                Узнать подробнее <I.Arrow className="w-4 h-4" />
+              </button>
+              <button onClick={() => onNav("events")} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+                К ивентам <I.ArrowDown className="w-4 h-4" />
+              </button>
+              <button onClick={() => copy(DISCORD_TAG, `Discord-тег ${DISCORD_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Discord className="w-5 h-5" /> Discord
+              </button>
+              <button onClick={() => copy(TELEGRAM_TAG, `Telegram ${TELEGRAM_TAG} скопирован`)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-white/15 text-white/80 hover:bg-white hover:text-black transition-all duration-300">
+                <I.Telegram className="w-5 h-5" /> Telegram
+              </button>
+            </div>
+
+
+            <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
+              {[
+                { k: "10+", v: "проведённых ивентов" },
+                { k: "8+", v: "уникальных игроков" },
+                { k: "24/7", v: "поддержка сервера" },
+                { k: "99.9%", v: "аптайм" },
+              ].map((s) => (
+                <div key={s.v} className="glass-card px-4 py-4">
+                  <div className="font-display font-bold text-2xl gradient-text">{s.k}</div>
+                  <div className="text-[12px] text-white/55 mt-1">{s.v}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-
-          <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
-            {[
-              { k: "10+", v: "проведённых ивентов" },
-              { k: "8+", v: "уникальных игроков" },
-              { k: "24/7", v: "поддержка сервера" },
-              { k: "99.9%", v: "аптайм" },
-            ].map((s) => (
-              <div key={s.v} className="glass-card px-4 py-4">
-                <div className="font-display font-bold text-2xl gradient-text">{s.k}</div>
-                <div className="text-[12px] text-white/55 mt-1">{s.v}</div>
+          <div className="hidden lg:block fade-up">
+            <TiltCard className="w-[320px] xl:w-[380px]">
+              <div className="relative rounded-[32px] overflow-hidden ring-1 ring-white/10 bg-linear-to-br from-white/10 to-white/[0.02] p-6">
+                <div className="absolute inset-0 pointer-events-none bg-linear-to-br from-brand-red/20 via-transparent to-brand-orange/20" />
+                <img
+                  src={ncealogo}
+                  alt="NovaCraft Event Agency"
+                  className="relative w-full h-auto select-none"
+                  draggable={false}
+                />
               </div>
-            ))}
+            </TiltCard>
           </div>
         </div>
       </div>

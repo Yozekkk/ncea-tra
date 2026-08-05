@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { toast } from "sonner";
 import { TiltCard } from "@/components/TiltCard";
-import ncealogoAsset from "@/assets/ncea-logo.png.asset.json";
+import ncealogoAsset from "@/assets/ncea-mark.png.asset.json";
 const ncealogo = ncealogoAsset.url;
 
 export const Route = createFileRoute("/")({

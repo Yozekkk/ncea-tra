@@ -20,7 +20,6 @@ export type Opt = {
 
 export type Field =
   | { id: string; label: string; type: "select"; options: Opt[]; def: string; help?: string }
-  | { id: string; label: string; type: "multi"; options: Opt[]; help?: string }
   | { id: string; label: string; type: "toggle"; price?: number; mult?: number; def?: boolean; desc?: string }
   | {
       id: string;

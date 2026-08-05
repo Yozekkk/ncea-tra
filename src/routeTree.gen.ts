@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebsitesRouteImport } from './routes/websites'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SkinsRouteImport } from './routes/skins'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ServerSetupRouteImport } from './routes/server-setup'
 import { Route as ResourcepacksRouteImport } from './routes/resourcepacks'
 import { Route as PluginsRouteImport } from './routes/plugins'
@@ -36,6 +37,11 @@ const SupportRoute = SupportRouteImport.update({
 const SkinsRoute = SkinsRouteImport.update({
   id: '/skins',
   path: '/skins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServerSetupRoute = ServerSetupRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/plugins': typeof PluginsRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
+  '/services': typeof ServicesRoute
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/plugins': typeof PluginsRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
+  '/services': typeof ServicesRoute
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/plugins': typeof PluginsRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
+  '/services': typeof ServicesRoute
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/plugins'
     | '/resourcepacks'
     | '/server-setup'
+    | '/services'
     | '/skins'
     | '/support'
     | '/websites'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/plugins'
     | '/resourcepacks'
     | '/server-setup'
+    | '/services'
     | '/skins'
     | '/support'
     | '/websites'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/plugins'
     | '/resourcepacks'
     | '/server-setup'
+    | '/services'
     | '/skins'
     | '/support'
     | '/websites'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   PluginsRoute: typeof PluginsRoute
   ResourcepacksRoute: typeof ResourcepacksRoute
   ServerSetupRoute: typeof ServerSetupRoute
+  ServicesRoute: typeof ServicesRoute
   SkinsRoute: typeof SkinsRoute
   SupportRoute: typeof SupportRoute
   WebsitesRoute: typeof WebsitesRoute
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/skins'
       fullPath: '/skins'
       preLoaderRoute: typeof SkinsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/server-setup': {
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   PluginsRoute: PluginsRoute,
   ResourcepacksRoute: ResourcepacksRoute,
   ServerSetupRoute: ServerSetupRoute,
+  ServicesRoute: ServicesRoute,
   SkinsRoute: SkinsRoute,
   SupportRoute: SupportRoute,
   WebsitesRoute: WebsitesRoute,

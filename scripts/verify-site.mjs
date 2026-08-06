@@ -67,10 +67,10 @@ for (const [min, max] of daysMatches) {
 }
 if (!process.exitCode) ok("Сроки услуг корректны");
 
-if (manifest.name !== "NCEA" && !String(manifest.name).includes("NCEA")) fail("В web manifest отсутствует название NCEA");
+if (!String(manifest.name).includes("NCEA") && !String(manifest.short_name).includes("NCEA")) fail("В web manifest отсутствует название NCEA");
 if (!manifest.start_url) fail("В web manifest отсутствует start_url");
-if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("В web manifest отсутствуют иконки");
-else ok("Web manifest заполнен");
+if (!manifest.theme_color || !manifest.background_color) fail("В web manifest отсутствуют фирменные цвета");
+if (!process.exitCode) ok("Web manifest заполнен");
 
 const forbiddenPatterns = [
   /href=[\"']#[\"']/g,

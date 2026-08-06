@@ -1,0 +1,12 @@
+{
+  "name": "NovaCraft Event Agency",
+  "short_name": "NCEA",
+  "description": "Разработка и оформление Minecraft-проектов: плагины, сборки, сайты, карты, дизайн и ивенты.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#0c0a09",
+  "lang": "ru",
+  "categories": ["business", "games", "productivity"]
+}

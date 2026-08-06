@@ -1,0 +1,31 @@
+@keyframes ncea-intro-fade {
+  0% { opacity: 0; }
+  12%, 78% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes ncea-logo-enter {
+  0% { opacity: 0; transform: scale(.72) rotate(-5deg); filter: blur(10px); }
+  55% { opacity: 1; transform: scale(1.04) rotate(0); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ncea-title-enter {
+  0% { opacity: 0; transform: translateY(14px); letter-spacing: .3em; }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: .14em; }
+}
+
+@keyframes ncea-line-enter {
+  0% { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
+
+.ncea-intro { animation: ncea-intro-fade 1.45s ease both; }
+.ncea-intro-logo { animation: ncea-logo-enter .75s cubic-bezier(.2,.8,.2,1) both; }
+.ncea-intro-title { animation: ncea-title-enter .55s .32s ease both; }
+.ncea-intro-line { animation: ncea-line-enter .5s .48s ease both; transform-origin: center; }
+.ncea-intro-subtitle { animation: ncea-title-enter .45s .58s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ncea-intro { display: none !important; }
+}

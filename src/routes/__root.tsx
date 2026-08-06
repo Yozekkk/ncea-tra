@@ -8,16 +8,7 @@ import { I, LOGO_MARK, LOGO_ROUND } from "@/components/site/ui";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-const BUILD_LABEL = "NCEA v2 · обновлено 06.08";
-
-function BuildBadge() {
-  return (
-    <div className="fixed bottom-3 left-3 z-[70] rounded-full border border-brand-orange/30 bg-stone-950/90 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white/70 shadow-lg backdrop-blur-xl">
-      <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-brand-orange shadow-[0_0_10px_rgba(255,120,40,.9)]" />
-      {BUILD_LABEL}
-    </div>
-  );
-}
+const SITE_URL = "https://ncea-tra.vercel.app";
 
 function NotFoundComponent() {
   return (
@@ -68,12 +59,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0c0a09" },
-      { name: "ncea-build", content: "2026-08-06-v2" },
+      { name: "application-name", content: "NCEA" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { title: "NCEA — разработка и оформление Minecraft-проектов" },
       { name: "description", content: "NCEA создаёт плагины, сборки, сайты, карты, скины, ресурспаки, дизайн и ивенты для Minecraft-проектов." },
       { property: "og:title", content: "NCEA — разработка и оформление Minecraft-проектов" },
       { property: "og:description", content: "Плагины, серверные сборки, сайты, карты, дизайн, ресурспаки и комплексные решения для Minecraft-сообществ." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL },
       { property: "og:image", content: LOGO_MARK },
       { property: "og:image:alt", content: "Официальный логотип NCEA" },
       { name: "twitter:card", content: "summary" },
@@ -83,6 +77,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "canonical", href: SITE_URL },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "icon", type: "image/png", href: LOGO_ROUND },
       { rel: "apple-touch-icon", href: LOGO_ROUND },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -102,5 +98,5 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  return <QueryClientProvider client={queryClient}><Outlet /><BuildBadge /><Toaster position="bottom-right" theme="dark" /></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}><Outlet /><Toaster position="bottom-right" theme="dark" /></QueryClientProvider>;
 }

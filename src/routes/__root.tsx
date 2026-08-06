@@ -12,11 +12,7 @@ const SITE_URL = "https://ncea-tra.vercel.app";
 
 function RouteEffects() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, [pathname]);
-
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "auto" }); }, [pathname]);
   return null;
 }
 
@@ -26,7 +22,6 @@ function BrandIntro() {
   useEffect(() => {
     const alreadyShown = sessionStorage.getItem("ncea:intro:shown");
     if (alreadyShown) return;
-
     setVisible(true);
     sessionStorage.setItem("ncea:intro:shown", "1");
     const timer = window.setTimeout(() => setVisible(false), 1450);
@@ -119,6 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: "/ncea-intro.css" },
       { rel: "canonical", href: SITE_URL },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "icon", type: "image/png", href: LOGO_ROUND },

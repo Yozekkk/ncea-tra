@@ -137,6 +137,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "/ncea-intro.css" },
       { rel: "stylesheet", href: "/visual-fixes.css" },
       { rel: "stylesheet", href: "/nav-motion.css" },
+      { rel: "stylesheet", href: "/network-effects.css" },
       { rel: "canonical", href: SITE_URL },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "icon", type: "image/svg+xml", href: "/ncea-round.svg" },

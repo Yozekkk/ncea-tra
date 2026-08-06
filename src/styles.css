@@ -64,10 +64,14 @@
   * { border-color: var(--color-border); }
   html { scroll-behavior: smooth; }
   body {
-    background-color: var(--color-background);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,77,77,.06), transparent 28%),
+      radial-gradient(circle at 85% 8%, rgba(255,123,59,.05), transparent 24%),
+      var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
   button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
@@ -83,30 +87,49 @@
 }
 
 @utility gradient-btn {
-  background-image: linear-gradient(to right, var(--color-brand-red), var(--color-brand-orange));
-  filter: saturate(0.85);
+  background-image: linear-gradient(100deg, var(--color-brand-red), var(--color-brand-orange));
+  filter: saturate(0.92);
   color: #fff;
-  transition: filter .3s ease, transform .3s ease, box-shadow .3s ease;
-  box-shadow: 0 10px 30px -10px rgba(255, 77, 77, 0.55);
+  transition: filter .25s ease, transform .25s ease, box-shadow .25s ease;
+  box-shadow: 0 12px 34px -14px rgba(255, 77, 77, 0.7);
+  position: relative;
+  overflow: hidden;
 
-  &:hover { filter: saturate(1.2); transform: translateY(-1px); box-shadow: 0 18px 40px -10px rgba(255,123,59,.6); }
+  &:hover { filter: saturate(1.2); transform: translateY(-2px); box-shadow: 0 20px 46px -14px rgba(255,123,59,.72); }
   &:active { transform: translateY(0) scale(.985); }
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.2), transparent 70%);
+    transition: transform .5s ease;
+  }
+  &:hover::after { transform: translateX(120%); }
 }
 
 @utility gradient-text {
-  background-image: linear-gradient(to right, var(--color-brand-red), var(--color-brand-orange));
+  background-image: linear-gradient(95deg, #ff5050 5%, #ff7b3b 90%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 @utility glass-card {
-  background-color: rgba(255,255,255,0.03);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.052), rgba(255,255,255,.018));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.105),
+    0 24px 70px -55px rgba(0,0,0,.95);
   border-radius: 1.5rem;
   transition: box-shadow .3s ease, background-color .3s ease, transform .3s ease;
+  backdrop-filter: blur(18px);
 
-  &:hover { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), 0 24px 70px -45px rgba(255,100,40,.5); }
+  &:hover {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.2),
+      0 30px 78px -48px rgba(255,100,40,.45);
+  }
 }
 
 @keyframes fade-up {
@@ -114,6 +137,16 @@
   to { opacity: 1; transform: translateY(0); }
 }
 @utility fade-up { animation: fade-up .55s cubic-bezier(.22,.8,.25,1) both; }
+
+@keyframes float-soft {
+  0%, 100% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(0,-9px,0); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(255,77,77,.18)); }
+  50% { filter: drop-shadow(0 0 34px rgba(255,123,59,.33)); }
+}
 
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -165,6 +198,113 @@ input[type="range"].brand-range::-moz-range-thumb {
   mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
 }
 
+/* Главная страница уровня digital agency */
+#home {
+  isolation: isolate;
+}
+
+#home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(12,10,9,.05), rgba(12,10,9,.55)),
+    radial-gradient(circle at 72% 28%, rgba(255,77,77,.085), transparent 27%);
+  z-index: -1;
+}
+
+#home h1 {
+  text-wrap: balance;
+  text-shadow: 0 20px 70px rgba(0,0,0,.55);
+}
+
+#home img[alt="NCEA"],
+#home img[alt*="NCEA"] {
+  animation: glow-breathe 4.5s ease-in-out infinite;
+}
+
+#home .glass-card {
+  border: 1px solid rgba(255,123,59,.08);
+}
+
+#home .glass-card:hover {
+  transform: translateY(-2px);
+}
+
+#about article,
+#services-preview article,
+#portfolio article,
+#team article {
+  position: relative;
+  overflow: hidden;
+}
+
+#about article::before,
+#services-preview article::before,
+#portfolio article::before,
+#team article::before {
+  content: "";
+  position: absolute;
+  inset: auto -35% -55% 30%;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255,92,40,.13), transparent 68%);
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+
+#about article:hover::before,
+#services-preview article:hover::before,
+#portfolio article:hover::before,
+#team article:hover::before {
+  opacity: 1;
+}
+
+#services-preview article {
+  border: 1px solid transparent;
+}
+
+#services-preview article:hover {
+  border-color: rgba(255,123,59,.18);
+  transform: translateY(-6px);
+}
+
+#portfolio article {
+  min-height: 260px;
+  background:
+    linear-gradient(165deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    radial-gradient(circle at 85% 5%, rgba(255,77,77,.1), transparent 32%);
+}
+
+#portfolio article:hover {
+  transform: translateY(-5px) scale(1.01);
+}
+
+#team article {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.04), rgba(255,255,255,.016));
+}
+
+#faq button {
+  transition: background-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+
+#faq button:hover {
+  background-color: rgba(255,255,255,.055);
+  box-shadow: inset 0 0 0 1px rgba(255,123,59,.16);
+}
+
+footer {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,77,77,.07), transparent 24%),
+    linear-gradient(to bottom, rgba(255,255,255,.01), transparent 30%);
+}
+
+footer img[alt*="NCEA"] {
+  filter: drop-shadow(0 0 18px rgba(255,95,35,.2));
+}
+
 /* Улучшения пошаговых конфигураторов */
 section[aria-label^="Конфигуратор"] {
   background:
@@ -213,6 +353,12 @@ aside.glass-card .gradient-text {
   text-shadow: 0 12px 34px rgba(255,77,77,.25);
 }
 
+@media (min-width: 1024px) {
+  #home > div.relative.mx-auto.grid > div:last-child {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+}
+
 @media (max-width: 1023px) {
   section[aria-label^="Конфигуратор"] { border-radius: 1.25rem; }
   aside.glass-card {
@@ -229,9 +375,13 @@ aside.glass-card .gradient-text {
 }
 
 @media (max-width: 640px) {
+  #home { min-height: auto; padding-top: 7rem; }
+  #home h1 { font-size: clamp(2.8rem, 14vw, 4rem); }
+  #home .glass-card { border-radius: 1.25rem; }
+  #about, #portfolio, #team, #faq { scroll-margin-top: 5rem; }
   section[aria-label^="Конфигуратор"] { padding: 1.15rem; }
   section[aria-label^="Конфигуратор"] button[aria-pressed] { min-height: 44px; }
-  aside.glass-card { padding: 1rem; }
+  aside.glass-card { padding: 1rem; bottom: max(10px, env(safe-area-inset-bottom)); }
   aside.glass-card .gradient-text { font-size: 2rem; }
 }
 

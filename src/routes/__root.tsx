@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { Outlet, Link, createRootRouteWithContext, useRouter, useRouterState, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,6 +9,48 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const SITE_URL = "https://ncea-tra.vercel.app";
+
+function RouteEffects() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+}
+
+function BrandIntro() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const alreadyShown = sessionStorage.getItem("ncea:intro:shown");
+    if (alreadyShown) return;
+
+    setVisible(true);
+    sessionStorage.setItem("ncea:intro:shown", "1");
+    const timer = window.setTimeout(() => setVisible(false), 1450);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-stone-950" aria-hidden="true">
+      <div className="noise absolute inset-0 opacity-40" />
+      <div className="absolute h-[440px] w-[440px] rounded-full bg-brand-red/18 blur-[110px]" />
+      <div className="relative flex flex-col items-center px-6 text-center">
+        <div className="ncea-intro-logo relative">
+          <div className="absolute inset-4 rounded-full bg-brand-orange/20 blur-3xl" />
+          <img src={LOGO_MARK} alt="" className="relative h-36 w-36 object-contain sm:h-44 sm:w-44" />
+        </div>
+        <div className="ncea-intro-title mt-5 font-display text-3xl font-black tracking-[.14em] sm:text-4xl">NCEA</div>
+        <div className="ncea-intro-line mt-4 h-px w-44 bg-linear-to-r from-transparent via-brand-orange to-transparent" />
+        <div className="ncea-intro-subtitle mt-3 text-xs uppercase tracking-[.28em] text-white/45">NovaCraft Event Agency</div>
+      </div>
+    </div>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -41,7 +83,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="relative flex min-h-screen items-center justify-center bg-stone-950 px-4 text-white">
       <div className="noise fixed inset-0 opacity-40 pointer-events-none" />
       <div className="relative max-w-md text-center glass-card p-8">
-        <img src={LOGO_ROUND} alt="NCEA" className="mx-auto h-16 w-16 object-contain" />
+        <img src={LOGO_ROUND} alt="NCEA" className="mx-auto h-20 w-20 rounded-full object-contain ring-1 ring-white/10" />
         <h1 className="mt-5 font-display text-2xl font-bold">Страница не загрузилась</h1>
         <p className="mt-3 text-sm text-white/55">Произошла техническая ошибка. Попробуйте загрузить страницу повторно или вернитесь на главную.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
@@ -98,5 +140,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  return <QueryClientProvider client={queryClient}><Outlet /><Toaster position="bottom-right" theme="dark" /></QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouteEffects />
+      <BrandIntro />
+      <Outlet />
+      <Toaster position="bottom-right" theme="dark" />
+    </QueryClientProvider>
+  );
 }

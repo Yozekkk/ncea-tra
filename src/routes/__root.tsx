@@ -47,7 +47,7 @@ function BrandIntro() {
     if (alreadyShown) return;
     setVisible(true);
     sessionStorage.setItem("ncea:intro:shown", "1");
-    const timer = window.setTimeout(() => setVisible(false), 1450);
+    const timer = window.setTimeout(() => setVisible(false), 1650);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -56,15 +56,11 @@ function BrandIntro() {
   return (
     <div className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-stone-950" aria-hidden="true">
       <div className="noise absolute inset-0 opacity-40" />
-      <div className="absolute h-[440px] w-[440px] rounded-full bg-brand-red/18 blur-[110px]" />
-      <div className="relative flex flex-col items-center px-6 text-center">
-        <div className="ncea-intro-logo relative">
-          <div className="absolute inset-4 rounded-full bg-brand-orange/20 blur-3xl" />
-          <img src={LOGO_MARK} alt="" className="round-brand-image relative h-36 w-36 sm:h-44 sm:w-44" />
-        </div>
-        <div className="ncea-intro-title mt-5 font-display text-3xl font-black tracking-[.14em] sm:text-4xl">NCEA</div>
-        <div className="ncea-intro-line mt-4 h-px w-44 bg-linear-to-r from-transparent via-brand-orange to-transparent" />
-        <div className="ncea-intro-subtitle mt-3 text-xs uppercase tracking-[.28em] text-white/45">NovaCraft Event Agency</div>
+      <div className="absolute left-1/2 top-1/2 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-red/16 blur-[120px]" />
+      <div className="ncea-intro-scan" />
+      <div className="relative flex flex-col items-center px-6 text-center [perspective:900px]">
+        <div className="ncea-wordmark" aria-label="NCEA"><span>N</span><span>C</span><span>E</span><span>A</span></div>
+        <div className="ncea-intro-caption mt-12 text-[10px] font-semibold uppercase tracking-[.42em] text-white/48 sm:text-xs">NovaCraft Event Agency</div>
       </div>
     </div>
   );
@@ -132,7 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:alt", content: "Официальный логотип NCEA" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "NCEA — разработка и оформление Minecraft-проектов" },
-      { name: "twitter:description", content: "Плагины, серверные сборки, сайты, карты, дизайн, ресурспаки и ивенты для Minecraft-проектов." },
+      { name: "twitter:description", content: "Плагины, сборки, сайты, карты, дизайн, ресурспаки и ивенты для Minecraft-проектов." },
       { name: "twitter:image", content: `${SITE_URL}/ncea-mark.svg` },
     ],
     links: [
@@ -140,6 +136,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: liquidCss },
       { rel: "stylesheet", href: "/ncea-intro.css" },
       { rel: "stylesheet", href: "/visual-fixes.css" },
+      { rel: "stylesheet", href: "/nav-motion.css" },
       { rel: "canonical", href: SITE_URL },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "icon", type: "image/svg+xml", href: "/ncea-round.svg" },

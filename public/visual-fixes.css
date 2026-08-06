@@ -1,0 +1,98 @@
+/* NCEA — финальные визуальные исправления */
+:root { --header-height: 72px; }
+
+header {
+  background: linear-gradient(180deg, rgba(12,10,9,.84), rgba(12,10,9,.42));
+  border-bottom: 1px solid rgba(255,255,255,.055);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+header nav[aria-label="Основная навигация"] {
+  background: rgba(255,255,255,.045) !important;
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055), 0 16px 44px rgba(0,0,0,.18);
+}
+
+header nav[aria-label="Основная навигация"] a[aria-current="page"] {
+  color: #17110f !important;
+  background: linear-gradient(135deg, #fff, #f4eee9) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18) !important;
+}
+
+header img,
+.round-brand-image {
+  display: block;
+  object-fit: cover !important;
+  object-position: center;
+  border-radius: 999px !important;
+  background: #171211;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.13), 0 10px 28px rgba(255,87,48,.16);
+}
+
+/* Чётче и легче стекло */
+.glass-card,
+.liquid-panel,
+section[aria-label^="Конфигуратор"] {
+  background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 24px 70px -45px rgba(0,0,0,.95) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(115%) !important;
+  backdrop-filter: blur(16px) saturate(115%) !important;
+}
+
+/* Карточка Project Center */
+#home .glass-card {
+  border-radius: 28px !important;
+  overflow: hidden;
+}
+
+#home .glass-card img {
+  flex: 0 0 auto;
+  object-fit: cover !important;
+  border-radius: 999px;
+}
+
+#home .glass-card a.group {
+  border-radius: 22px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.035)) !important;
+  border: 1px solid rgba(255,255,255,.11) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+#home .glass-card a.group:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(255,122,60,.34) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,91,55,.055)) !important;
+}
+
+/* Читаемость */
+h1, h2, h3, .font-display { text-wrap: balance; }
+p { text-wrap: pretty; }
+.text-white\/38, .text-white\/40, .text-white\/42, .text-white\/45 { color: rgba(255,255,255,.53) !important; }
+.text-white\/50, .text-white\/52, .text-white\/55, .text-white\/58 { color: rgba(255,255,255,.66) !important; }
+
+.gradient-btn {
+  box-shadow: 0 12px 30px -12px rgba(255,84,54,.72) !important;
+}
+
+@media (max-width: 1180px) {
+  header nav[aria-label="Основная навигация"] { gap: 0 !important; }
+  header nav[aria-label="Основная навигация"] > * { padding-left: .75rem !important; padding-right: .75rem !important; }
+}
+
+@media (max-width: 1023px) {
+  header { background: rgba(12,10,9,.82); }
+  #home { min-height: auto !important; padding-top: 7rem !important; }
+  #home h1 { font-size: clamp(2.65rem, 11vw, 4.4rem) !important; line-height: .98 !important; }
+  #home .glass-card { margin-top: .5rem; }
+}
+
+@media (max-width: 640px) {
+  #home { padding-bottom: 3.5rem !important; }
+  #home .glass-card { padding: 1rem !important; border-radius: 22px !important; }
+  #home .glass-card a.group { min-height: 126px; padding: .9rem !important; }
+  #home .glass-card .grid { gap: .65rem !important; }
+  .gradient-btn, .liquid-secondary { min-height: 46px; }
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { I } from "@/components/site/ui";
+import { I, LOGO_MARK } from "@/components/site/ui";
 import { GROUPS, SERVICES } from "@/lib/services";
 
 const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
@@ -151,25 +151,26 @@ export function SiteHeader() {
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "border-b border-white/7 bg-black/58 backdrop-blur-2xl" : "bg-black/18 backdrop-blur-md"}`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
-        <Link to="/" aria-label="NCEA — на главную" className="shrink-0 whitespace-nowrap" onClick={() => moveTo("home")}>
-          <span className="font-display text-base font-bold tracking-tight lg:text-lg">NCEA <span className="gradient-text">Event Agency</span></span>
+        <Link to="/" aria-label="NCEA — на главную" className="flex shrink-0 items-center gap-2.5 whitespace-nowrap" onClick={() => moveTo("home")}>
+          <img src={LOGO_MARK} alt="" width={36} height={36} className="h-9 w-9 rounded-xl object-cover ring-1 ring-white/10" />
+          <span className="font-display text-sm font-extrabold tracking-tight lg:text-base">NCEA <span className="gradient-text">Event Agency</span></span>
         </Link>
 
         <nav ref={navRef} aria-label="Основная навигация" className="liquid-nav relative hidden items-center gap-1 rounded-full p-1 lg:flex">
           <span className="liquid-nav-indicator pointer-events-none absolute bottom-1 top-1 rounded-full" style={{ transform: `translateX(${indicator.left}px)`, width: indicator.width, opacity: indicator.opacity }} />
-          <Link ref={(node) => { itemRefs.current.home = node; }} to="/" onClick={() => moveTo("home")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "home" ? "text-black" : "text-white/66 hover:text-white"}`}>Главная</Link>
-          <button ref={(node) => { itemRefs.current.about = node; }} onClick={() => hashClick("about", "about")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "about" ? "text-black" : "text-white/66 hover:text-white"}`}>О нас</button>
+          <Link ref={(node) => { itemRefs.current.home = node; }} to="/" onClick={() => moveTo("home")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "home" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>Главная</Link>
+          <button ref={(node) => { itemRefs.current.about = node; }} onClick={() => hashClick("about", "about")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "about" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>О нас</button>
 
           <div ref={megaRef} className="relative z-10" onMouseEnter={() => setMega(true)} onMouseLeave={() => setMega(false)}>
-            <button ref={(node) => { itemRefs.current.services = node; }} type="button" aria-expanded={mega} aria-haspopup="menu" onClick={() => { moveTo("services"); setMega((value) => !value); }} className={`nav-liquid-item inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm transition ${active === "services" ? "text-black" : "text-white/66 hover:text-white"}`}>
+            <button ref={(node) => { itemRefs.current.services = node; }} type="button" aria-expanded={mega} aria-haspopup="menu" onClick={() => { moveTo("services"); setMega((value) => !value); }} className={`nav-liquid-item inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm transition ${active === "services" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>
               Услуги <I.Chevron className={`h-4 w-4 transition-transform ${mega ? "rotate-180" : ""}`} />
             </button>
             {mega && <MegaMenu onPick={() => setMega(false)} />}
           </div>
 
-          <button ref={(node) => { itemRefs.current.portfolio = node; }} onClick={() => hashClick("portfolio", "portfolio")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "portfolio" ? "text-black" : "text-white/66 hover:text-white"}`}>Портфолио</button>
-          <button ref={(node) => { itemRefs.current.team = node; }} onClick={() => hashClick("team", "team")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "team" ? "text-black" : "text-white/66 hover:text-white"}`}>Отзывы</button>
-          <button ref={(node) => { itemRefs.current.partner = node; }} onClick={() => hashClick("partner", "partner")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "partner" ? "text-black" : "text-white/66 hover:text-white"}`}>Сотрудничество</button>
+          <button ref={(node) => { itemRefs.current.portfolio = node; }} onClick={() => hashClick("portfolio", "portfolio")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "portfolio" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>Портфолио</button>
+          <button ref={(node) => { itemRefs.current.team = node; }} onClick={() => hashClick("team", "team")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "team" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>Отзывы</button>
+          <button ref={(node) => { itemRefs.current.partner = node; }} onClick={() => hashClick("partner", "partner")} className={`nav-liquid-item relative z-10 inline-flex h-10 items-center rounded-full px-4 text-sm transition ${active === "partner" ? "text-white font-semibold" : "text-white/66 hover:text-white"}`}>Сотрудничество</button>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -181,7 +182,7 @@ export function SiteHeader() {
       {open && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/94 backdrop-blur-2xl lg:hidden" role="dialog" aria-modal="true" aria-label="Мобильное меню">
           <div className="sticky top-0 flex h-16 items-center justify-between border-b border-white/7 bg-black/55 px-4 backdrop-blur-2xl">
-            <Link to="/" onClick={() => setOpen(false)} className="font-display font-bold">NCEA <span className="gradient-text">Event Agency</span></Link>
+            <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2.5 font-display text-sm font-extrabold"><img src={LOGO_MARK} alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-cover ring-1 ring-white/10" />NCEA <span className="gradient-text">Event Agency</span></Link>
             <button type="button" aria-label="Закрыть меню" onClick={() => setOpen(false)} className="inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-white/12"><I.Close className="h-5 w-5" /></button>
           </div>
           <div className="flex flex-col gap-2 px-4 py-5 pb-10">

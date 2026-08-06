@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { I, LOGO_MARK, LOGO_ROUND } from "@/components/site/ui";
+import { I, LOGO_ROUND } from "@/components/site/ui";
 import appCss from "../styles.css?url";
 import liquidCss from "../liquid.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -73,7 +73,7 @@ function NotFoundComponent() {
       <SiteHeader />
       <main className="relative z-10 min-h-[82vh] flex items-center justify-center px-4 pt-24 pb-16">
         <div className="max-w-2xl text-center liquid-panel p-8 sm:p-12">
-          <img src={LOGO_MARK} alt="NCEA" className="round-brand-image mx-auto h-28 w-28" />
+          <img src={LOGO_ROUND} alt="NCEA" width={112} height={112} className="round-brand-image mx-auto h-28 w-28" />
           <div className="mt-4 font-display text-8xl sm:text-9xl font-black gradient-text">404</div>
           <h1 className="mt-3 font-display text-2xl sm:text-4xl font-bold">Страница не найдена</h1>
           <p className="mx-auto mt-4 max-w-lg text-sm sm:text-base text-white/55">Возможно, адрес изменился или такой страницы больше нет. Вернитесь на главную либо откройте каталог услуг NCEA.</p>
@@ -114,7 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0c0a09" },
+      { name: "theme-color", content: "#050505" },
       { name: "application-name", content: "NCEA" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -124,27 +124,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Плагины, серверные сборки, сайты, карты, дизайн, ресурспаки и комплексные решения для Minecraft-сообществ." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
-      { property: "og:image", content: `${SITE_URL}/ncea-mark.svg` },
+      { property: "og:image", content: `${SITE_URL}/images/brand/ncea-logo-mark.webp` },
       { property: "og:image:alt", content: "Официальный логотип NCEA" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "NCEA — разработка и оформление Minecraft-проектов" },
       { name: "twitter:description", content: "Плагины, сборки, сайты, карты, дизайн, ресурспаки и ивенты для Minecraft-проектов." },
-      { name: "twitter:image", content: `${SITE_URL}/ncea-mark.svg` },
+      { name: "twitter:image", content: `${SITE_URL}/images/brand/ncea-logo-mark.webp` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "stylesheet", href: liquidCss },
       { rel: "stylesheet", href: "/ncea-intro.css" },
-      { rel: "stylesheet", href: "/visual-fixes.css" },
-      { rel: "stylesheet", href: "/nav-motion.css" },
-      { rel: "stylesheet", href: "/network-effects.css" },
       { rel: "canonical", href: SITE_URL },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "icon", type: "image/svg+xml", href: "/ncea-round.svg" },
       { rel: "apple-touch-icon", href: "/ncea-round.svg" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@600;700;800;900&display=swap" },
     ],
   }),
   shellComponent: RootShell,

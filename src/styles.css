@@ -1,3 +1,11 @@
+@import "@fontsource/unbounded/400.css";
+@import "@fontsource/unbounded/700.css";
+@import "@fontsource/unbounded/800.css";
+@import "@fontsource/unbounded/900.css";
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
 @import "tailwindcss" source(none);
 @source "../src";
 
@@ -27,35 +35,36 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-brand-red: #ff4d4d;
-  --color-brand-orange: #ff7b3b;
-  --color-stone-950: #0c0a09;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Manrope", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --color-brand-red: #ff1738;
+  --color-brand-orange: #ff8a22;
+  --color-stone-950: #050505;
+  --color-brand-ember: #ff4d1f;
+  --font-body: "Manrope", Inter, Arial, sans-serif;
+  --font-display: "Unbounded", "Arial Black", sans-serif;
+  --font-sans: "Manrope", Inter, Arial, sans-serif;
 }
 
 :root {
   --radius: 1rem;
-  --background: #0c0a09;
+  --background: #050505;
   --foreground: #ffffff;
-  --card: #12100f;
+  --card: #0d0d0e;
   --card-foreground: #ffffff;
-  --popover: #12100f;
+  --popover: #0d0d0e;
   --popover-foreground: #ffffff;
-  --primary: #ff4d4d;
+  --primary: #ff1738;
   --primary-foreground: #ffffff;
-  --secondary: #1a1716;
+  --secondary: #121213;
   --secondary-foreground: #ffffff;
-  --muted: #1a1716;
-  --muted-foreground: rgba(255,255,255,0.55);
-  --accent: #ff7b3b;
-  --accent-foreground: #0c0a09;
+  --muted: #121213;
+  --muted-foreground: #a7a7ad;
+  --accent: #ff8a22;
+  --accent-foreground: #050505;
   --destructive: #ff3b3b;
   --destructive-foreground: #ffffff;
   --border: rgba(255,255,255,0.1);
   --input: rgba(255,255,255,0.1);
-  --ring: #ff4d4d;
+  --ring: #ff4d1f;
 }
 
 .dark { color-scheme: dark; }
@@ -63,10 +72,13 @@
 @layer base {
   * { border-color: var(--color-border); }
   html { scroll-behavior: smooth; }
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1 { font-size: clamp(1.75rem, 5.4vw, 4.4rem); line-height: 1; }
+  h2 { font-size: clamp(1.45rem, 3.6vw, 3rem); line-height: 1.08; }
   body {
     background:
-      radial-gradient(circle at 15% 0%, rgba(255,77,77,.06), transparent 28%),
-      radial-gradient(circle at 85% 8%, rgba(255,123,59,.05), transparent 24%),
+      radial-gradient(circle at 12% -4%, rgba(255,23,56,.09), transparent 34%),
+      radial-gradient(circle at 88% 6%, rgba(255,138,34,.07), transparent 30%),
       var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
@@ -87,7 +99,7 @@
 }
 
 @utility gradient-btn {
-  background-image: linear-gradient(100deg, var(--color-brand-red), var(--color-brand-orange));
+  background-image: linear-gradient(135deg, #ff1738 0%, #ff4d1f 48%, #ff8a22 100%);
   filter: saturate(0.92);
   color: #fff;
   transition: filter .25s ease, transform .25s ease, box-shadow .25s ease;
@@ -109,7 +121,7 @@
 }
 
 @utility gradient-text {
-  background-image: linear-gradient(95deg, #ff5050 5%, #ff7b3b 90%);
+  background-image: linear-gradient(135deg, #ff1738 0%, #ff4d1f 48%, #ff8a22 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -376,7 +388,7 @@ aside.glass-card .gradient-text {
 
 @media (max-width: 640px) {
   #home { min-height: auto; padding-top: 7rem; }
-  #home h1 { font-size: clamp(2.8rem, 14vw, 4rem); }
+  #home h1 { font-size: clamp(1.9rem, 9vw, 2.6rem); }
   #home .glass-card { border-radius: 1.25rem; }
   #about, #portfolio, #team, #faq { scroll-margin-top: 5rem; }
   section[aria-label^="Конфигуратор"] { padding: 1.15rem; }

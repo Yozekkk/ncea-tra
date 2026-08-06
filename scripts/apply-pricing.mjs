@@ -1,7 +1,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const DISCOUNT = 0.20;
+// Итоговая скидка от первоначального прайса:
+// прежние -20%, затем дополнительные -25% от сниженной цены => 0.8 × 0.75 = 0.6.
+const DISCOUNT = 0.40;
 const factor = 1 - DISCOUNT;
 const file = resolve(process.cwd(), "src/lib/services.ts");
 let source = readFileSync(file, "utf8");
@@ -21,4 +23,4 @@ for (const key of priceKeys) {
 }
 
 writeFileSync(file, source);
-console.log(`Применена скидка ${DISCOUNT * 100}% к ${changed} ценовым значениям NCEA.`);
+console.log(`Применена итоговая скидка ${DISCOUNT * 100}% к ${changed} ценовым значениям NCEA.`);

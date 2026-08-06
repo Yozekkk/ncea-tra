@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { I, Blob, LOGO_MARK } from "@/components/site/ui";
+import { I, Blob, LOGO_ROUND } from "@/components/site/ui";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { computeQuote, defaultValues, formatEUR, getService, type Values } from "@/lib/services";
@@ -181,7 +181,7 @@ export function ServicePage({ id }: { id: string }) {
 
                 {isCheckout && (
                   <div className="mt-8 fade-up text-center">
-                    <img src={LOGO_MARK} alt="NCEA" className="mx-auto h-24 w-24 rounded-full object-cover shadow-[0_14px_45px_rgba(255,90,45,.3)]" />
+                    <img src={LOGO_ROUND} alt="NCEA" width={96} height={96} className="mx-auto h-24 w-24 rounded-full object-cover shadow-[0_14px_45px_rgba(255,90,45,.3)]" />
                     <h2 className="mt-5 font-display text-3xl font-bold">Свяжитесь с менеджером</h2>
                     <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/55">Параметры заказа уже собраны. Выберите удобный мессенджер — в Telegram откроется готовый текст заявки, а в Discord вы попадёте на сервер NCEA.</p>
                     <div className="mt-7 grid gap-3 sm:grid-cols-2">

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { I, LOGO_MARK } from "@/components/site/ui";
+import { I, LOGO_MARK, LOGO_ROUND } from "@/components/site/ui";
 import { SERVICES, startingPrice } from "@/lib/services";
 
 export const Route = createFileRoute("/")({
@@ -25,10 +25,10 @@ const featured = ["plugins", "server-setup", "websites", "design", "modpacks", "
   .filter(Boolean) as typeof SERVICES;
 
 const portfolio = [
-  { title: "Minecraft-сервер под ключ", tag: "Server setup", image: "https://picsum.photos/seed/ncea-server/900/620", desc: "Ядро, плагины, права, TAB, экономика, защита и оптимизация." },
-  { title: "Сайт игрового проекта", tag: "Web development", image: "https://picsum.photos/seed/ncea-web/900/620", desc: "Адаптивный сайт с личным кабинетом, формами и интеграциями." },
-  { title: "Карта для RPG-сервера", tag: "Minecraft map", image: "https://picsum.photos/seed/ncea-map/900/620", desc: "Локации, ландшафт, интерьеры и игровые механики." },
-  { title: "Фирменное оформление", tag: "Brand design", image: "https://picsum.photos/seed/ncea-design/900/620", desc: "Логотип, баннеры, карточки и единая визуальная система." },
+  { title: "Minecraft-сервер под ключ", tag: "Server setup", art: "art-a", desc: "Ядро, плагины, права, TAB, экономика, защита и оптимизация." },
+  { title: "Сайт игрового проекта", tag: "Web development", art: "art-b", desc: "Адаптивный сайт с личным кабинетом, формами и интеграциями." },
+  { title: "Карта для RPG-сервера", tag: "Minecraft map", art: "art-c", desc: "Локации, ландшафт, интерьеры и игровые механики." },
+  { title: "Фирменное оформление", tag: "Brand design", art: "art-d", desc: "Логотип, баннеры, карточки и единая визуальная система." },
 ];
 
 const reviews = [
@@ -63,11 +63,11 @@ function HomePage() {
       <main className="relative z-10">
         <section id="home" className="relative flex min-h-screen items-center overflow-hidden pb-16 pt-24">
           <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
-            <div className="reveal">
+            <div className="reveal min-w-0">
               <div className="liquid-secondary inline-flex items-center gap-2 px-4 py-2 text-xs text-white/70">
                 <span className="h-2 w-2 rounded-full bg-brand-orange shadow-[0_0_16px_rgba(255,120,40,.9)]" /> Заказы открыты
               </div>
-              <h1 className="mt-7 max-w-4xl font-display text-5xl font-black leading-[.95] tracking-[-.045em] sm:text-6xl lg:text-7xl">
+              <h1 className="mt-7 max-w-4xl font-display text-[1.75rem] font-black leading-[1] tracking-[-.04em] sm:text-6xl lg:text-7xl">
                 Не самые быстрые. <span className="gradient-text">Самые надёжные.</span>
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/58 sm:text-lg">NCEA создаёт плагины, сборки, сайты, карты, дизайн и ивенты для Minecraft-проектов. Понятный процесс, расчёт стоимости и связь без лишних форм.</p>
@@ -83,6 +83,7 @@ function HomePage() {
             </div>
 
             <div className="reveal relative mx-auto w-full max-w-xl">
+              <img src={LOGO_MARK} alt="Логотип NCEA" width={132} height={132} className="brand-glow mx-auto mb-6 h-28 w-28 rounded-[28px] object-cover ring-1 ring-white/10 sm:h-32 sm:w-32" />
               <div className="liquid-panel relative overflow-hidden p-5 sm:p-7">
                 <div className="flex items-center justify-between border-b border-white/8 pb-5">
                   <div className="text-sm font-medium text-white/65">Выберите направление</div>
@@ -114,6 +115,7 @@ function HomePage() {
             <div className="reveal">
               <div className="text-xs font-semibold uppercase tracking-[.22em] text-brand-orange">О нас</div>
               <h2 className="mt-4 font-display text-4xl font-black sm:text-5xl">Команда для развития Minecraft-проектов</h2>
+              <img src={LOGO_ROUND} alt="Круглый логотип NCEA" width={128} height={128} loading="lazy" className="brand-glow mt-8 h-28 w-28 rounded-full object-cover ring-1 ring-white/10" />
             </div>
             <div className="reveal grid gap-4 sm:grid-cols-2">
               <div className="liquid-panel p-6"><div className="gradient-text font-display text-3xl font-black">12</div><div className="mt-2 font-medium">направлений</div><p className="mt-2 text-sm leading-6 text-white/50">Разработка, настройка, дизайн и организация событий в одном месте.</p></div>
@@ -151,7 +153,7 @@ function HomePage() {
             <div className="mt-10 grid gap-4 md:grid-cols-2">
               {portfolio.map((item) => (
                 <article key={item.title} className="liquid-panel reveal group overflow-hidden">
-                  <div className="relative h-56 overflow-hidden bg-linear-to-br from-brand-red/20 to-brand-orange/10"><img src={item.image} alt={item.title} loading="lazy" className="h-full w-full object-cover opacity-75 transition duration-700 group-hover:scale-105 group-hover:opacity-90" onError={(event) => { event.currentTarget.style.display = "none"; }} /><div className="absolute inset-0 bg-linear-to-t from-stone-950 via-transparent to-transparent" /></div>
+                  <div className={`case-art ${item.art} relative h-56 overflow-hidden`} aria-hidden="true"><div className="absolute inset-0 bg-linear-to-t from-stone-950 via-transparent to-transparent" /></div>
                   <div className="p-6"><div className="text-xs uppercase tracking-[.2em] text-brand-orange">{item.tag}</div><h3 className="mt-3 font-display text-2xl font-bold">{item.title}</h3><p className="mt-3 text-sm leading-6 text-white/48">{item.desc}</p></div>
                 </article>
               ))}
@@ -171,7 +173,7 @@ function HomePage() {
 
         <section id="partner" className="scroll-mt-24 px-4 pb-24 lg:px-8">
           <div className="liquid-panel reveal mx-auto max-w-7xl px-6 py-14 text-center sm:px-10 sm:py-20">
-            <img src={LOGO_MARK} alt="NCEA" className="round-brand-image mx-auto h-24 w-24" />
+            <img src={LOGO_ROUND} alt="Логотип NCEA" width={112} height={112} loading="lazy" className="round-brand-image mx-auto h-24 w-24" />
             <h2 className="mt-6 font-display text-4xl font-black sm:text-5xl">Готовы собрать проект?</h2>
             <p className="mx-auto mt-5 max-w-2xl text-white/55">Выберите услугу и настройте параметры. На последнем шаге останутся только Discord и Telegram.</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3"><Link to="/services" className="cta-pulse gradient-btn inline-flex h-12 items-center gap-2 rounded-full px-6 font-semibold">Рассчитать проект <I.Arrow className="h-4 w-4" /></Link><a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="liquid-secondary inline-flex h-12 items-center gap-2 px-6"><I.Telegram className="h-5 w-5" /> Telegram</a><a href={DISCORD_URL} target="_blank" rel="noreferrer" className="liquid-secondary inline-flex h-12 items-center gap-2 px-6"><I.Discord className="h-5 w-5" /> Discord</a></div>

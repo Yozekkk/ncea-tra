@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ncea-tra.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/services</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/events</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/modpacks</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/plugins</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/server-setup</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/websites</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/maps</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/skins</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/design</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/logos</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/resourcepacks</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ncea-tra.vercel.app/fancymenu</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>

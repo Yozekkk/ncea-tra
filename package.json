@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite dev",
     "pricing": "node scripts/apply-pricing.mjs",
+    "polish-home": "node scripts/polish-home.mjs",
     "verify": "node scripts/verify-site.mjs",
-    "prebuild": "npm run pricing && npm run verify",
+    "prebuild": "npm run pricing && npm run polish-home && npm run verify",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",

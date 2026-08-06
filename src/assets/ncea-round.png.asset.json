@@ -1,11 +1,9 @@
 {
-  "version": 1,
-  "asset_id": "ded3fe7c-db51-4518-b14b-d713fe6e4852",
-  "project_id": "2dd9141c-7ade-412e-88ef-4fdf828d2026",
-  "url": "/__l5e/assets-v1/ded3fe7c-db51-4518-b14b-d713fe6e4852/ncea-round.png",
-  "r2_key": "a/v1/2dd9141c-7ade-412e-88ef-4fdf828d2026/ded3fe7c-db51-4518-b14b-d713fe6e4852/ncea-round.png",
-  "original_filename": "ncea-round.png",
-  "size": 1964342,
-  "content_type": "image/png",
-  "created_at": "2026-08-05T13:17:19Z"
+  "version": 2,
+  "asset_id": "ncea-round-local",
+  "project_id": "ncea-tra",
+  "url": "/ncea-round.svg",
+  "r2_key": "public/ncea-round.svg",
+  "original_filename": "ncea-round.svg",
+  "content_type": "image/svg+xml"
 }

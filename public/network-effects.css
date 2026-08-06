@@ -1,0 +1,125 @@
+.network-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: .72;
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.9) 42%, rgba(0,0,0,.35) 78%, transparent 100%);
+}
+
+.network-layer {
+  position: absolute;
+  inset: -12%;
+  background-repeat: repeat;
+  transform-origin: center;
+}
+
+.network-layer-a {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,92,52,.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 38% 27%, rgba(255,120,50,.55) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 72% 16%, rgba(255,75,75,.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 88% 42%, rgba(255,135,55,.55) 0 1.5px, transparent 2.5px),
+    linear-gradient(28deg, transparent 48.8%, rgba(255,95,45,.12) 49.4%, rgba(255,95,45,.12) 50%, transparent 50.6%),
+    linear-gradient(152deg, transparent 48.9%, rgba(255,118,52,.10) 49.5%, rgba(255,118,52,.10) 50.1%, transparent 50.7%);
+  background-size: 420px 280px, 520px 360px, 610px 330px, 470px 390px, 240px 180px, 300px 220px;
+  animation: network-drift-a 24s ease-in-out infinite alternate;
+}
+
+.network-layer-b {
+  background-image:
+    radial-gradient(circle, rgba(255,107,54,.45) 0 1px, transparent 2px),
+    linear-gradient(67deg, transparent 49.2%, rgba(255,255,255,.045) 49.7%, rgba(255,255,255,.045) 50.2%, transparent 50.8%),
+    linear-gradient(113deg, transparent 49.1%, rgba(255,96,50,.07) 49.6%, rgba(255,96,50,.07) 50.1%, transparent 50.7%);
+  background-size: 150px 130px, 230px 190px, 290px 210px;
+  opacity: .5;
+  animation: network-drift-b 32s linear infinite;
+}
+
+.service-square {
+  min-height: 0 !important;
+  aspect-ratio: 1 / 1;
+  border-radius: 22px !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.portfolio-code-card {
+  min-height: 310px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.025)),
+    radial-gradient(circle at 85% 15%, rgba(255,91,48,.12), transparent 45%);
+}
+
+.portfolio-code-visual {
+  position: relative;
+  min-height: 150px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.10);
+  background:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255,77,77,.09), rgba(255,126,50,.03));
+  background-size: 28px 28px, 28px 28px, auto;
+}
+
+.portfolio-code-index {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  font-size: 12px;
+  letter-spacing: .18em;
+  color: rgba(255,255,255,.38);
+}
+
+.portfolio-code-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.16);
+  text-shadow: 0 0 35px rgba(255,90,40,.16);
+}
+
+.portfolio-code-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,100,50,.65), transparent);
+  transform-origin: left;
+}
+
+.portfolio-code-line-a { width: 52%; left: 12%; top: 34%; transform: rotate(12deg); }
+.portfolio-code-line-b { width: 46%; right: 8%; bottom: 24%; transform: rotate(-17deg); }
+.portfolio-code-dot { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #ff6b35; box-shadow: 0 0 18px rgba(255,107,53,.9); }
+.portfolio-code-dot-a { left: 13%; top: 31%; }
+.portfolio-code-dot-b { right: 18%; bottom: 18%; }
+.portfolio-code-arrow { position: absolute; right: 22px; top: 20px; color: rgba(255,255,255,.25); transition: transform .3s ease, color .3s ease; }
+.portfolio-code-card:hover .portfolio-code-arrow { transform: translateX(6px); color: #ff7a35; }
+
+@keyframes network-drift-a {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); filter: saturate(.85); }
+  to { transform: translate3d(1.5%, 1%, 0) scale(1.035); filter: saturate(1.15); }
+}
+
+@keyframes network-drift-b {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(-2%, 1%, 0) rotate(.8deg); }
+}
+
+@media (max-width: 640px) {
+  .network-background { opacity: .42; }
+  .service-square { aspect-ratio: auto; min-height: 190px !important; }
+  .portfolio-code-card { min-height: 280px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .network-layer { animation: none !important; }
+}

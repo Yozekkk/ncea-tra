@@ -405,3 +405,27 @@ aside.glass-card .gradient-text {
     transition-duration: .01ms !important;
   }
 }
+
+/* ---- Premium typographic scale ---- */
+@utility text-caption { font-size:.68rem; line-height:1; letter-spacing:.22em; text-transform:uppercase; font-weight:600; }
+@utility text-display { font-family:var(--font-display); font-weight:800; letter-spacing:-.03em; line-height:1.02; font-size:clamp(2.1rem,5.6vw,4.4rem); }
+@utility text-section { font-family:var(--font-display); font-weight:800; letter-spacing:-.025em; line-height:1.08; font-size:clamp(1.6rem,3.6vw,3rem); }
+@utility text-lead { font-size:clamp(.98rem,1.25vw,1.18rem); line-height:1.65; color:rgba(255,255,255,.58); }
+
+/* ---- Stagger reveal ---- */
+.reveal-stagger > * { opacity:0; transform:translateY(20px); animation:fade-up .7s cubic-bezier(.2,.8,.2,1) forwards; }
+.reveal-stagger > *:nth-child(1){animation-delay:.04s}
+.reveal-stagger > *:nth-child(2){animation-delay:.1s}
+.reveal-stagger > *:nth-child(3){animation-delay:.16s}
+.reveal-stagger > *:nth-child(4){animation-delay:.22s}
+.reveal-stagger > *:nth-child(5){animation-delay:.28s}
+.reveal-stagger > *:nth-child(6){animation-delay:.34s}
+.reveal-stagger > *:nth-child(7){animation-delay:.4s}
+.reveal-stagger > *:nth-child(8){animation-delay:.46s}
+
+/* ---- Rhythm & layout stability ---- */
+main > section, main section[id] { scroll-margin-top: 6.5rem; }
+img, svg, video { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-stagger > * { opacity:1; transform:none; animation:none; }
+}

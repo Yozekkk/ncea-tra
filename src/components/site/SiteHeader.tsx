@@ -202,7 +202,8 @@ export function SiteHeader() {
               type="button"
               aria-expanded={mega}
               aria-haspopup="menu"
-              onClick={() => { moveTo("services"); setMega((value) => !value); }}
+              onPointerDown={(event) => { event.stopPropagation(); }}
+              onClick={() => { moveTo("services"); openMega(); }}
               className={`nav-liquid-item inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm transition ${active === "services" ? "font-semibold text-white" : "text-white/66 hover:text-white"}`}
             >
               Услуги <I.Chevron className={`h-4 w-4 transition-transform duration-300 ${mega ? "rotate-180" : ""}`} />

@@ -34,7 +34,7 @@ export function useHashNav() {
 
 function MegaMenu({ onPick }: { onPick: () => void }) {
   return (
-    <div className="mega-menu absolute left-1/2 top-full w-[min(94vw,980px)] -translate-x-1/2 pt-3" role="menu">
+    <div className="mega-menu w-[min(94vw,980px)] pt-3" role="menu">
       <div className="mega-panel p-5">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {GROUPS.map((group) => (

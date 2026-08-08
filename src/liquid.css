@@ -76,3 +76,5 @@
 @media(prefers-reduced-motion:reduce){.nv-mega,.nv-sheet,.nv-sub{animation:none}.nv-pill{transition:none}}
 
 .magnetic{transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease}.magnetic:hover{transform:translateY(-2px) scale(1.02)}
+@media(min-width:1024px){:where(.nv-icon-btn),.nv-sheet{display:none!important}}
+@media(max-width:767px){.nv-bar .nv-cta{display:none}}

@@ -28,11 +28,11 @@
 .nv-shell{margin:0 auto;max-width:1200px}
 .nv-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;height:66px;padding:0 12px 0 14px;border-radius:20px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(160deg,rgba(24,20,20,.72),rgba(10,9,9,.62));-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 30px rgba(0,0,0,.25);transition:height .35s cubic-bezier(.2,.8,.2,1),background .35s ease,border-color .35s ease,box-shadow .35s ease}
 .nv-header[data-scrolled="true"] .nv-bar{height:58px;border-color:rgba(255,255,255,.13);background:linear-gradient(160deg,rgba(22,18,18,.9),rgba(8,7,7,.86));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 44px rgba(0,0,0,.45)}
-.nv-brand{display:flex;flex:none;align-items:center;gap:10px;white-space:nowrap;border-radius:14px;padding:4px 6px 4px 2px;transition:opacity .25s ease}
+.nv-brand{display:flex;min-width:0;flex:1 1 auto;align-items:center;gap:10px;white-space:nowrap;border-radius:14px;padding:4px 6px 4px 2px;transition:opacity .25s ease}
 .nv-brand:hover{opacity:.86}
 .nv-brand-mark{height:34px;width:34px;border-radius:11px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 6px 18px rgba(255,74,42,.22);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .nv-brand:hover .nv-brand-mark{transform:scale(1.06) rotate(-2deg)}
-.nv-brand-text{font-family:var(--font-display,inherit);font-size:14px;font-weight:800;letter-spacing:-.02em}
+.nv-brand-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-display,inherit);font-size:14px;font-weight:800;letter-spacing:-.02em}
 @media(min-width:1280px){.nv-brand-text{font-size:15px}}
 
 .nv-list{position:relative;display:flex;align-items:center;gap:2px}
@@ -42,7 +42,8 @@
 .nv-item.is-active{color:#fff;font-weight:600}
 .nv-item.is-active::after{content:"";position:absolute;left:50%;bottom:-1px;width:16px;height:2px;margin-left:-8px;border-radius:2px;background:linear-gradient(90deg,#ff1738,#ff8a22)}
 
-.nv-cta{display:inline-flex;align-items:center;gap:8px;border-radius:999px;font-weight:600;color:#fff;background:linear-gradient(135deg,#ff1738,#ff8a22);box-shadow:0 8px 24px rgba(255,80,40,.28);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease,filter .25s ease}
+.nv-cta:where(:not(.hidden)){display:inline-flex}
+.nv-cta{align-items:center;gap:8px;border-radius:999px;font-weight:600;color:#fff;background:linear-gradient(135deg,#ff1738,#ff8a22);box-shadow:0 8px 24px rgba(255,80,40,.28);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease,filter .25s ease}
 .nv-cta:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 12px 30px rgba(255,80,40,.38)}
 .nv-cta:active{transform:translateY(0)}
 .nv-icon-btn{display:inline-flex;height:40px;width:40px;flex:none;align-items:center;justify-content:center;border-radius:14px;color:#fff;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);transition:background .22s ease,transform .22s ease}

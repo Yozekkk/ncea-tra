@@ -166,7 +166,7 @@ export const SERVICES: Service[] = [
             type: "select",
             def: "none",
             options: [
-              { id: "none", label: "Не нужна", price: 0.5 },
+              { id: "none", label: "Не нужна", price: 0 },
               { id: "yaml", label: "YAML-файлы", price: 1 },
               { id: "sqlite", label: "SQLite", price: 3 },
               { id: "mysql", label: "MySQL / MariaDB", price: 5 },
@@ -361,7 +361,7 @@ export const SERVICES: Service[] = [
             type: "select",
             def: "none",
             options: [
-              { id: "none", label: "Не нужна", price: 0.5 },
+              { id: "none", label: "Не нужна", price: 0 },
               { id: "week", label: "1 неделя", price: 3 },
               { id: "month", label: "1 месяц", price: 7.5 },
             ],
@@ -968,7 +968,7 @@ export const SERVICES: Service[] = [
             type: "select",
             def: "none",
             options: [
-              { id: "none", label: "Не нужна", price: 0.5 },
+              { id: "none", label: "Не нужна", price: 0 },
               { id: "month", label: "1 месяц", price: 6.5 },
               { id: "quarter", label: "3 месяца", price: 14 },
             ],

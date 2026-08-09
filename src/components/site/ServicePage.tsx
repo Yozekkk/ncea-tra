@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { I, Blob, LOGO_ROUND } from "@/components/site/ui";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { computeQuote, defaultValues, formatEUR, getService, type Values } from "@/lib/services";
+import { computeQuote, defaultValues, getService, type Values } from "@/lib/services";
+import { useCurrency } from "@/lib/currency";
 
 const TELEGRAM_URL = "https://t.me/lisiy_bob";
 const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
@@ -23,6 +24,7 @@ function Breadcrumbs({ title }: { title: string }) {
 
 export function ServicePage({ id }: { id: string }) {
   const service = getService(id);
+  const { fmt } = useCurrency();
   const storageKey = `ncea:cfg:${id}`;
   const [values, setValues] = useState<Values>(() => defaultValues(service));
   const [step, setStep] = useState(0);
@@ -65,12 +67,12 @@ export function ServicePage({ id }: { id: string }) {
       "Выбранные параметры:",
       params,
       "",
-      `Предварительная стоимость: ${formatEUR(quote.total)}`,
+      `Предварительная стоимость: ${fmt(quote.total)}`,
       `Срок выполнения: ${quote.daysMin}–${quote.daysMax} дней`,
       "",
       "Итоговая стоимость уточняется после обсуждения проекта.",
     ].join("\n");
-  }, [quote, service.title]);
+  }, [quote, service.title, fmt]);
 
   const pageUrl = typeof window === "undefined" ? "https://ncea-tra.vercel.app" : window.location.href;
   const telegramShare = `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(applicationText)}`;
@@ -135,7 +137,7 @@ export function ServicePage({ id }: { id: string }) {
                             <button type="button" onClick={() => set(field.id, !values[field.id])} aria-pressed={Boolean(values[field.id])} className={`liquid-toggle w-full ${values[field.id] ? "is-active" : ""}`}>
                               <span className="text-left"><span className="block text-sm font-medium">{field.label}</span>{field.desc && <span className="mt-0.5 block text-xs text-white/45">{field.desc}</span>}</span>
                               <span className="flex shrink-0 items-center gap-3">
-                                {typeof field.price === "number" && field.price !== 0 && <span className="text-xs text-white/50">{field.price > 0 ? "+" : ""}{field.price} €</span>}
+                                {typeof field.price === "number" && field.price !== 0 && <span className="text-xs text-white/50">{field.price > 0 ? "+" : ""}{fmt(field.price)}</span>}
                                 <span className="liquid-check">{values[field.id] && <I.Check className="h-3.5 w-3.5" />}</span>
                               </span>
                             </button>
@@ -164,15 +166,15 @@ export function ServicePage({ id }: { id: string }) {
                       {quote.lines.map((line, index) => (
                         <div key={`${line.label}-${index}`} className="flex items-center justify-between gap-4 py-3 text-sm">
                           <span className="text-white/55">{line.label}</span>
-                          <span className="text-right"><span className="text-white/90">{line.value}</span>{line.amount ? <span className="ml-2 text-white/45">{line.amount > 0 ? "+" : ""}{line.amount} €</span> : null}{line.mult ? <span className="ml-2 text-brand-orange">×{line.mult}</span> : null}</span>
+                          <span className="text-right"><span className="text-white/90">{line.value}</span>{line.amount ? <span className="ml-2 text-white/45">{line.amount > 0 ? "+" : ""}{fmt(line.amount)}</span> : null}{line.mult ? <span className="ml-2 text-brand-orange">×{line.mult}</span> : null}</span>
                         </div>
                       ))}
                     </div>
                     <div className="liquid-summary mt-6 p-5 text-sm">
-                      <Row label="Базовая стоимость" value={formatEUR(quote.base)} />
-                      <Row label="Дополнительные функции" value={formatEUR(quote.addons)} />
+                      <Row label="Базовая стоимость" value={fmt(quote.base)} />
+                      <Row label="Дополнительные функции" value={fmt(quote.addons)} />
                       <Row label="Коэффициенты" value={`${quote.multPct >= 0 ? "+" : ""}${quote.multPct}%`} />
-                      <div className="mt-4 flex items-end justify-between gap-4 border-t border-white/10 pt-4"><span className="text-white/60">Предварительная стоимость</span><span className="gradient-text font-display text-3xl font-black">{formatEUR(quote.total)}</span></div>
+                      <div className="mt-4 flex items-end justify-between gap-4 border-t border-white/10 pt-4"><span className="text-white/60">Предварительная стоимость</span><span className="gradient-text font-display text-3xl font-black">{fmt(quote.total)}</span></div>
                       <div className="mt-2 text-white/50">Срок выполнения: {quote.daysMin}–{quote.daysMax} дней</div>
                     </div>
                     <p className="mt-4 text-xs text-white/45">Цена предварительная и уточняется после обсуждения проекта с менеджером NCEA.</p>
@@ -188,7 +190,7 @@ export function ServicePage({ id }: { id: string }) {
                       <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="liquid-contact liquid-contact-discord"><I.Discord className="h-7 w-7" /><span><b>Написать в Discord</b><small>Открыть сервер NCEA</small></span></a>
                       <a href={telegramShare} target="_blank" rel="noreferrer" className="liquid-contact liquid-contact-telegram"><I.Telegram className="h-7 w-7" /><span><b>Написать в Telegram</b><small>Отправить готовую заявку</small></span></a>
                     </div>
-                    <div className="liquid-summary mt-6 p-5 text-left text-sm"><Row label="Услуга" value={service.title} /><Row label="Стоимость" value={formatEUR(quote.total)} /><Row label="Срок" value={`${quote.daysMin}–${quote.daysMax} дней`} /></div>
+                    <div className="liquid-summary mt-6 p-5 text-left text-sm"><Row label="Услуга" value={service.title} /><Row label="Стоимость" value={fmt(quote.total)} /><Row label="Срок" value={`${quote.daysMin}–${quote.daysMax} дней`} /></div>
                   </div>
                 )}
 
@@ -201,9 +203,9 @@ export function ServicePage({ id }: { id: string }) {
 
             <aside className="liquid-panel p-6 lg:sticky lg:top-24">
               <div className="text-[11px] uppercase tracking-widest text-white/40">Предварительно</div>
-              <div className="gradient-text mt-2 font-display text-4xl font-black">{formatEUR(quote.total)}</div>
+              <div className="gradient-text mt-2 font-display text-4xl font-black">{fmt(quote.total)}</div>
               <div className="mt-1 text-sm text-white/50">Срок: {quote.daysMin}–{quote.daysMax} дней</div>
-              <div className="mt-5 flex flex-col gap-2 text-sm"><Row label="База" value={formatEUR(quote.base)} /><Row label="Опции" value={formatEUR(quote.addons)} /><Row label="Коэффициенты" value={`${quote.multPct >= 0 ? "+" : ""}${quote.multPct}%`} /></div>
+              <div className="mt-5 flex flex-col gap-2 text-sm"><Row label="База" value={fmt(quote.base)} /><Row label="Опции" value={fmt(quote.addons)} /><Row label="Коэффициенты" value={`${quote.multPct >= 0 ? "+" : ""}${quote.multPct}%`} /></div>
               <button type="button" onClick={() => goTo(service.steps.length)} className="gradient-btn mt-6 h-12 w-full rounded-full font-medium">К расчёту</button>
               <p className="mt-3 text-[11px] text-white/40">Стоимость предварительная и уточняется с менеджером NCEA.</p>
             </aside>

@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { I, LOGO_MARK } from "@/components/site/ui";
 import { GROUPS, SERVICES } from "@/lib/services";
 import { DISCORD_URL, NAV_ITEMS, TELEGRAM_URL, type NavKey } from "./nav-items";
+import { CurrencySwitcher } from "./CurrencySwitcher";
 
 type Props = {
   open: boolean;
@@ -33,11 +34,14 @@ export function MobileNav({ open, active, onClose, onHash }: Props) {
       </div>
 
       <div className="nv-sheet-body">
+        <CurrencySwitcher variant="mobile" />
+
         {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
           if (item.kind === "route") {
             return (
               <Link key={item.key} to={item.to} onClick={onClose} className={`nv-row${active === item.key ? " is-active" : ""}`}>
-                Главная
+                <Icon className="nv-row-icon" aria-hidden="true" /> Главная
               </Link>
             );
           }
@@ -51,7 +55,7 @@ export function MobileNav({ open, active, onClose, onHash }: Props) {
                   onClick={() => setServicesOpen((value) => !value)}
                   className={`nv-row justify-between${active === item.key ? " is-active" : ""}`}
                 >
-                  <span>Услуги</span>
+                  <span className="inline-flex items-center gap-2.5"><Icon className="nv-row-icon" aria-hidden="true" /> Услуги</span>
                   <I.Chevron className={`h-5 w-5 transition-transform duration-300 ${servicesOpen ? "rotate-180" : ""}`} />
                 </button>
                 {servicesOpen && (
@@ -81,7 +85,7 @@ export function MobileNav({ open, active, onClose, onHash }: Props) {
 
           return (
             <button key={item.key} type="button" onClick={() => hash(item.key, item.hash)} className={`nv-row${active === item.key ? " is-active" : ""}`}>
-              {item.label}
+              <Icon className="nv-row-icon" aria-hidden="true" /> {item.label}
             </button>
           );
         })}

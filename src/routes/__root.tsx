@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { I, LOGO_ROUND } from "@/components/site/ui";
+import { CurrencyProvider } from "@/lib/currency";
 import appCss from "../styles.css?url";
 import liquidCss from "../liquid.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -155,10 +156,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <RouteEffects />
-      <BrandIntro />
-      <Outlet />
-      <Toaster position="bottom-right" theme="dark" />
+      <CurrencyProvider>
+        <RouteEffects />
+        <BrandIntro />
+        <Outlet />
+        <Toaster position="bottom-right" theme="dark" />
+      </CurrencyProvider>
     </QueryClientProvider>
   );
 }

@@ -4,6 +4,7 @@ import { I, LOGO_MARK } from "@/components/site/ui";
 import { DesktopNav } from "./DesktopNav";
 import { MobileNav } from "./MobileNav";
 import { useHashNav } from "./useHashNav";
+import { CurrencySwitcher } from "./CurrencySwitcher";
 import type { NavKey } from "./nav-items";
 
 export function Navbar() {
@@ -134,6 +135,7 @@ export function Navbar() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
+            <CurrencySwitcher />
             <Link to="/services" onClick={() => setActive("services")} className="nv-cta hidden h-10 px-5 text-sm md:inline-flex">
               Рассчитать стоимость
             </Link>

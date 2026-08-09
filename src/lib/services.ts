@@ -1069,6 +1069,9 @@ export function getService(id: string): Service {
    Расчёт стоимости
    ============================================================ */
 
+/** Максимальная итоговая стоимость любой услуги, € */
+export const PRICE_CAP_EUR = 40;
+
 export type Values = Record<string, string | number | boolean>;
 
 export type QuoteLine = { label: string; value: string; amount?: number; mult?: number };
@@ -1138,7 +1141,8 @@ export function computeQuote(service: Service, values: Values): Quote {
 
   const base = service.base;
   const subtotal = base + addons;
-  const total = Math.max(0, Math.round(subtotal * mult));
+  /* Потолок стоимости NCEA — доступные цены для небольших проектов. */
+  const total = Math.min(PRICE_CAP_EUR, Math.max(0, Math.round(subtotal * mult)));
   const daysMin = Math.max(1, Math.round((service.days[0] + extraDays * 0.6) * daysMult));
   const daysMax = Math.max(daysMin + 1, Math.round((service.days[1] + extraDays) * daysMult));
 

@@ -25,10 +25,10 @@ const featured = ["plugins", "server-setup", "websites", "design", "modpacks", "
   .filter(Boolean) as typeof SERVICES;
 
 const portfolio = [
-  { title: "Minecraft-сервер под ключ", tag: "Server setup", art: "art-a", desc: "Ядро, плагины, права, TAB, экономика, защита и оптимизация." },
-  { title: "Сайт игрового проекта", tag: "Web development", art: "art-b", desc: "Адаптивный сайт с личным кабинетом, формами и интеграциями." },
-  { title: "Карта для RPG-сервера", tag: "Minecraft map", art: "art-c", desc: "Локации, ландшафт, интерьеры и игровые механики." },
-  { title: "Фирменное оформление", tag: "Brand design", art: "art-d", desc: "Логотип, баннеры, карточки и единая визуальная система." },
+  { title: "Minecraft-сервер под ключ", tag: "Server setup", code: "SERVER", desc: "Ядро, плагины, права, TAB, экономика, защита и оптимизация." },
+  { title: "Сайт игрового проекта", tag: "Web development", code: "WEB", desc: "Адаптивный сайт с личным кабинетом, формами и интеграциями." },
+  { title: "Карта для RPG-сервера", tag: "Minecraft map", code: "MAP", desc: "Локации, ландшафт, интерьеры и игровые механики." },
+  { title: "Фирменное оформление", tag: "Brand design", code: "BRAND", desc: "Логотип, баннеры, карточки и единая визуальная система." },
 ];
 
 const reviews = [
@@ -58,6 +58,7 @@ function HomePage() {
       <div className="noise fixed inset-0 z-0 opacity-35 pointer-events-none" />
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
+      <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
       <SiteHeader />
 
       <main className="relative z-10">
@@ -73,7 +74,8 @@ function HomePage() {
               <p className="mt-6 max-w-2xl text-lead">NCEA создаёт плагины, сборки, сайты, карты, дизайн и ивенты для Minecraft-проектов. Понятный процесс, расчёт стоимости и связь без лишних форм.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/services" className="cta-pulse gradient-btn magnetic inline-flex h-13 items-center gap-2 rounded-full px-7 font-semibold">Рассчитать проект <I.Arrow className="h-4 w-4" /></Link>
-                <a href="#portfolio" className="liquid-secondary inline-flex h-13 items-center gap-2 px-7 font-medium">Портфолио</a>
+                <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="liquid-secondary inline-flex h-13 items-center gap-2 px-7 font-medium"><I.Telegram className="h-5 w-5" /> Telegram</a>
+                <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="liquid-secondary inline-flex h-13 items-center gap-2 px-7 font-medium"><I.Discord className="h-5 w-5" /> Discord</a>
               </div>
               <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/45">
                 <span className="inline-flex items-center gap-2"><I.Check className="h-4 w-4 text-brand-orange" /> 12 направлений</span>
@@ -93,7 +95,7 @@ function HomePage() {
                   {featured.slice(0, 4).map((service) => {
                     const Icon = I[service.icon];
                     return (
-                      <Link key={service.id} to={service.path} className="liquid-choice group block rounded-2xl p-4">
+                      <Link key={service.id} to={service.path} className="liquid-choice service-square group block p-5">
                         <div className="flex items-start justify-between">
                           <span className="liquid-icon inline-flex h-10 w-10 items-center justify-center text-brand-orange"><Icon className="h-5 w-5" /></span>
                           <I.Arrow className="h-4 w-4 text-white/25 transition group-hover:translate-x-1 group-hover:text-brand-orange" />
@@ -151,10 +153,20 @@ function HomePage() {
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <div className="reveal max-w-2xl"><div className="text-caption text-brand-orange">Портфолио</div><h2 className="mt-4 text-section">Как может выглядеть ваш проект</h2></div>
             <div className="reveal-stagger mt-10 grid gap-5 md:grid-cols-2">
-              {portfolio.map((item) => (
-                <article key={item.title} className="liquid-panel group overflow-hidden transition duration-300 hover:-translate-y-1.5">
-                  <div className={`case-art ${item.art} relative h-56 overflow-hidden`} aria-hidden="true"><div className="absolute inset-0 bg-linear-to-t from-stone-950 via-transparent to-transparent" /></div>
-                  <div className="p-6"><div className="text-xs uppercase tracking-[.2em] text-brand-orange">{item.tag}</div><h3 className="mt-3 font-display text-2xl font-bold">{item.title}</h3><p className="mt-3 text-sm leading-6 text-white/48">{item.desc}</p></div>
+              {portfolio.map((item, index) => (
+                <article key={item.title} className="portfolio-code-card liquid-panel reveal group overflow-hidden p-6">
+                  <div className="portfolio-code-visual" aria-hidden="true">
+                    <span className="portfolio-code-index">0{index + 1}</span>
+                    <span className="portfolio-code-label">{item.code}</span>
+                    <span className="portfolio-code-line portfolio-code-line-a" />
+                    <span className="portfolio-code-line portfolio-code-line-b" />
+                    <span className="portfolio-code-dot portfolio-code-dot-a" />
+                    <span className="portfolio-code-dot portfolio-code-dot-b" />
+                    <I.Arrow className="portfolio-code-arrow h-6 w-6" />
+                  </div>
+                  <div className="mt-6 text-xs uppercase tracking-[.2em] text-brand-orange">{item.tag}</div>
+                  <h3 className="mt-3 font-display text-2xl font-bold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/48">{item.desc}</p>
                 </article>
               ))}
             </div>

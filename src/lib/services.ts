@@ -86,8 +86,8 @@ const URGENCY: Opt[] = [
 
 const urgencyField: Field = { id: "urgency", label: "Срок выполнения", type: "select", options: URGENCY, def: "normal" };
 const versionField: Field = { id: "version", label: "Версия Minecraft", type: "select", options: MC_VERSIONS, def: "1.20.1" };
-const docsField: Field = { id: "docs", label: "Документация к проекту", type: "toggle", price: 6.5 };
-const sourcesField: Field = { id: "sources", label: "Передача исходников", type: "toggle", price: 12 };
+const docsField: Field = { id: "docs", label: "Документация к проекту", type: "toggle", price: 1.5 };
+const sourcesField: Field = { id: "sources", label: "Передача исходников", type: "toggle", price: 2.4 };
 
 /* ============================================================
    Услуги
@@ -103,7 +103,7 @@ export const SERVICES: Service[] = [
     desc: "Пишем плагины под задачу: механики, GUI, база данных, интеграции с Discord, PlaceholderAPI и Vault.",
     icon: "Service",
     group: "mc",
-    base: 20,
+    base: 3.9,
     days: [3, 6],
     steps: [
       {
@@ -156,10 +156,10 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 2,
             unit: "шт.",
-            pricePerUnit: 7,
+            pricePerUnit: 1.5,
             daysPerUnit: 0.7,
           },
-          { id: "gui", label: "Графический интерфейс (GUI)", type: "toggle", price: 9.5 },
+          { id: "gui", label: "Графический интерфейс (GUI)", type: "toggle", price: 2.1 },
           {
             id: "db",
             label: "База данных",
@@ -167,9 +167,9 @@ export const SERVICES: Service[] = [
             def: "none",
             options: [
               { id: "none", label: "Не нужна", price: 0 },
-              { id: "yaml", label: "YAML-файлы", price: 3 },
-              { id: "sqlite", label: "SQLite", price: 8 },
-              { id: "mysql", label: "MySQL / MariaDB", price: 14 },
+              { id: "yaml", label: "YAML-файлы", price: 1 },
+              { id: "sqlite", label: "SQLite", price: 1.8 },
+              { id: "mysql", label: "MySQL / MariaDB", price: 3 },
             ],
           },
         ],
@@ -177,10 +177,10 @@ export const SERVICES: Service[] = [
       {
         title: "Интеграции",
         fields: [
-          { id: "discord", label: "Интеграция с Discord", type: "toggle", price: 11 },
-          { id: "papi", label: "PlaceholderAPI", type: "toggle", price: 5 },
-          { id: "vault", label: "Vault", type: "toggle", price: 5 },
-          { id: "multi", label: "Поддержка нескольких серверов", type: "toggle", price: 16 },
+          { id: "discord", label: "Интеграция с Discord", type: "toggle", price: 2.4 },
+          { id: "papi", label: "PlaceholderAPI", type: "toggle", price: 1.2 },
+          { id: "vault", label: "Vault", type: "toggle", price: 1.2 },
+          { id: "multi", label: "Поддержка нескольких серверов", type: "toggle", price: 3 },
         ],
       },
       { title: "Дополнительно", fields: [sourcesField, docsField, urgencyField] },
@@ -196,7 +196,7 @@ export const SERVICES: Service[] = [
     desc: "Собираем клиентские и серверные модпаки: подбор модов, конфигурация, квесты, меню и оптимизация.",
     icon: "Cube",
     group: "mc",
-    base: 24,
+    base: 4.5,
     days: [4, 8],
     steps: [
       {
@@ -240,7 +240,7 @@ export const SERVICES: Service[] = [
             step: 10,
             def: 80,
             unit: "шт.",
-            pricePerUnit: 0.14,
+            pricePerUnit: 1,
             daysPerUnit: 0.02,
           },
           {
@@ -249,9 +249,9 @@ export const SERVICES: Service[] = [
             type: "select",
             def: "client",
             options: [
-              { id: "client", label: "Клиентская", price: 0 },
-              { id: "server", label: "Серверная", price: 8 },
-              { id: "both", label: "Клиент + сервер", price: 14 },
+              { id: "client", label: "Клиентская", price: 1 },
+              { id: "server", label: "Серверная", price: 1.8 },
+              { id: "both", label: "Клиент + сервер", price: 3 },
             ],
           },
         ],
@@ -259,12 +259,12 @@ export const SERVICES: Service[] = [
       {
         title: "Опции",
         fields: [
-          { id: "optimize", label: "Оптимизация производительности", type: "toggle", price: 9.5, def: true },
-          { id: "configs", label: "Настройка конфигураций", type: "toggle", price: 11 },
-          { id: "quests", label: "Настройка квестов (FTB Quests)", type: "toggle", price: 18 },
-          { id: "menu", label: "Кастомное главное меню", type: "toggle", price: 9.5 },
-          { id: "respack", label: "Ресурспак под сборку", type: "toggle", price: 13 },
-          { id: "readyserver", label: "Готовый сервер под сборку", type: "toggle", price: 16 },
+          { id: "optimize", label: "Оптимизация производительности", type: "toggle", price: 2.1, def: true },
+          { id: "configs", label: "Настройка конфигураций", type: "toggle", price: 2.4 },
+          { id: "quests", label: "Настройка квестов (FTB Quests)", type: "toggle", price: 3.6 },
+          { id: "menu", label: "Кастомное главное меню", type: "toggle", price: 2.1 },
+          { id: "respack", label: "Ресурспак под сборку", type: "toggle", price: 2.7 },
+          { id: "readyserver", label: "Готовый сервер под сборку", type: "toggle", price: 3 },
         ],
       },
       { title: "Дополнительно", fields: [docsField, urgencyField] },
@@ -280,7 +280,7 @@ export const SERVICES: Service[] = [
     desc: "Полная настройка Minecraft-сервера: ядро, плагины, права, чат, экономика, античит и оптимизация.",
     icon: "Wrench",
     group: "mc",
-    base: 28,
+    base: 5.4,
     days: [3, 7],
     steps: [
       {
@@ -331,24 +331,24 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 15,
             unit: "шт.",
-            pricePerUnit: 0.4,
+            pricePerUnit: 1,
             daysPerUnit: 0.05,
           },
-          { id: "perms", label: "Настройка прав (LuckPerms)", type: "toggle", price: 8, def: true },
-          { id: "tab", label: "Настройка TAB и Scoreboard", type: "toggle", price: 6.5 },
-          { id: "chat", label: "Чат и форматирование", type: "toggle", price: 5.5 },
-          { id: "auth", label: "Авторизация", type: "toggle", price: 5 },
-          { id: "economy", label: "Экономика и магазины", type: "toggle", price: 9.5 },
+          { id: "perms", label: "Настройка прав (LuckPerms)", type: "toggle", price: 1.8, def: true },
+          { id: "tab", label: "Настройка TAB и Scoreboard", type: "toggle", price: 1.5 },
+          { id: "chat", label: "Чат и форматирование", type: "toggle", price: 1.2 },
+          { id: "auth", label: "Авторизация", type: "toggle", price: 1.2 },
+          { id: "economy", label: "Экономика и магазины", type: "toggle", price: 2.1 },
         ],
       },
       {
         title: "Защита и производительность",
         fields: [
-          { id: "anticheat", label: "Античит", type: "toggle", price: 11 },
-          { id: "protect", label: "Защита территорий и гриферов", type: "toggle", price: 8 },
-          { id: "optimize", label: "Оптимизация TPS", type: "toggle", price: 9.5, def: true },
-          { id: "db", label: "Подключение базы данных", type: "toggle", price: 8 },
-          { id: "proxy", label: "Настройка прокси-сети", type: "toggle", price: 16 },
+          { id: "anticheat", label: "Античит", type: "toggle", price: 2.4 },
+          { id: "protect", label: "Защита территорий и гриферов", type: "toggle", price: 1.8 },
+          { id: "optimize", label: "Оптимизация TPS", type: "toggle", price: 2.1, def: true },
+          { id: "db", label: "Подключение базы данных", type: "toggle", price: 1.8 },
+          { id: "proxy", label: "Настройка прокси-сети", type: "toggle", price: 3 },
         ],
       },
       {
@@ -362,8 +362,8 @@ export const SERVICES: Service[] = [
             def: "none",
             options: [
               { id: "none", label: "Не нужна", price: 0 },
-              { id: "week", label: "1 неделя", price: 8 },
-              { id: "month", label: "1 месяц", price: 24 },
+              { id: "week", label: "1 неделя", price: 1.8 },
+              { id: "month", label: "1 месяц", price: 4.5 },
             ],
           },
           urgencyField,
@@ -381,7 +381,7 @@ export const SERVICES: Service[] = [
     desc: "Ресурспаки любой сложности: CustomModelData, CIT, интерфейс, шрифты, звуки и поддержка сервера.",
     icon: "Layers",
     group: "mc",
-    base: 16,
+    base: 3,
     days: [3, 6],
     steps: [
       {
@@ -414,23 +414,23 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 20,
             unit: "шт.",
-            pricePerUnit: 0.48,
+            pricePerUnit: 1,
             daysPerUnit: 0.05,
           },
-          { id: "blocks", label: "Блоки", type: "toggle", price: 9.5 },
-          { id: "ui", label: "Интерфейс (GUI)", type: "toggle", price: 11 },
-          { id: "fonts", label: "Шрифты", type: "toggle", price: 6.5 },
-          { id: "sounds", label: "Звуки", type: "toggle", price: 8 },
-          { id: "models", label: "3D-модели", type: "toggle", price: 14 },
+          { id: "blocks", label: "Блоки", type: "toggle", price: 2.1 },
+          { id: "ui", label: "Интерфейс (GUI)", type: "toggle", price: 2.4 },
+          { id: "fonts", label: "Шрифты", type: "toggle", price: 1.5 },
+          { id: "sounds", label: "Звуки", type: "toggle", price: 1.8 },
+          { id: "models", label: "3D-модели", type: "toggle", price: 3 },
         ],
       },
       {
         title: "Технические опции",
         fields: [
-          { id: "cmd", label: "CustomModelData", type: "toggle", price: 8 },
-          { id: "cit", label: "OptiFine / CIT", type: "toggle", price: 9.5 },
-          { id: "server", label: "Поддержка сервера (авто-выдача)", type: "toggle", price: 6.5 },
-          { id: "optimize", label: "Оптимизация размера пака", type: "toggle", price: 5 },
+          { id: "cmd", label: "CustomModelData", type: "toggle", price: 1.8 },
+          { id: "cit", label: "OptiFine / CIT", type: "toggle", price: 2.1 },
+          { id: "server", label: "Поддержка сервера (авто-выдача)", type: "toggle", price: 1.5 },
+          { id: "optimize", label: "Оптимизация размера пака", type: "toggle", price: 1.2 },
         ],
       },
       { title: "Дополнительно", fields: [sourcesField, urgencyField] },
@@ -446,7 +446,7 @@ export const SERVICES: Service[] = [
     desc: "Оформление клиента через FancyMenu: главное меню, пауза, экран загрузки, анимации и кнопки.",
     icon: "Monitor",
     group: "mc",
-    base: 14,
+    base: 3,
     days: [2, 5],
     steps: [
       {
@@ -468,9 +468,9 @@ export const SERVICES: Service[] = [
       {
         title: "Экраны",
         fields: [
-          { id: "main", label: "Главное меню", type: "toggle", price: 9.5, def: true },
-          { id: "pause", label: "Меню паузы", type: "toggle", price: 6.5 },
-          { id: "loading", label: "Загрузочный экран", type: "toggle", price: 8 },
+          { id: "main", label: "Главное меню", type: "toggle", price: 2.1, def: true },
+          { id: "pause", label: "Меню паузы", type: "toggle", price: 1.5 },
+          { id: "loading", label: "Загрузочный экран", type: "toggle", price: 1.8 },
           {
             id: "extra",
             label: "Дополнительные экраны",
@@ -480,7 +480,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 0,
             unit: "шт.",
-            pricePerUnit: 4,
+            pricePerUnit: 1,
             daysPerUnit: 0.3,
           },
         ],
@@ -488,14 +488,14 @@ export const SERVICES: Service[] = [
       {
         title: "Оформление",
         fields: [
-          { id: "anim", label: "Анимации", type: "toggle", price: 8 },
-          { id: "buttons", label: "Собственные кнопки", type: "toggle", price: 6.5 },
-          { id: "logo", label: "Логотип проекта", type: "toggle", price: 5 },
-          { id: "bg", label: "Кастомный фон", type: "toggle", price: 5.5 },
-          { id: "model", label: "Модель персонажа на фоне", type: "toggle", price: 9.5 },
-          { id: "music", label: "Музыка", type: "toggle", price: 5 },
-          { id: "transitions", label: "Переходы между экранами", type: "toggle", price: 6.5 },
-          { id: "connect", label: "Кнопка подключения к серверу", type: "toggle", price: 4 },
+          { id: "anim", label: "Анимации", type: "toggle", price: 1.8 },
+          { id: "buttons", label: "Собственные кнопки", type: "toggle", price: 1.5 },
+          { id: "logo", label: "Логотип проекта", type: "toggle", price: 1.2 },
+          { id: "bg", label: "Кастомный фон", type: "toggle", price: 1.2 },
+          { id: "model", label: "Модель персонажа на фоне", type: "toggle", price: 2.1 },
+          { id: "music", label: "Музыка", type: "toggle", price: 1.2 },
+          { id: "transitions", label: "Переходы между экранами", type: "toggle", price: 1.5 },
+          { id: "connect", label: "Кнопка подключения к серверу", type: "toggle", price: 1 },
         ],
       },
       { title: "Дополнительно", fields: [sourcesField, urgencyField] },
@@ -511,7 +511,7 @@ export const SERVICES: Service[] = [
     desc: "Строим карты любого масштаба: спавны, арены, лор-локации, редстоун и командные блоки.",
     icon: "Map",
     group: "content",
-    base: 18,
+    base: 3.6,
     days: [4, 9],
     steps: [
       {
@@ -570,20 +570,20 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 4,
             unit: "шт.",
-            pricePerUnit: 4,
+            pricePerUnit: 1,
             daysPerUnit: 0.4,
           },
-          { id: "interior", label: "Интерьеры", type: "toggle", price: 11 },
-          { id: "terrain", label: "Ручной ландшафт", type: "toggle", price: 14 },
-          { id: "unique", label: "Уникальные постройки", type: "toggle", price: 16 },
+          { id: "interior", label: "Интерьеры", type: "toggle", price: 2.4 },
+          { id: "terrain", label: "Ручной ландшафт", type: "toggle", price: 3 },
+          { id: "unique", label: "Уникальные постройки", type: "toggle", price: 3 },
         ],
       },
       {
         title: "Механика",
         fields: [
-          { id: "redstone", label: "Редстоун-механизмы", type: "toggle", price: 11 },
-          { id: "cmdblocks", label: "Командные блоки", type: "toggle", price: 9.5 },
-          { id: "optimize", label: "Оптимизация карты", type: "toggle", price: 6.5 },
+          { id: "redstone", label: "Редстоун-механизмы", type: "toggle", price: 2.4 },
+          { id: "cmdblocks", label: "Командные блоки", type: "toggle", price: 2.1 },
+          { id: "optimize", label: "Оптимизация карты", type: "toggle", price: 1.5 },
         ],
       },
       { title: "Дополнительно", fields: [urgencyField] },
@@ -599,7 +599,7 @@ export const SERVICES: Service[] = [
     desc: "Рисуем скины: классический и slim формат, шейдинг, детализация, несколько вариантов.",
     icon: "User",
     group: "content",
-    base: 5,
+    base: 1.2,
     days: [1, 3],
     steps: [
       {
@@ -650,11 +650,11 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 1,
             unit: "шт.",
-            pricePerUnit: 3,
+            pricePerUnit: 1,
             daysPerUnit: 0.4,
           },
-          { id: "layers", label: "Дополнительные слои (шляпа, плащ)", type: "toggle", price: 2.5 },
-          { id: "hq", label: "Повышенная детализация", type: "toggle", price: 4 },
+          { id: "layers", label: "Дополнительные слои (шляпа, плащ)", type: "toggle", price: 1 },
+          { id: "hq", label: "Повышенная детализация", type: "toggle", price: 1 },
           { id: "ref", label: "Есть референс", type: "toggle", price: -2, desc: "Скидка за готовый референс" },
         ],
       },
@@ -671,7 +671,7 @@ export const SERVICES: Service[] = [
     desc: "Графика для игровых проектов: баннеры, аватары, карточки, оформление соцсетей и сайта.",
     icon: "Paint",
     group: "content",
-    base: 8,
+    base: 1.8,
     days: [2, 4],
     steps: [
       {
@@ -727,7 +727,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 1,
             unit: "шт.",
-            pricePerUnit: 5.5,
+            pricePerUnit: 1.2,
             daysPerUnit: 0.4,
           },
           sourcesField,
@@ -746,7 +746,7 @@ export const SERVICES: Service[] = [
     desc: "Логотипы для игровых и корпоративных проектов: концепты, правки, прозрачный фон и исходники.",
     icon: "Sparkle",
     group: "content",
-    base: 12,
+    base: 2.4,
     days: [2, 5],
     steps: [
       {
@@ -787,7 +787,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 2,
             unit: "шт.",
-            pricePerUnit: 6.5,
+            pricePerUnit: 1.5,
             daysPerUnit: 0.5,
           },
           {
@@ -799,7 +799,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 2,
             unit: "шт.",
-            pricePerUnit: 2.5,
+            pricePerUnit: 1,
             daysPerUnit: 0.2,
           },
         ],
@@ -807,9 +807,9 @@ export const SERVICES: Service[] = [
       {
         title: "Выдача файлов",
         fields: [
-          { id: "transparent", label: "Прозрачный фон (PNG)", type: "toggle", price: 2.5, def: true },
+          { id: "transparent", label: "Прозрачный фон (PNG)", type: "toggle", price: 1, def: true },
           sourcesField,
-          { id: "variants", label: "Дополнительные версии (тёмная, светлая, иконка)", type: "toggle", price: 8 },
+          { id: "variants", label: "Дополнительные версии (тёмная, светлая, иконка)", type: "toggle", price: 1.8 },
         ],
       },
       { title: "Дополнительно", fields: [urgencyField] },
@@ -825,7 +825,7 @@ export const SERVICES: Service[] = [
     desc: "Организация и проведение ивентов под ключ: сценарий, карта, плагины, ведущий, награды и трансляция.",
     icon: "Gift",
     group: "other",
-    base: 32,
+    base: 6,
     days: [5, 12],
     steps: [
       {
@@ -852,7 +852,7 @@ export const SERVICES: Service[] = [
             step: 2,
             def: 24,
             unit: "уч.",
-            pricePerUnit: 0.4,
+            pricePerUnit: 1,
             daysPerUnit: 0.02,
           },
           {
@@ -864,7 +864,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 2,
             unit: "дн.",
-            pricePerUnit: 5,
+            pricePerUnit: 1.2,
             daysPerUnit: 0.5,
           },
           {
@@ -876,7 +876,7 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 3,
             unit: "шт.",
-            pricePerUnit: 4,
+            pricePerUnit: 1,
             daysPerUnit: 0.3,
           },
         ],
@@ -884,19 +884,19 @@ export const SERVICES: Service[] = [
       {
         title: "Подготовка",
         fields: [
-          { id: "map", label: "Карта под ивент", type: "toggle", price: 18 },
-          { id: "script", label: "Сценарий и лор", type: "toggle", price: 12 },
-          { id: "plugins", label: "Плагины под механику", type: "toggle", price: 20 },
-          { id: "decor", label: "Оформление и графика", type: "toggle", price: 9.5 },
+          { id: "map", label: "Карта под ивент", type: "toggle", price: 3.6 },
+          { id: "script", label: "Сценарий и лор", type: "toggle", price: 2.4 },
+          { id: "plugins", label: "Плагины под механику", type: "toggle", price: 3.9 },
+          { id: "decor", label: "Оформление и графика", type: "toggle", price: 2.1 },
         ],
       },
       {
         title: "Проведение",
         fields: [
-          { id: "host", label: "Ведущий", type: "toggle", price: 11 },
-          { id: "tech", label: "Техническое сопровождение", type: "toggle", price: 13, def: true },
-          { id: "rewards", label: "Наградная система", type: "toggle", price: 8 },
-          { id: "stream", label: "Трансляция", type: "toggle", price: 14 },
+          { id: "host", label: "Ведущий", type: "toggle", price: 2.4 },
+          { id: "tech", label: "Техническое сопровождение", type: "toggle", price: 2.7, def: true },
+          { id: "rewards", label: "Наградная система", type: "toggle", price: 1.8 },
+          { id: "stream", label: "Трансляция", type: "toggle", price: 3 },
         ],
       },
       { title: "Дополнительно", fields: [urgencyField] },
@@ -912,7 +912,7 @@ export const SERVICES: Service[] = [
     desc: "Сайты для игровых сообществ: лендинги, личные кабинеты, админки, оплата и интеграции.",
     icon: "Globe",
     group: "other",
-    base: 36,
+    base: 7.2,
     days: [5, 14],
     steps: [
       {
@@ -938,30 +938,30 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 3,
             unit: "шт.",
-            pricePerUnit: 7,
+            pricePerUnit: 1.5,
             daysPerUnit: 0.5,
           },
-          { id: "mobile", label: "Адаптация под мобильные", type: "toggle", price: 9.5, def: true },
-          { id: "anim", label: "Анимации и интерактив", type: "toggle", price: 12 },
+          { id: "mobile", label: "Адаптация под мобильные", type: "toggle", price: 2.1, def: true },
+          { id: "anim", label: "Анимации и интерактив", type: "toggle", price: 2.4 },
         ],
       },
       {
         title: "Функциональность",
         fields: [
-          { id: "auth", label: "Авторизация", type: "toggle", price: 20 },
-          { id: "cabinet", label: "Личный кабинет", type: "toggle", price: 28 },
-          { id: "db", label: "База данных", type: "toggle", price: 16 },
-          { id: "admin", label: "Административная панель", type: "toggle", price: 24 },
-          { id: "form", label: "Форма заказа / заявок", type: "toggle", price: 8 },
-          { id: "bots", label: "Подключение Telegram / Discord", type: "toggle", price: 11 },
-          { id: "pay", label: "Платёжная система", type: "toggle", price: 24 },
+          { id: "auth", label: "Авторизация", type: "toggle", price: 3.9 },
+          { id: "cabinet", label: "Личный кабинет", type: "toggle", price: 5.4 },
+          { id: "db", label: "База данных", type: "toggle", price: 3 },
+          { id: "admin", label: "Административная панель", type: "toggle", price: 4.5 },
+          { id: "form", label: "Форма заказа / заявок", type: "toggle", price: 1.8 },
+          { id: "bots", label: "Подключение Telegram / Discord", type: "toggle", price: 2.4 },
+          { id: "pay", label: "Платёжная система", type: "toggle", price: 4.5 },
         ],
       },
       {
         title: "Запуск",
         fields: [
-          { id: "domain", label: "Подключение домена", type: "toggle", price: 5 },
-          { id: "deploy", label: "Публикация сайта", type: "toggle", price: 6.5, def: true },
+          { id: "domain", label: "Подключение домена", type: "toggle", price: 1.2 },
+          { id: "deploy", label: "Публикация сайта", type: "toggle", price: 1.5, def: true },
           {
             id: "aftercare",
             label: "Дальнейшая поддержка",
@@ -969,8 +969,8 @@ export const SERVICES: Service[] = [
             def: "none",
             options: [
               { id: "none", label: "Не нужна", price: 0 },
-              { id: "month", label: "1 месяц", price: 20 },
-              { id: "quarter", label: "3 месяца", price: 48 },
+              { id: "month", label: "1 месяц", price: 3.9 },
+              { id: "quarter", label: "3 месяца", price: 8.4 },
             ],
           },
         ],
@@ -988,7 +988,7 @@ export const SERVICES: Service[] = [
     desc: "Диагностика, починка конфигов, устранение ошибок, обновления и бэкапы вашего проекта.",
     icon: "Heart",
     group: "other",
-    base: 6.5,
+    base: 1.5,
     days: [1, 2],
     steps: [
       {
@@ -1042,14 +1042,14 @@ export const SERVICES: Service[] = [
             step: 1,
             def: 2,
             unit: "ч.",
-            pricePerUnit: 4,
+            pricePerUnit: 1,
             daysPerUnit: 0.1,
           },
-          { id: "diag", label: "Удалённая диагностика", type: "toggle", price: 4, def: true },
-          { id: "fixcfg", label: "Исправление конфигураций", type: "toggle", price: 6.5 },
-          { id: "fixbugs", label: "Исправление ошибок", type: "toggle", price: 9.5 },
-          { id: "update", label: "Обновление проекта", type: "toggle", price: 11 },
-          { id: "backup", label: "Резервное копирование", type: "toggle", price: 5 },
+          { id: "diag", label: "Удалённая диагностика", type: "toggle", price: 1, def: true },
+          { id: "fixcfg", label: "Исправление конфигураций", type: "toggle", price: 1.5 },
+          { id: "fixbugs", label: "Исправление ошибок", type: "toggle", price: 2.1 },
+          { id: "update", label: "Обновление проекта", type: "toggle", price: 2.4 },
+          { id: "backup", label: "Резервное копирование", type: "toggle", price: 1.2 },
         ],
       },
       { title: "Дополнительно", fields: [urgencyField] },

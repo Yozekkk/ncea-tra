@@ -60,9 +60,12 @@ export function DesktopNav({
       <span className="nv-pill" style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.ready ? 1 : 0 }} />
 
       {NAV_ITEMS.map((item) => {
+        const Icon = item.icon;
+
         if (item.kind === "route") {
           return (
             <Link key={item.key} to={item.to} onClick={onHome} className={itemClass(item.key)} ref={(node) => { itemRefs.current[item.key] = node; }}>
+              <Icon className="nv-item-icon" aria-hidden="true" />
               {item.label}
             </Link>
           );
@@ -82,10 +85,11 @@ export function DesktopNav({
                 aria-expanded={megaOpen}
                 aria-haspopup="menu"
                 onClick={onToggleMega}
-                className={`${itemClass(item.key)} gap-1.5`}
+                className={itemClass(item.key)}
               >
+                <Icon className="nv-item-icon" aria-hidden="true" />
                 {item.label}
-                <I.Chevron className={`h-3.5 w-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`} />
+                <I.Chevron className={`h-3.5 w-3.5 opacity-70 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`} />
               </button>
               {megaOpen && <ServicesDropdown onPick={onCloseMega} />}
             </div>
@@ -100,6 +104,7 @@ export function DesktopNav({
             onClick={() => onHash(item.key, item.hash)}
             className={`${itemClass(item.key)}${item.key === "partner" ? " hidden xl:inline-flex" : ""}`}
           >
+            <Icon className="nv-item-icon" aria-hidden="true" />
             {item.label}
           </button>
         );

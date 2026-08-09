@@ -3,6 +3,7 @@ import { I } from "@/components/site/ui";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GROUPS, SERVICES, startingPrice } from "@/lib/services";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/services")({
 });
 
 function ServicesPage() {
+  const { fmt } = useCurrency();
   return (
     <div className="relative min-h-screen bg-stone-950 text-white overflow-x-hidden">
       <div className="noise fixed inset-0 opacity-40 pointer-events-none z-0" />
@@ -56,7 +58,7 @@ function ServicesPage() {
                       <h3 className="mt-4 font-display font-bold text-lg">{service.title}</h3>
                       <p className="mt-2 text-sm text-white/50 flex-1">{service.short}</p>
                       <div className="mt-5 flex items-center justify-between gap-4 text-sm">
-                        <span className="text-white/70">От <b className="gradient-text">{startingPrice(service)}</b></span>
+                        <span className="text-white/70">От <b className="gradient-text">{fmt(startingPrice(service))}</b></span>
                         <span className="text-white/45">Срок: от {service.days[0]} дн.</span>
                       </div>
                       <Link to={service.path} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full gradient-btn px-5 text-sm font-medium">

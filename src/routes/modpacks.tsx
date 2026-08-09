@@ -8,7 +8,7 @@ export const Route = createFileRoute("/modpacks")({
   head: () => ({
     meta: [
       { title: `${service.title} — NCEA` },
-      { name: "description", content: `${service.short}. Онлайн-расчёт стоимости, от ${startingPrice(service)}.` },
+      { name: "description", content: `${service.short}. Онлайн-расчёт стоимости, от ${startingPrice(service)} €.` },
       { property: "og:title", content: `${service.title} — NCEA` },
       { property: "og:description", content: service.desc },
       { property: "og:type", content: "website" },

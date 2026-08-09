@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { I, LOGO_MARK, LOGO_ROUND } from "@/components/site/ui";
 import { SERVICES, startingPrice } from "@/lib/services";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,6 +52,7 @@ const faq = [
 
 function HomePage() {
   const [openedFaq, setOpenedFaq] = useState<number | null>(0);
+  const { fmt: fmtMoney } = useCurrency();
   const doubledReviews = [...reviews, ...reviews];
 
   return (
@@ -58,6 +60,7 @@ function HomePage() {
       <div className="noise fixed inset-0 z-0 opacity-35 pointer-events-none" />
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
+      <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
       <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
       <SiteHeader />
 
@@ -101,7 +104,7 @@ function HomePage() {
                           <I.Arrow className="h-4 w-4 text-white/25 transition group-hover:translate-x-1 group-hover:text-brand-orange" />
                         </div>
                         <div className="mt-4 font-display font-bold text-white">{service.title}</div>
-                        <div className="mt-1 text-xs text-white/42">От {startingPrice(service)} € · от {service.days[0]} дней</div>
+                        <div className="mt-1 text-xs text-white/42">От {fmtMoney(startingPrice(service))} · от {service.days[0]} дней</div>
                       </Link>
                     );
                   })}
@@ -141,7 +144,7 @@ function HomePage() {
                   <div className="flex items-start justify-between"><span className="liquid-icon inline-flex h-12 w-12 items-center justify-center text-brand-orange"><Icon className="h-6 w-6" /></span>{index < 2 && <span className="rounded-full border border-brand-orange/25 bg-brand-orange/10 px-3 py-1 text-[10px] uppercase tracking-wider text-brand-orange">Популярно</span>}</div>
                   <h3 className="mt-6 font-display text-xl font-bold">{service.title}</h3>
                   <p className="mt-3 flex-1 text-sm leading-6 text-white/47">{service.short}</p>
-                  <div className="mt-6 flex items-center justify-between text-sm"><span>От <b className="gradient-text">{startingPrice(service)} €</b></span><span className="text-white/38">от {service.days[0]} дней</span></div>
+                  <div className="mt-6 flex items-center justify-between text-sm"><span>От <b className="gradient-text">{fmtMoney(startingPrice(service))}</b></span><span className="text-white/38">от {service.days[0]} дней</span></div>
                   <Link to={service.path} className="liquid-secondary mt-4 inline-flex h-11 items-center justify-center gap-2 px-5">Настроить заказ <I.Arrow className="h-4 w-4" /></Link>
                 </article>
               );

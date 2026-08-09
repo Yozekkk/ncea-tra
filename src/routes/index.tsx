@@ -61,6 +61,7 @@ function HomePage() {
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
       <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
+      <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
       <SiteHeader />
 
       <main className="relative z-10">

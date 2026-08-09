@@ -52,6 +52,7 @@ const faq = [
 
 function HomePage() {
   const [openedFaq, setOpenedFaq] = useState<number | null>(0);
+  const { fmt: fmtMoney } = useCurrency();
   const doubledReviews = [...reviews, ...reviews];
 
   return (

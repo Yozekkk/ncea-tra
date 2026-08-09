@@ -99,3 +99,4 @@
 .nv-cur-mobile{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04)}
 .nv-cur-seg{height:42px;border-radius:13px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);transition:background .2s ease,color .2s ease}
 .nv-cur-seg.is-active{color:#fff;background:linear-gradient(135deg,rgba(255,23,56,.9),rgba(255,138,34,.9));box-shadow:0 8px 20px rgba(255,80,40,.28)}
+.nv-item{gap:7px}

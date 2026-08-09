@@ -78,3 +78,24 @@
 .magnetic{transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease}.magnetic:hover{transform:translateY(-2px) scale(1.02)}
 @media(min-width:1024px){:where(.nv-icon-btn),.nv-sheet{display:none!important}}
 @media(max-width:767px){.nv-bar .nv-cta{display:none}}
+
+/* ===== Navbar: иконки пунктов и переключатель валют ===== */
+.nv-item-icon{height:15px;width:15px;flex:none;opacity:.7;transition:opacity .2s ease,color .2s ease}
+.nv-item.is-active .nv-item-icon,.nv-item:hover .nv-item-icon{opacity:1;color:#ff8a22}
+.nv-row-icon{height:18px;width:18px;flex:none;color:#ff8a22}
+
+.nv-cur-wrap{position:relative;flex:none}
+:where(.nv-cur-btn){display:inline-flex}
+.nv-cur-btn{height:40px;align-items:center;gap:7px;padding:0 12px;border-radius:999px;font-size:13px;color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);backdrop-filter:blur(18px);transition:background .22s ease,transform .22s ease,border-color .22s ease}
+.nv-cur-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,138,34,.35)}
+.nv-cur-btn:active{transform:scale(.97)}
+.nv-cur-menu{position:absolute;right:0;top:calc(100% + 10px);z-index:90;width:210px;padding:6px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(14,12,12,.96);backdrop-filter:blur(24px);box-shadow:0 24px 60px rgba(0,0,0,.55);animation:nvCurIn .18s cubic-bezier(.2,.8,.2,1)}
+@keyframes nvCurIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.nv-cur-item{display:flex;width:100%;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;transition:background .18s ease}
+.nv-cur-item:hover{background:rgba(255,255,255,.07)}
+.nv-cur-item.is-active{background:rgba(255,138,34,.1)}
+.nv-cur-sym{display:inline-flex;height:28px;width:28px;flex:none;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:700;color:#ff8a22;border:1px solid rgba(255,138,34,.25);background:rgba(255,138,34,.1)}
+
+.nv-cur-mobile{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04)}
+.nv-cur-seg{height:42px;border-radius:13px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);transition:background .2s ease,color .2s ease}
+.nv-cur-seg.is-active{color:#fff;background:linear-gradient(135deg,rgba(255,23,56,.9),rgba(255,138,34,.9));box-shadow:0 8px 20px rgba(255,80,40,.28)}

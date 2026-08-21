@@ -58,10 +58,11 @@ function HomePage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-stone-950 text-white">
       <div className="noise fixed inset-0 z-0 opacity-35 pointer-events-none" />
+      <div className="ncea-decor" aria-hidden="true" />
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
       <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
-      <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
+
       <SiteHeader />
 
       <main className="relative z-10">

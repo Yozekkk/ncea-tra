@@ -508,10 +508,6 @@ body {
 
 /* ---- service / bento cards ---- */
 #services-preview .reveal-stagger { grid-auto-rows: 1fr; }
-@media (min-width: 1024px) {
-  #services-preview article:nth-child(1) { grid-column: span 2; }
-  #services-preview article:nth-child(6) { grid-column: span 2; }
-}
 #services-preview article { border-radius: 26px; }
 #services-preview article::after {
   content: ""; position: absolute; right: -40px; top: -40px; width: 190px; height: 190px;
@@ -522,7 +518,7 @@ body {
 #services-preview article:hover { transform: translateY(-6px) scale(1.012); }
 
 /* ---- portfolio showcase ---- */
-#portfolio article { min-height: 340px; border-radius: 28px; background: linear-gradient(150deg, rgba(255,255,255,.05), rgba(255,255,255,.015)), radial-gradient(circle at 88% 8%, rgba(255,122,24,.14), transparent 38%); }
+#portfolio article { min-height: 300px; border-radius: 28px; background: linear-gradient(150deg, rgba(255,255,255,.05), rgba(255,255,255,.015)), radial-gradient(circle at 88% 8%, rgba(255,122,24,.14), transparent 38%); }
 #portfolio article:hover { transform: translateY(-6px); border-color: rgba(255,122,24,.28); }
 #portfolio h3 { text-transform: uppercase; letter-spacing: -.02em; font-size: clamp(1.35rem,2.4vw,2rem); }
 #portfolio .portfolio-code-index { opacity: .5; }
@@ -544,6 +540,3 @@ a, button { transition-duration: .25s; }
   #home h1 { font-size: clamp(2rem, 10.5vw, 3rem); }
   .ncea-decor::after { display: none; }
 }
-
-.nv-brand-text{max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap}
-@media(max-width:1279px){.nv-brand-text span{display:none}}

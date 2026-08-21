@@ -66,7 +66,7 @@ function HomePage() {
       <SiteHeader />
 
       <main className="relative z-10">
-        <section id="home" className="relative flex min-h-screen items-center overflow-hidden pb-16 pt-24">
+        <section id="home" className="relative flex min-h-[82vh] items-center overflow-hidden pb-20 pt-28">
           <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
             <div className="reveal min-w-0">
               <div className="liquid-secondary inline-flex items-center gap-2 px-4 py-2 text-xs text-white/70">

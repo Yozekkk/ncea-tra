@@ -544,3 +544,6 @@ a, button { transition-duration: .25s; }
   #home h1 { font-size: clamp(2rem, 10.5vw, 3rem); }
   .ncea-decor::after { display: none; }
 }
+
+.nv-brand-text{max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap}
+@media(max-width:1279px){.nv-brand-text span{display:none}}

@@ -58,14 +58,15 @@ function HomePage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-stone-950 text-white">
       <div className="noise fixed inset-0 z-0 opacity-35 pointer-events-none" />
+      <div className="ncea-decor" aria-hidden="true" />
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
       <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
-      <div className="network-background" aria-hidden="true"><span className="network-layer network-layer-a" /><span className="network-layer network-layer-b" /></div>
+
       <SiteHeader />
 
       <main className="relative z-10">
-        <section id="home" className="relative flex min-h-screen items-center overflow-hidden pb-16 pt-24">
+        <section id="home" className="relative flex min-h-[82vh] items-center overflow-hidden pb-20 pt-28">
           <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
             <div className="reveal min-w-0">
               <div className="liquid-secondary inline-flex items-center gap-2 px-4 py-2 text-xs text-white/70">

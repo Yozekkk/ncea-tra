@@ -486,7 +486,7 @@ body {
 #home::after {
   content: ""; position: absolute; right: -12%; top: -14%;
   width: min(78vw, 1000px); height: min(78vw, 1000px);
-  background: radial-gradient(circle, rgba(255,90,16,.32), rgba(255,60,10,.1) 42%, transparent 68%);
+  background: radial-gradient(circle, rgba(255,90,16,.18), rgba(255,60,10,.06) 42%, transparent 66%);
   filter: blur(30px); pointer-events: none; z-index: -1;
 }
 #home h1 {
@@ -495,7 +495,9 @@ body {
   font-weight: 900;
   letter-spacing: -.035em;
   line-height: .92;
-  font-size: clamp(2.35rem, 6.6vw, 5.4rem);
+  font-size: clamp(2.1rem, 4.6vw, 4.1rem);
+  max-width: 15ch;
+  overflow-wrap: break-word;
 }
 #home h1 .gradient-text { display: inline-block; }
 #home .text-lead { max-width: 34rem; font-size: clamp(1rem,1.15vw,1.12rem); }

@@ -11,6 +11,7 @@ import liquidCss from "../liquid.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const SITE_URL = "https://ncea-tra.vercel.app";
+let motionReady = false;
 
 function RouteEffects() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -20,11 +21,17 @@ function RouteEffects() {
   }, [pathname]);
 
   useEffect(() => {
-    const nodes = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
-    if (!("IntersectionObserver" in window)) {
-      nodes.forEach((node) => node.classList.add("is-visible"));
+    const selector = ".reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger, .image-reveal";
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      document.querySelectorAll<HTMLElement>(selector).forEach((node) => node.classList.add("is-visible"));
       return;
     }
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll<HTMLElement>(selector).forEach((node) => node.classList.add("is-visible"));
+      return;
+    }
+    const registered = new WeakSet<Element>();
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -33,8 +40,98 @@ function RouteEffects() {
         }
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    const register = () => {
+      document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
+        if (registered.has(node)) return;
+        registered.add(node);
+        observer.observe(node);
+      });
+    };
+    // Lazy route content may still be hydrating when the root effect mounts.
+    // Register after that window so DOM classes never race React hydration.
+    const delay = motionReady ? 60 : 1700;
+    const startTimer = window.setTimeout(() => {
+      register();
+      motionReady = true;
+    }, delay);
+    const lateTimer = window.setTimeout(register, delay + 320);
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearTimeout(lateTimer);
+      observer.disconnect();
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    if (reducedMotion) return;
+    let stop: () => void = () => undefined;
+    const delay = motionReady ? 80 : 1700;
+    const startTimer = window.setTimeout(() => {
+      const parallaxNodes = Array.from(document.querySelectorAll<HTMLElement>(".js-scroll-parallax"));
+      const scenes = coarsePointer ? [] : Array.from(document.querySelectorAll<HTMLElement>(".js-parallax-scene"));
+      const cleanups: Array<() => void> = [];
+      let scrollFrame = 0;
+      const updateScrollParallax = () => {
+        scrollFrame = 0;
+        const viewport = window.innerHeight;
+        parallaxNodes.forEach((node) => {
+          const rect = node.getBoundingClientRect();
+          const progress = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - viewport / 2) / viewport));
+          node.style.setProperty("--scroll-shift", `${progress * -18}px`);
+        });
+      };
+      const onScroll = () => {
+        if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScrollParallax);
+      };
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+
+      scenes.forEach((scene) => {
+        let pointerFrame = 0;
+        let nextX = 0;
+        let nextY = 0;
+        const paint = () => {
+          pointerFrame = 0;
+          scene.style.setProperty("--parallax-x", `${nextX}px`);
+          scene.style.setProperty("--parallax-y", `${nextY}px`);
+          scene.style.setProperty("--parallax-x-slow", `${nextX * 0.28}px`);
+          scene.style.setProperty("--parallax-y-slow", `${nextY * 0.28}px`);
+          scene.style.setProperty("--parallax-x-mid", `${nextX * 0.58}px`);
+          scene.style.setProperty("--parallax-y-mid", `${nextY * 0.58}px`);
+          scene.style.setProperty("--parallax-x-fast", `${nextX * 0.95}px`);
+          scene.style.setProperty("--parallax-y-fast", `${nextY * 0.95}px`);
+        };
+        const onMove = (event: PointerEvent) => {
+          const rect = scene.getBoundingClientRect();
+          nextX = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
+          nextY = ((event.clientY - rect.top) / rect.height - 0.5) * 12;
+          if (!pointerFrame) pointerFrame = window.requestAnimationFrame(paint);
+        };
+        const onLeave = () => {
+          nextX = 0;
+          nextY = 0;
+          if (!pointerFrame) pointerFrame = window.requestAnimationFrame(paint);
+        };
+        scene.addEventListener("pointermove", onMove, { passive: true });
+        scene.addEventListener("pointerleave", onLeave, { passive: true });
+        cleanups.push(() => {
+          scene.removeEventListener("pointermove", onMove);
+          scene.removeEventListener("pointerleave", onLeave);
+          if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+        });
+      });
+      stop = () => {
+        window.removeEventListener("scroll", onScroll);
+        if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+        cleanups.forEach((cleanup) => cleanup());
+      };
+    }, delay);
+    return () => {
+      window.clearTimeout(startTimer);
+      stop();
+    };
   }, [pathname]);
 
   return null;
@@ -165,3 +262,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

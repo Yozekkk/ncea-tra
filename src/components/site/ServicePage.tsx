@@ -83,15 +83,15 @@ export function ServicePage({ id }: { id: string }) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-stone-950 text-white">
+    <div className="ncea-service-page relative min-h-screen overflow-x-hidden bg-stone-950 text-white">
       <div className="noise fixed inset-0 z-0 opacity-35 pointer-events-none" />
       <div className="liquid-orb liquid-orb-a" />
       <div className="liquid-orb liquid-orb-b" />
       <SiteHeader />
       <main className="relative z-10 pb-28 pt-28">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <Breadcrumbs title={service.title} />
-          <div className="mt-6 flex items-start gap-4">
+          <div className="reveal-left"><Breadcrumbs title={service.title} /></div>
+          <div className="service-title-block reveal-up mt-6 flex items-start gap-4">
             <span className="liquid-icon inline-flex h-12 w-12 shrink-0 items-center justify-center text-brand-orange">
               {(() => { const Icon = I[service.icon]; return <Icon className="h-6 w-6" />; })()}
             </span>
@@ -102,7 +102,7 @@ export function ServicePage({ id }: { id: string }) {
           </div>
 
           <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1fr_360px]">
-            <section className="liquid-panel relative overflow-hidden p-5 sm:p-7 lg:p-8" aria-label={`Конфигуратор: ${service.title}`}>
+            <section className="service-configurator reveal-up liquid-panel relative overflow-hidden p-5 sm:p-7 lg:p-8" aria-label={`Конфигуратор: ${service.title}`}>
               <Blob className="-right-24 -top-32 h-[320px] w-[320px] bg-brand-red/15" />
               <div className="relative">
                 <div className="flex items-center justify-between gap-3 text-xs text-white/50">
@@ -183,7 +183,7 @@ export function ServicePage({ id }: { id: string }) {
 
                 {isCheckout && (
                   <div className="mt-8 fade-up text-center">
-                    <img src={LOGO_ROUND} alt="NCEA" width={96} height={96} className="mx-auto h-24 w-24 rounded-full object-cover shadow-[0_14px_45px_rgba(255,90,45,.3)]" />
+                    <img src={LOGO_ROUND} alt="NCEA" width={96} height={96} loading="lazy" className="mx-auto h-24 w-24 rounded-full object-cover shadow-[0_14px_45px_rgba(255,90,45,.3)]" />
                     <h2 className="mt-5 font-display text-3xl font-bold">Свяжитесь с менеджером</h2>
                     <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/55">Параметры заказа уже собраны. Выберите удобный мессенджер — в Telegram откроется готовый текст заявки, а в Discord вы попадёте на сервер NCEA.</p>
                     <div className="mt-7 grid gap-3 sm:grid-cols-2">
@@ -201,7 +201,7 @@ export function ServicePage({ id }: { id: string }) {
               </div>
             </section>
 
-            <aside className="liquid-panel p-6 lg:sticky lg:top-24">
+            <aside className="service-summary reveal-right liquid-panel p-6 lg:sticky lg:top-24">
               <div className="text-[11px] uppercase tracking-widest text-white/40">Предварительно</div>
               <div className="gradient-text mt-2 font-display text-4xl font-black">{fmt(quote.total)}</div>
               <div className="mt-1 text-sm text-white/50">Срок: {quote.daysMin}–{quote.daysMax} дней</div>
@@ -225,3 +225,4 @@ function Input({ label, value, onChange, placeholder, textarea }: { label: strin
   const className = "liquid-input mt-1.5 w-full px-4 py-3 text-sm text-white outline-none placeholder:text-white/30";
   return <label className="block text-sm"><span className="text-white/60">{label}</span>{textarea ? <textarea rows={4} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className={className} /> : <input value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className={className} />}</label>;
 }
+

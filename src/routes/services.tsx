@@ -22,21 +22,21 @@ export const Route = createFileRoute("/services")({
 function ServicesPage() {
   const { fmt } = useCurrency();
   return (
-    <div className="relative min-h-screen bg-stone-950 text-white overflow-x-hidden">
+    <div className="ncea-catalog relative min-h-screen bg-stone-950 text-white overflow-x-hidden">
       <div className="noise fixed inset-0 opacity-40 pointer-events-none z-0" />
       <SiteHeader />
       <main className="relative z-10 pt-28 pb-24">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <nav aria-label="Хлебные крошки" className="flex items-center gap-2 text-xs text-white/45">
+          <nav aria-label="Хлебные крошки" className="reveal-left flex items-center gap-2 text-xs text-white/45">
             <Link to="/" className="hover:text-white transition">Главная</Link><span aria-hidden="true">→</span><span className="text-white/80" aria-current="page">Услуги</span>
           </nav>
 
           <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_340px] lg:items-end">
-            <div>
+            <div className="reveal-up">
               <h1 className="font-display font-extrabold text-4xl lg:text-6xl leading-[1.05]">Все <span className="gradient-text">услуги</span> агентства</h1>
               <p className="mt-4 text-white/55 max-w-2xl">Выберите направление, настройте параметры заказа и сразу получите предварительную стоимость и срок выполнения.</p>
             </div>
-            <div className="glass-card p-5 text-sm text-white/55">
+            <div className="catalog-process reveal-right p-5 text-sm text-white/55">
               <div className="font-display text-lg font-bold text-white">Как это работает</div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                 <span className="rounded-xl bg-white/4 p-3"><b className="block text-brand-orange">1</b>Услуга</span>
@@ -47,13 +47,13 @@ function ServicesPage() {
           </div>
 
           {GROUPS.map((group) => (
-            <section key={group.id} className="mt-14" aria-labelledby={`group-${group.id}`}>
+            <section key={group.id} className="catalog-group mt-14" aria-labelledby={`group-${group.id}`}>
               <div className="flex items-center gap-3"><h2 id={`group-${group.id}`} className="font-display font-bold text-2xl">{group.label}</h2><span className="h-px flex-1 bg-white/10" /></div>
-              <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="catalog-grid reveal-stagger mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {SERVICES.filter((service) => service.group === group.id).map((service) => {
                   const Icon = I[service.icon];
                   return (
-                    <article key={service.id} className="group glass-card p-6 flex flex-col hover-scale">
+                    <article key={service.id} className="catalog-card group p-6 flex flex-col">
                       <span className="inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-linear-to-br from-brand-red/20 to-brand-orange/20 ring-1 ring-white/10 text-brand-orange"><Icon className="w-6 h-6" /></span>
                       <h3 className="mt-4 font-display font-bold text-lg">{service.title}</h3>
                       <p className="mt-2 text-sm text-white/50 flex-1">{service.short}</p>
@@ -76,3 +76,4 @@ function ServicesPage() {
     </div>
   );
 }
+

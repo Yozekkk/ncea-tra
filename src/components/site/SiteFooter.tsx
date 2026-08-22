@@ -5,7 +5,6 @@ import { useHashNav } from "@/components/site/SiteHeader";
 
 const TELEGRAM_URL = "https://t.me/lisiy_bob";
 const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
-const GITHUB_URL = "https://github.com/Yozekkk";
 
 export function SiteFooter() {
   const goHash = useHashNav();
@@ -32,7 +31,6 @@ export function SiteFooter() {
         <div><span>Связь</span><ul>
           <li><a href={TELEGRAM_URL} target="_blank" rel="noreferrer">Telegram: @lisiy_bob</a></li>
           <li><a href={DISCORD_URL} target="_blank" rel="noreferrer">Discord: сервер NCEA</a></li>
-          <li><a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a></li>
           <li>Заказы принимаются через конфигураторы услуг.</li>
         </ul></div>
       </div>

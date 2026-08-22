@@ -18,7 +18,6 @@ export const Route = createFileRoute("/")({
 
 const TELEGRAM_URL = "https://t.me/lisiy_bob";
 const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
-const GITHUB_URL = "https://github.com/Yozekkk";
 
 const featured = ["plugins", "server-setup", "websites", "design", "modpacks", "events"]
   .map((id) => SERVICES.find((service) => service.id === id)).filter(Boolean) as typeof SERVICES;
@@ -103,7 +102,6 @@ function HomePage() {
           <div className="ar-section-heading"><span className="reveal-left">О нас / направления</span><DisplayHeading lines={[{ text: "Команда для развития" }, { text: "Minecraft-проектов", accent: true }]} /></div>
           <div className="ar-direction-stage reveal-scale">
             <div className="ar-direction-nav" role="tablist" aria-label="Направления NCEA">
-              <span className="ar-direction-highlight" aria-hidden="true" style={{ transform: `translate3d(0, calc(${selectedDirection} * var(--direction-step)), 0)` }} />
               {SERVICES.map((service, index) => <button key={service.id} type="button" role="tab" aria-selected={selectedDirection === index} onClick={() => setSelectedDirection(index)} className={selectedDirection === index ? "is-active" : ""}><span>{String(index + 1).padStart(2, "0")}</span>{service.title}</button>)}
             </div>
             <div className="ar-direction-visual image-reveal js-parallax-scene" aria-hidden="true">
@@ -170,7 +168,6 @@ function HomePage() {
             <Link to="/services" className="ar-social-card ar-social-order"><span>01</span><strong>Рассчитать<br />проект</strong><I.Arrow className="h-7 w-7" /></Link>
             <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="ar-social-card"><span>02</span><I.Telegram className="h-12 w-12" /><strong>Telegram</strong><I.Arrow className="h-7 w-7" /></a>
             <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="ar-social-card"><span>03</span><I.Discord className="h-12 w-12" /><strong>Discord</strong><I.Arrow className="h-7 w-7" /></a>
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="ar-social-card"><span>04</span><strong>GitHub</strong><I.Arrow className="h-7 w-7" /></a>
           </div>
         </section>
       </main>

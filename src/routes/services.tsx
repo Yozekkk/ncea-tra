@@ -1,17 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { I } from "@/components/site/ui";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { GROUPS, SERVICES, startingPrice } from "@/lib/services";
+import { GROUPS, SERVICES, startingPrice, type Service } from "@/lib/services";
 import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Услуги NCEA — Minecraft-разработка, дизайн и ивенты" },
-      { name: "description", content: "Все услуги NCEA: плагины, сборки, настройка серверов, сайты, карты, скины, дизайн, логотипы, ресурспаки, FancyMenu, ивенты и поддержка." },
+      {
+        name: "description",
+        content:
+          "Все услуги NCEA: плагины, сборки, настройка серверов, сайты, карты, скины, дизайн, логотипы, ресурспаки, FancyMenu, ивенты и поддержка.",
+      },
       { property: "og:title", content: "Услуги NCEA — Minecraft-разработка, дизайн и ивенты" },
-      { property: "og:description", content: "12 направлений с отдельными конфигураторами, расчётом стоимости и срока выполнения." },
+      {
+        property: "og:description",
+        content:
+          "12 направлений с отдельными конфигураторами, расчётом стоимости и срока выполнения.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -19,57 +28,213 @@ export const Route = createFileRoute("/services")({
   component: ServicesPage,
 });
 
+const CARD_TONES = ["ember", "ink", "paper", "brown"] as const;
+
+function cardSpan(count: number, index: number) {
+  if (count === 5) return ["feature", "hero", "regular", "regular", "regular"][index];
+  if (count === 4) return ["hero", "feature", "half", "half"][index];
+  return "regular";
+}
+
+function ServiceCard({
+  service,
+  index,
+  localIndex,
+  groupCount,
+  fmt,
+}: {
+  service: Service;
+  index: number;
+  localIndex: number;
+  groupCount: number;
+  fmt: (amount: number) => string;
+}) {
+  const Icon = I[service.icon];
+  const number = String(index + 1).padStart(2, "0");
+  const tone = CARD_TONES[index % CARD_TONES.length];
+  const span = cardSpan(groupCount, localIndex);
+  const style = { "--card-delay": `${localIndex * 70}ms` } as CSSProperties;
+
+  return (
+    <Link
+      to={service.path}
+      className={`service-showcase-card service-showcase-card--${tone} service-showcase-card--${span}`}
+      style={style}
+      aria-label={`${service.title}: настроить заказ`}
+    >
+      <span className="service-card-grid" aria-hidden="true" />
+      <Icon className="service-card-symbol" />
+      <span className="service-card-orbit" aria-hidden="true">
+        <i />
+        <i />
+      </span>
+
+      <span className="service-card-top">
+        <span className="service-card-number">{number}</span>
+        {index % 3 === 1 && <span className="service-card-badge">NCEA</span>}
+      </span>
+
+      <span className="service-card-copy">
+        <span className="service-card-kicker">NCEA / SERVICE {number}</span>
+        <strong className="service-card-title">{service.title}</strong>
+        <span className="service-card-description">{service.short}</span>
+      </span>
+
+      <span className="service-card-meta">
+        <span>
+          <small>От</small>
+          <b>{fmt(startingPrice(service))}</b>
+        </span>
+        <span>
+          <small>Срок</small>
+          <b>от {service.days[0]} дн.</b>
+        </span>
+      </span>
+
+      <span className="service-card-action">
+        <b>Настроить заказ</b>
+        <span>
+          <I.Arrow className="h-5 w-5" />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 function ServicesPage() {
   const { fmt } = useCurrency();
-  return (
-    <div className="ncea-catalog relative min-h-screen bg-stone-950 text-white overflow-x-hidden">
-      <div className="noise fixed inset-0 opacity-40 pointer-events-none z-0" />
-      <SiteHeader />
-      <main className="relative z-10 pt-28 pb-24">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <nav aria-label="Хлебные крошки" className="reveal-left flex items-center gap-2 text-xs text-white/45">
-            <Link to="/" className="hover:text-white transition">Главная</Link><span aria-hidden="true">→</span><span className="text-white/80" aria-current="page">Услуги</span>
-          </nav>
+  const catalogRef = useRef<HTMLElement>(null);
 
-          <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_340px] lg:items-end">
-            <div className="reveal-up">
-              <h1 className="font-display font-extrabold text-4xl lg:text-6xl leading-[1.05]">Все <span className="gradient-text">услуги</span> агентства</h1>
-              <p className="mt-4 text-white/55 max-w-2xl">Выберите направление, настройте параметры заказа и сразу получите предварительную стоимость и срок выполнения.</p>
-            </div>
-            <div className="catalog-process reveal-right p-5 text-sm text-white/55">
-              <div className="font-display text-lg font-bold text-white">Как это работает</div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-                <span className="rounded-xl bg-white/4 p-3"><b className="block text-brand-orange">1</b>Услуга</span>
-                <span className="rounded-xl bg-white/4 p-3"><b className="block text-brand-orange">2</b>Настройка</span>
-                <span className="rounded-xl bg-white/4 p-3"><b className="block text-brand-orange">3</b>Заявка</span>
+  useEffect(() => {
+    const root = catalogRef.current;
+    if (!root || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    let frame = 0;
+    const handlePointer = (event: PointerEvent) => {
+      const card = (event.target as HTMLElement).closest<HTMLElement>(".service-showcase-card");
+      if (!card || !root.contains(card)) return;
+      const x = event.clientX;
+      const y = event.clientY;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${x - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${y - rect.top}px`);
+      });
+    };
+
+    root.addEventListener("pointermove", handlePointer, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      root.removeEventListener("pointermove", handlePointer);
+    };
+  }, []);
+
+  return (
+    <div className="ncea-catalog relative min-h-screen bg-stone-950 text-white">
+      <div className="noise fixed inset-0 opacity-30 pointer-events-none z-0" />
+      <SiteHeader />
+      <main ref={catalogRef} className="catalog-main relative z-10">
+        <section className="catalog-hero">
+          <div className="catalog-hero-grid" aria-hidden="true" />
+          <div className="catalog-hero-word" aria-hidden="true">
+            SERVICES
+          </div>
+          <div className="catalog-hero-ring" aria-hidden="true">
+            <i />
+          </div>
+
+          <div className="catalog-shell relative z-10">
+            <nav
+              aria-label="Хлебные крошки"
+              className="reveal-left flex items-center gap-2 text-xs text-white/45"
+            >
+              <Link to="/" className="catalog-text-link">
+                Главная
+              </Link>
+              <span aria-hidden="true">→</span>
+              <span className="text-white/80" aria-current="page">
+                Услуги
+              </span>
+            </nav>
+
+            <div className="catalog-hero-layout">
+              <div>
+                <span className="catalog-eyebrow reveal-left">NCEA / SERVICE DIRECTORY</span>
+                <h1 className="catalog-hero-title reveal-stagger" aria-label="Все услуги агентства">
+                  <span>
+                    <i>Все</i>
+                  </span>
+                  <span>
+                    <i>услуги</i>
+                  </span>
+                  <span>
+                    <i>агентства</i>
+                  </span>
+                </h1>
+                <p className="catalog-hero-copy reveal-up">
+                  Выберите направление, настройте параметры заказа и сразу получите предварительную
+                  стоимость и срок выполнения.
+                </p>
+              </div>
+
+              <div className="catalog-hero-index reveal-right" aria-hidden="true">
+                <span>
+                  AVAILABLE
+                  <br />
+                  DIRECTIONS
+                </span>
+                <b>{String(SERVICES.length).padStart(2, "0")}</b>
+                <i>
+                  NCEA © 2026
+                  <br />
+                  50.4501° N / 30.5234° E
+                </i>
               </div>
             </div>
           </div>
+        </section>
 
-          {GROUPS.map((group) => (
-            <section key={group.id} className="catalog-group mt-14" aria-labelledby={`group-${group.id}`}>
-              <div className="flex items-center gap-3"><h2 id={`group-${group.id}`} className="font-display font-bold text-2xl">{group.label}</h2><span className="h-px flex-1 bg-white/10" /></div>
-              <div className="catalog-grid reveal-stagger mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {SERVICES.filter((service) => service.group === group.id).map((service) => {
-                  const Icon = I[service.icon];
-                  return (
-                    <article key={service.id} className="catalog-card group p-6 flex flex-col">
-                      <span className="inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-linear-to-br from-brand-red/20 to-brand-orange/20 ring-1 ring-white/10 text-brand-orange"><Icon className="w-6 h-6" /></span>
-                      <h3 className="mt-4 font-display font-bold text-lg">{service.title}</h3>
-                      <p className="mt-2 text-sm text-white/50 flex-1">{service.short}</p>
-                      <div className="mt-5 flex items-center justify-between gap-4 text-sm">
-                        <span className="text-white/70">От <b className="gradient-text">{fmt(startingPrice(service))}</b></span>
-                        <span className="text-white/45">Срок: от {service.days[0]} дн.</span>
-                      </div>
-                      <Link to={service.path} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full gradient-btn px-5 text-sm font-medium">
-                        Настроить заказ <I.Arrow className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-          ))}
+        <div className="catalog-groups">
+          {GROUPS.map((group, groupIndex) => {
+            const services = SERVICES.filter((service) => service.group === group.id);
+            return (
+              <section
+                key={group.id}
+                className="catalog-group"
+                aria-labelledby={`group-${group.id}`}
+              >
+                <div className="catalog-shell">
+                  <header className="catalog-group-heading">
+                    <span className="catalog-group-index reveal-left">
+                      {String(groupIndex + 1).padStart(2, "0")} /
+                    </span>
+                    <h2 id={`group-${group.id}`} className="catalog-group-title reveal-stagger">
+                      <span>
+                        <i>{group.label}</i>
+                      </span>
+                    </h2>
+                    <span className="catalog-group-count reveal-right">
+                      {String(services.length).padStart(2, "0")} направлений
+                    </span>
+                  </header>
+
+                  <div className="service-showcase-grid reveal-stagger">
+                    {services.map((service, localIndex) => (
+                      <ServiceCard
+                        key={service.id}
+                        service={service}
+                        index={SERVICES.indexOf(service)}
+                        localIndex={localIndex}
+                        groupCount={services.length}
+                        fmt={fmt}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            );
+          })}
         </div>
       </main>
       <SiteFooter />

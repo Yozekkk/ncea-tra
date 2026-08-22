@@ -52,6 +52,8 @@ export type Service = {
   group: ServiceGroup;
   /** базовая стоимость, € */
   base: number;
+  /** единый коэффициент ко всем денежным составляющим услуги */
+  priceFactor?: number;
   /** базовый срок [мин, макс] в днях */
   days: [number, number];
   steps: Step[];
@@ -62,6 +64,8 @@ export const GROUPS: { id: ServiceGroup; label: string }[] = [
   { id: "content", label: "Контент и оформление" },
   { id: "other", label: "Другие услуги" },
 ];
+
+const REDUCED_PRICE_FACTOR = 0.4;
 
 /* ---------- переиспользуемые наборы опций ---------- */
 
@@ -196,6 +200,7 @@ export const SERVICES: Service[] = [
     desc: "Собираем клиентские и серверные модпаки: подбор модов, конфигурация, квесты, меню и оптимизация.",
     icon: "Cube",
     group: "mc",
+    priceFactor: REDUCED_PRICE_FACTOR,
     base: 1.8,
     days: [4, 8],
     steps: [
@@ -280,6 +285,7 @@ export const SERVICES: Service[] = [
     desc: "Полная настройка Minecraft-сервера: ядро, плагины, права, чат, экономика, античит и оптимизация.",
     icon: "Wrench",
     group: "mc",
+    priceFactor: REDUCED_PRICE_FACTOR,
     base: 2.4,
     days: [3, 7],
     steps: [
@@ -381,6 +387,7 @@ export const SERVICES: Service[] = [
     desc: "Ресурспаки любой сложности: CustomModelData, CIT, интерфейс, шрифты, звуки и поддержка сервера.",
     icon: "Layers",
     group: "mc",
+    priceFactor: REDUCED_PRICE_FACTOR,
     base: 1.2,
     days: [3, 6],
     steps: [
@@ -825,6 +832,7 @@ export const SERVICES: Service[] = [
     desc: "Организация и проведение ивентов под ключ: сценарий, карта, плагины, ведущий, награды и трансляция.",
     icon: "Gift",
     group: "other",
+    priceFactor: REDUCED_PRICE_FACTOR,
     base: 2.4,
     days: [5, 12],
     steps: [
@@ -912,6 +920,7 @@ export const SERVICES: Service[] = [
     desc: "Сайты для игровых сообществ: лендинги, личные кабинеты, админки, оплата и интеграции.",
     icon: "Globe",
     group: "other",
+    priceFactor: REDUCED_PRICE_FACTOR,
     base: 3,
     days: [5, 14],
     steps: [
@@ -1103,6 +1112,15 @@ export function allFields(service: Service): Field[] {
   return service.steps.flatMap((s) => s.fields);
 }
 
+function roundPrice(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+/** Применяет единый коэффициент услуги к сумме в базовой валюте EUR. */
+export function priceForService(service: Service, amount: number) {
+  return roundPrice(amount * (service.priceFactor ?? 1));
+}
+
 export function computeQuote(service: Service, values: Values): Quote {
   let addons = 0;
   let mult = 1;
@@ -1139,21 +1157,25 @@ export function computeQuote(service: Service, values: Values): Quote {
     }
   }
 
-  const base = service.base;
-  const subtotal = base + addons;
+  const rawBase = service.base;
+  const subtotal = rawBase + addons;
   /* Потолок стоимости NCEA — доступные цены для небольших проектов. */
-  const total = Math.min(PRICE_CAP_EUR, Math.max(0, Math.round(subtotal * mult)));
+  const rawTotal = Math.min(PRICE_CAP_EUR, Math.max(0, Math.round(subtotal * mult)));
+  const base = priceForService(service, rawBase);
+  const scaledAddons = priceForService(service, addons);
+  const total = priceForService(service, rawTotal);
+  const scaledLines = lines.map((line) => line.amount == null ? line : { ...line, amount: priceForService(service, line.amount) });
   const daysMin = Math.max(1, Math.round((service.days[0] + extraDays * 0.6) * daysMult));
   const daysMax = Math.max(daysMin + 1, Math.round((service.days[1] + extraDays) * daysMult));
 
   return {
     base,
-    addons: Math.round(addons),
+    addons: scaledAddons,
     multPct: Math.round((mult - 1) * 100),
     total,
     daysMin,
     daysMax,
-    lines,
+    lines: scaledLines,
   };
 }
 
@@ -1165,3 +1187,4 @@ export function formatEUR(n: number) {
 export function startingPrice(service: Service) {
   return computeQuote(service, defaultValues(service)).total;
 }
+

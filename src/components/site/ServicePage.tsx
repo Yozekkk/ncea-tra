@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { I, Blob, LOGO_ROUND } from "@/components/site/ui";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { computeQuote, defaultValues, getService, type Values } from "@/lib/services";
+import { computeQuote, defaultValues, getService, priceForService, type Values } from "@/lib/services";
 import { useCurrency } from "@/lib/currency";
 
 const TELEGRAM_URL = "https://t.me/lisiy_bob";
@@ -137,7 +137,7 @@ export function ServicePage({ id }: { id: string }) {
                             <button type="button" onClick={() => set(field.id, !values[field.id])} aria-pressed={Boolean(values[field.id])} className={`liquid-toggle w-full ${values[field.id] ? "is-active" : ""}`}>
                               <span className="text-left"><span className="block text-sm font-medium">{field.label}</span>{field.desc && <span className="mt-0.5 block text-xs text-white/45">{field.desc}</span>}</span>
                               <span className="flex shrink-0 items-center gap-3">
-                                {typeof field.price === "number" && field.price !== 0 && <span className="text-xs text-white/50">{field.price > 0 ? "+" : ""}{fmt(field.price)}</span>}
+                                {typeof field.price === "number" && field.price !== 0 && <span className="text-xs text-white/50">{field.price > 0 ? "+" : ""}{fmt(priceForService(service, field.price))}</span>}
                                 <span className="liquid-check">{values[field.id] && <I.Check className="h-3.5 w-3.5" />}</span>
                               </span>
                             </button>

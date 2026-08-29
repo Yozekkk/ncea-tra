@@ -52,7 +52,10 @@ export function CurrencySwitcher({ variant = "desktop" }: { variant?: "desktop" 
       >
         <Coins className="h-4 w-4 text-brand-orange" aria-hidden="true" />
         <span className="font-semibold">{info.code}</span>
-        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
       </button>
 
       {open && (
@@ -74,7 +77,9 @@ export function CurrencySwitcher({ variant = "desktop" }: { variant?: "desktop" 
                 <span className="block text-[13px] font-medium text-white/88">{currency.code}</span>
                 <span className="block text-[11px] text-white/40">{currency.label}</span>
               </span>
-              {code === currency.code && <Check className="h-4 w-4 text-brand-orange" aria-hidden="true" />}
+              {code === currency.code && (
+                <Check className="h-4 w-4 text-brand-orange" aria-hidden="true" />
+              )}
             </button>
           ))}
         </div>

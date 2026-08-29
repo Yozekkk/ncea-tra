@@ -9,79 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WebsitesRouteImport } from './routes/websites'
-import { Route as SupportRouteImport } from './routes/support'
-import { Route as SkinsRouteImport } from './routes/skins'
-import { Route as ServicesRouteImport } from './routes/services'
-import { Route as ServerSetupRouteImport } from './routes/server-setup'
-import { Route as ResourcepacksRouteImport } from './routes/resourcepacks'
-import { Route as PluginsRouteImport } from './routes/plugins'
-import { Route as ModpacksRouteImport } from './routes/modpacks'
-import { Route as MapsRouteImport } from './routes/maps'
-import { Route as LogosRouteImport } from './routes/logos'
-import { Route as FancymenuRouteImport } from './routes/fancymenu'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as DesignRouteImport } from './routes/design'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DesignRouteImport } from './routes/design'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as FancymenuRouteImport } from './routes/fancymenu'
+import { Route as LogosRouteImport } from './routes/logos'
+import { Route as MapsRouteImport } from './routes/maps'
+import { Route as ModpacksRouteImport } from './routes/modpacks'
+import { Route as PluginsRouteImport } from './routes/plugins'
+import { Route as ResourcepacksRouteImport } from './routes/resourcepacks'
+import { Route as ServerSetupRouteImport } from './routes/server-setup'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SkinsRouteImport } from './routes/skins'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as WebsitesRouteImport } from './routes/websites'
+import { Route as WorkersRouteImport } from './routes/workers'
 
-const WebsitesRoute = WebsitesRouteImport.update({
-  id: '/websites',
-  path: '/websites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportRoute = SupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SkinsRoute = SkinsRouteImport.update({
-  id: '/skins',
-  path: '/skins',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesRoute = ServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServerSetupRoute = ServerSetupRouteImport.update({
-  id: '/server-setup',
-  path: '/server-setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResourcepacksRoute = ResourcepacksRouteImport.update({
-  id: '/resourcepacks',
-  path: '/resourcepacks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PluginsRoute = PluginsRouteImport.update({
-  id: '/plugins',
-  path: '/plugins',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModpacksRoute = ModpacksRouteImport.update({
-  id: '/modpacks',
-  path: '/modpacks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MapsRoute = MapsRouteImport.update({
-  id: '/maps',
-  path: '/maps',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LogosRoute = LogosRouteImport.update({
-  id: '/logos',
-  path: '/logos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FancymenuRoute = FancymenuRouteImport.update({
-  id: '/fancymenu',
-  path: '/fancymenu',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignRoute = DesignRouteImport.update({
@@ -89,9 +35,69 @@ const DesignRoute = DesignRouteImport.update({
   path: '/design',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FancymenuRoute = FancymenuRouteImport.update({
+  id: '/fancymenu',
+  path: '/fancymenu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogosRoute = LogosRouteImport.update({
+  id: '/logos',
+  path: '/logos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapsRoute = MapsRouteImport.update({
+  id: '/maps',
+  path: '/maps',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModpacksRoute = ModpacksRouteImport.update({
+  id: '/modpacks',
+  path: '/modpacks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PluginsRoute = PluginsRouteImport.update({
+  id: '/plugins',
+  path: '/plugins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcepacksRoute = ResourcepacksRouteImport.update({
+  id: '/resourcepacks',
+  path: '/resourcepacks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServerSetupRoute = ServerSetupRouteImport.update({
+  id: '/server-setup',
+  path: '/server-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkinsRoute = SkinsRouteImport.update({
+  id: '/skins',
+  path: '/skins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebsitesRoute = WebsitesRouteImport.update({
+  id: '/websites',
+  path: '/websites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkersRoute = WorkersRouteImport.update({
+  id: '/workers',
+  path: '/workers',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/skins': typeof SkinsRoute
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/skins'
     | '/support'
     | '/websites'
+    | '/workers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/skins'
     | '/support'
     | '/websites'
+    | '/workers'
   id:
     | '__root__'
     | '/'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/skins'
     | '/support'
     | '/websites'
+    | '/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,92 +222,16 @@ export interface RootRouteChildren {
   SkinsRoute: typeof SkinsRoute
   SupportRoute: typeof SupportRoute
   WebsitesRoute: typeof WebsitesRoute
+  WorkersRoute: typeof WorkersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/websites': {
-      id: '/websites'
-      path: '/websites'
-      fullPath: '/websites'
-      preLoaderRoute: typeof WebsitesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/skins': {
-      id: '/skins'
-      path: '/skins'
-      fullPath: '/skins'
-      preLoaderRoute: typeof SkinsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services': {
-      id: '/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/server-setup': {
-      id: '/server-setup'
-      path: '/server-setup'
-      fullPath: '/server-setup'
-      preLoaderRoute: typeof ServerSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resourcepacks': {
-      id: '/resourcepacks'
-      path: '/resourcepacks'
-      fullPath: '/resourcepacks'
-      preLoaderRoute: typeof ResourcepacksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/plugins': {
-      id: '/plugins'
-      path: '/plugins'
-      fullPath: '/plugins'
-      preLoaderRoute: typeof PluginsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/modpacks': {
-      id: '/modpacks'
-      path: '/modpacks'
-      fullPath: '/modpacks'
-      preLoaderRoute: typeof ModpacksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maps': {
-      id: '/maps'
-      path: '/maps'
-      fullPath: '/maps'
-      preLoaderRoute: typeof MapsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/logos': {
-      id: '/logos'
-      path: '/logos'
-      fullPath: '/logos'
-      preLoaderRoute: typeof LogosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fancymenu': {
-      id: '/fancymenu'
-      path: '/fancymenu'
-      fullPath: '/fancymenu'
-      preLoaderRoute: typeof FancymenuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design': {
@@ -305,11 +241,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesignRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fancymenu': {
+      id: '/fancymenu'
+      path: '/fancymenu'
+      fullPath: '/fancymenu'
+      preLoaderRoute: typeof FancymenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logos': {
+      id: '/logos'
+      path: '/logos'
+      fullPath: '/logos'
+      preLoaderRoute: typeof LogosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maps': {
+      id: '/maps'
+      path: '/maps'
+      fullPath: '/maps'
+      preLoaderRoute: typeof MapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modpacks': {
+      id: '/modpacks'
+      path: '/modpacks'
+      fullPath: '/modpacks'
+      preLoaderRoute: typeof ModpacksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins': {
+      id: '/plugins'
+      path: '/plugins'
+      fullPath: '/plugins'
+      preLoaderRoute: typeof PluginsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resourcepacks': {
+      id: '/resourcepacks'
+      path: '/resourcepacks'
+      fullPath: '/resourcepacks'
+      preLoaderRoute: typeof ResourcepacksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/server-setup': {
+      id: '/server-setup'
+      path: '/server-setup'
+      fullPath: '/server-setup'
+      preLoaderRoute: typeof ServerSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skins': {
+      id: '/skins'
+      path: '/skins'
+      fullPath: '/skins'
+      preLoaderRoute: typeof SkinsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/websites': {
+      id: '/websites'
+      path: '/websites'
+      fullPath: '/websites'
+      preLoaderRoute: typeof WebsitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workers': {
+      id: '/workers'
+      path: '/workers'
+      fullPath: '/workers'
+      preLoaderRoute: typeof WorkersRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -330,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   SkinsRoute: SkinsRoute,
   SupportRoute: SupportRoute,
   WebsitesRoute: WebsitesRoute,
+  WorkersRoute: WorkersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

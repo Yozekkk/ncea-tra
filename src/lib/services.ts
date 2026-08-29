@@ -20,7 +20,15 @@ export type Opt = {
 
 export type Field =
   | { id: string; label: string; type: "select"; options: Opt[]; def: string; help?: string }
-  | { id: string; label: string; type: "toggle"; price?: number; mult?: number; def?: boolean; desc?: string }
+  | {
+      id: string;
+      label: string;
+      type: "toggle";
+      price?: number;
+      mult?: number;
+      def?: boolean;
+      desc?: string;
+    }
   | {
       id: string;
       label: string;
@@ -88,10 +96,27 @@ const URGENCY: Opt[] = [
   { id: "asap", label: "Срочный", mult: 1.45, daysMult: 0.45, note: "+45%" },
 ];
 
-const urgencyField: Field = { id: "urgency", label: "Срок выполнения", type: "select", options: URGENCY, def: "normal" };
-const versionField: Field = { id: "version", label: "Версия Minecraft", type: "select", options: MC_VERSIONS, def: "1.20.1" };
+const urgencyField: Field = {
+  id: "urgency",
+  label: "Срок выполнения",
+  type: "select",
+  options: URGENCY,
+  def: "normal",
+};
+const versionField: Field = {
+  id: "version",
+  label: "Версия Minecraft",
+  type: "select",
+  options: MC_VERSIONS,
+  def: "1.20.1",
+};
 const docsField: Field = { id: "docs", label: "Документация к проекту", type: "toggle", price: 1 };
-const sourcesField: Field = { id: "sources", label: "Передача исходников", type: "toggle", price: 1 };
+const sourcesField: Field = {
+  id: "sources",
+  label: "Передача исходников",
+  type: "toggle",
+  price: 1,
+};
 
 /* ============================================================
    Услуги
@@ -264,7 +289,13 @@ export const SERVICES: Service[] = [
       {
         title: "Опции",
         fields: [
-          { id: "optimize", label: "Оптимизация производительности", type: "toggle", price: 1, def: true },
+          {
+            id: "optimize",
+            label: "Оптимизация производительности",
+            type: "toggle",
+            price: 1,
+            def: true,
+          },
           { id: "configs", label: "Настройка конфигураций", type: "toggle", price: 1 },
           { id: "quests", label: "Настройка квестов (FTB Quests)", type: "toggle", price: 1.5 },
           { id: "menu", label: "Кастомное главное меню", type: "toggle", price: 1 },
@@ -662,7 +693,13 @@ export const SERVICES: Service[] = [
           },
           { id: "layers", label: "Дополнительные слои (шляпа, плащ)", type: "toggle", price: 1 },
           { id: "hq", label: "Повышенная детализация", type: "toggle", price: 1 },
-          { id: "ref", label: "Есть референс", type: "toggle", price: -2, desc: "Скидка за готовый референс" },
+          {
+            id: "ref",
+            label: "Есть референс",
+            type: "toggle",
+            price: -2,
+            desc: "Скидка за готовый референс",
+          },
         ],
       },
       { title: "Дополнительно", fields: [sourcesField, urgencyField] },
@@ -816,7 +853,12 @@ export const SERVICES: Service[] = [
         fields: [
           { id: "transparent", label: "Прозрачный фон (PNG)", type: "toggle", price: 1, def: true },
           sourcesField,
-          { id: "variants", label: "Дополнительные версии (тёмная, светлая, иконка)", type: "toggle", price: 1 },
+          {
+            id: "variants",
+            label: "Дополнительные версии (тёмная, светлая, иконка)",
+            type: "toggle",
+            price: 1,
+          },
         ],
       },
       { title: "Дополнительно", fields: [urgencyField] },
@@ -1066,7 +1108,9 @@ export const SERVICES: Service[] = [
   },
 ];
 
-export const SERVICE_BY_ID: Record<string, Service> = Object.fromEntries(SERVICES.map((s) => [s.id, s]));
+export const SERVICE_BY_ID: Record<string, Service> = Object.fromEntries(
+  SERVICES.map((s) => [s.id, s]),
+);
 
 export function getService(id: string): Service {
   const s = SERVICE_BY_ID[id];
@@ -1164,7 +1208,9 @@ export function computeQuote(service: Service, values: Values): Quote {
   const base = priceForService(service, rawBase);
   const scaledAddons = priceForService(service, addons);
   const total = priceForService(service, rawTotal);
-  const scaledLines = lines.map((line) => line.amount == null ? line : { ...line, amount: priceForService(service, line.amount) });
+  const scaledLines = lines.map((line) =>
+    line.amount == null ? line : { ...line, amount: priceForService(service, line.amount) },
+  );
   const daysMin = Math.max(1, Math.round((service.days[0] + extraDays * 0.6) * daysMult));
   const daysMax = Math.max(daysMin + 1, Math.round((service.days[1] + extraDays) * daysMult));
 
@@ -1187,4 +1233,3 @@ export function formatEUR(n: number) {
 export function startingPrice(service: Service) {
   return computeQuote(service, defaultValues(service)).total;
 }
-

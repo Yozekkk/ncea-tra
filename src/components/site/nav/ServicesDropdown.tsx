@@ -30,7 +30,9 @@ export function ServicesDropdown({ onPick }: { onPick: () => void }) {
                         <span className="block truncate text-[13px] font-medium text-white/85 transition-colors group-hover:text-white">
                           {service.title}
                         </span>
-                        <span className="block truncate text-[11px] text-white/40">{service.short}</span>
+                        <span className="block truncate text-[11px] text-white/40">
+                          {service.short}
+                        </span>
                       </span>
                     </Link>
                   );

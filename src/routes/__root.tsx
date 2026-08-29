@@ -1,5 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, Link, createRootRouteWithContext, useRouter, useRouterState, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+  Outlet,
+  Link,
+  createRootRouteWithContext,
+  useRouter,
+  useRouterState,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -21,25 +29,33 @@ function RouteEffects() {
   }, [pathname]);
 
   useEffect(() => {
-    const selector = ".reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger, .image-reveal";
+    const selector =
+      ".reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger, .image-reveal";
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      document.querySelectorAll<HTMLElement>(selector).forEach((node) => node.classList.add("is-visible"));
+      document
+        .querySelectorAll<HTMLElement>(selector)
+        .forEach((node) => node.classList.add("is-visible"));
       return;
     }
     if (!("IntersectionObserver" in window)) {
-      document.querySelectorAll<HTMLElement>(selector).forEach((node) => node.classList.add("is-visible"));
+      document
+        .querySelectorAll<HTMLElement>(selector)
+        .forEach((node) => node.classList.add("is-visible"));
       return;
     }
     const registered = new WeakSet<Element>();
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px" },
+    );
     const register = () => {
       document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
         if (registered.has(node)) return;
@@ -69,8 +85,12 @@ function RouteEffects() {
     let stop: () => void = () => undefined;
     const delay = motionReady ? 80 : 1700;
     const startTimer = window.setTimeout(() => {
-      const parallaxNodes = Array.from(document.querySelectorAll<HTMLElement>(".js-scroll-parallax"));
-      const scenes = coarsePointer ? [] : Array.from(document.querySelectorAll<HTMLElement>(".js-parallax-scene"));
+      const parallaxNodes = Array.from(
+        document.querySelectorAll<HTMLElement>(".js-scroll-parallax"),
+      );
+      const scenes = coarsePointer
+        ? []
+        : Array.from(document.querySelectorAll<HTMLElement>(".js-parallax-scene"));
       const cleanups: Array<() => void> = [];
       let scrollFrame = 0;
       const updateScrollParallax = () => {
@@ -78,7 +98,10 @@ function RouteEffects() {
         const viewport = window.innerHeight;
         parallaxNodes.forEach((node) => {
           const rect = node.getBoundingClientRect();
-          const progress = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - viewport / 2) / viewport));
+          const progress = Math.max(
+            -1,
+            Math.min(1, (rect.top + rect.height / 2 - viewport / 2) / viewport),
+          );
           node.style.setProperty("--scroll-shift", `${progress * -18}px`);
         });
       };
@@ -152,13 +175,23 @@ function BrandIntro() {
   if (!visible) return null;
 
   return (
-    <div className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-stone-950" aria-hidden="true">
+    <div
+      className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-stone-950"
+      aria-hidden="true"
+    >
       <div className="noise absolute inset-0 opacity-40" />
       <div className="absolute left-1/2 top-1/2 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-red/16 blur-[120px]" />
       <div className="ncea-intro-scan" />
       <div className="relative flex flex-col items-center px-6 text-center [perspective:900px]">
-        <div className="ncea-wordmark" aria-label="NCEA"><span>N</span><span>C</span><span>E</span><span>A</span></div>
-        <div className="ncea-intro-caption mt-12 text-[10px] font-semibold uppercase tracking-[.42em] text-white/48 sm:text-xs">NovaCraft Event Agency</div>
+        <div className="ncea-wordmark" aria-label="NCEA">
+          <span>N</span>
+          <span>C</span>
+          <span>E</span>
+          <span>A</span>
+        </div>
+        <div className="ncea-intro-caption mt-12 text-[10px] font-semibold uppercase tracking-[.42em] text-white/48 sm:text-xs">
+          NovaCraft Event Agency
+        </div>
       </div>
     </div>
   );
@@ -171,13 +204,32 @@ function NotFoundComponent() {
       <SiteHeader />
       <main className="relative z-10 min-h-[82vh] flex items-center justify-center px-4 pt-24 pb-16">
         <div className="max-w-2xl text-center liquid-panel p-8 sm:p-12">
-          <img src={LOGO_ROUND} alt="NCEA" width={112} height={112} className="round-brand-image mx-auto h-28 w-28" />
+          <img
+            src={LOGO_ROUND}
+            alt="NCEA"
+            width={112}
+            height={112}
+            className="round-brand-image mx-auto h-28 w-28"
+          />
           <div className="mt-4 font-display text-8xl sm:text-9xl font-black gradient-text">404</div>
           <h1 className="mt-3 font-display text-2xl sm:text-4xl font-bold">Страница не найдена</h1>
-          <p className="mx-auto mt-4 max-w-lg text-sm sm:text-base text-white/55">Возможно, адрес изменился или такой страницы больше нет. Вернитесь на главную либо откройте каталог услуг NCEA.</p>
+          <p className="mx-auto mt-4 max-w-lg text-sm sm:text-base text-white/55">
+            Возможно, адрес изменился или такой страницы больше нет. Вернитесь на главную либо
+            откройте каталог услуг NCEA.
+          </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/" className="inline-flex h-12 items-center gap-2 rounded-full gradient-btn px-6 font-medium"><I.Home className="h-4 w-4" /> На главную</Link>
-            <Link to="/services" className="liquid-secondary inline-flex h-12 items-center gap-2 px-6 font-medium">Посмотреть услуги <I.Arrow className="h-4 w-4" /></Link>
+            <Link
+              to="/"
+              className="inline-flex h-12 items-center gap-2 rounded-full gradient-btn px-6 font-medium"
+            >
+              <I.Home className="h-4 w-4" /> На главную
+            </Link>
+            <Link
+              to="/services"
+              className="liquid-secondary inline-flex h-12 items-center gap-2 px-6 font-medium"
+            >
+              Посмотреть услуги <I.Arrow className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </main>
@@ -189,7 +241,9 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => { reportLovableError(error, { boundary: "tanstack_root_error_component" }); }, [error]);
+  useEffect(() => {
+    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+  }, [error]);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-stone-950 px-4 text-white">
@@ -197,10 +251,26 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="relative max-w-md text-center liquid-panel p-8">
         <img src={LOGO_ROUND} alt="NCEA" className="round-brand-image mx-auto h-20 w-20" />
         <h1 className="mt-5 font-display text-2xl font-bold">Страница не загрузилась</h1>
-        <p className="mt-3 text-sm text-white/55">Произошла техническая ошибка. Попробуйте загрузить страницу повторно или вернитесь на главную.</p>
+        <p className="mt-3 text-sm text-white/55">
+          Произошла техническая ошибка. Попробуйте загрузить страницу повторно или вернитесь на
+          главную.
+        </p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <button onClick={() => { router.invalidate(); reset(); }} className="inline-flex h-11 items-center justify-center rounded-full gradient-btn px-5 text-sm font-medium">Повторить</button>
-          <a href="/" className="liquid-secondary inline-flex h-11 items-center justify-center px-5 text-sm font-medium">На главную</a>
+          <button
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+            className="inline-flex h-11 items-center justify-center rounded-full gradient-btn px-5 text-sm font-medium"
+          >
+            Повторить
+          </button>
+          <a
+            href="/"
+            className="liquid-secondary inline-flex h-11 items-center justify-center px-5 text-sm font-medium"
+          >
+            На главную
+          </a>
         </div>
       </div>
     </div>
@@ -217,16 +287,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { title: "NCEA — разработка и оформление Minecraft-проектов" },
-      { name: "description", content: "NCEA создаёт плагины, сборки, сайты, карты, скины, ресурспаки, дизайн и ивенты для Minecraft-проектов." },
+      {
+        name: "description",
+        content:
+          "NCEA создаёт плагины, сборки, сайты, карты, скины, ресурспаки, дизайн и ивенты для Minecraft-проектов.",
+      },
       { property: "og:title", content: "NCEA — разработка и оформление Minecraft-проектов" },
-      { property: "og:description", content: "Плагины, серверные сборки, сайты, карты, дизайн, ресурспаки и комплексные решения для Minecraft-сообществ." },
+      {
+        property: "og:description",
+        content:
+          "Плагины, серверные сборки, сайты, карты, дизайн, ресурспаки и комплексные решения для Minecraft-сообществ.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
       { property: "og:image", content: `${SITE_URL}/images/brand/ncea-logo-mark.webp` },
       { property: "og:image:alt", content: "Официальный логотип NCEA" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "NCEA — разработка и оформление Minecraft-проектов" },
-      { name: "twitter:description", content: "Плагины, сборки, сайты, карты, дизайн, ресурспаки и ивенты для Minecraft-проектов." },
+      {
+        name: "twitter:description",
+        content:
+          "Плагины, сборки, сайты, карты, дизайн, ресурспаки и ивенты для Minecraft-проектов.",
+      },
       { name: "twitter:image", content: `${SITE_URL}/images/brand/ncea-logo-mark.webp` },
     ],
     links: [
@@ -246,7 +328,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  return <html lang="ru"><head><HeadContent /></head><body>{children}<Scripts /></body></html>;
+  return (
+    <html lang="ru">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
 }
 
 function RootComponent() {
@@ -255,11 +347,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
         <RouteEffects />
-        <BrandIntro />
         <Outlet />
-        <Toaster position="bottom-right" theme="dark" />
+        <Toaster position="bottom-right" theme="light" />
       </CurrencyProvider>
     </QueryClientProvider>
   );
 }
-

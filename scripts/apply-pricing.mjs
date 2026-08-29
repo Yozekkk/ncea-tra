@@ -23,4 +23,3 @@ for (const id of TARGET_IDS) {
 }
 
 console.log(`Проверен коэффициент ${FACTOR} для ${TARGET_IDS.length} выбранных услуг NCEA.`);
-

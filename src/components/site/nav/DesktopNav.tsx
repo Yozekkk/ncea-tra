@@ -57,14 +57,25 @@ export function DesktopNav({
 
   return (
     <div ref={listRef} className="nv-list" role="menubar" aria-label="Основная навигация">
-      <span className="nv-pill" style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.ready ? 1 : 0 }} />
+      <span
+        className="nv-pill"
+        style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.ready ? 1 : 0 }}
+      />
 
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
 
         if (item.kind === "route") {
           return (
-            <Link key={item.key} to={item.to} onClick={onHome} className={itemClass(item.key)} ref={(node) => { itemRefs.current[item.key] = node; }}>
+            <Link
+              key={item.key}
+              to={item.to}
+              onClick={onHome}
+              className={itemClass(item.key)}
+              ref={(node) => {
+                itemRefs.current[item.key] = node;
+              }}
+            >
               <Icon className="nv-item-icon" aria-hidden="true" />
               {item.label}
             </Link>
@@ -81,7 +92,9 @@ export function DesktopNav({
             >
               <button
                 type="button"
-                ref={(node) => { itemRefs.current[item.key] = node; }}
+                ref={(node) => {
+                  itemRefs.current[item.key] = node;
+                }}
                 aria-expanded={megaOpen}
                 aria-haspopup="menu"
                 onClick={onToggleMega}
@@ -89,7 +102,9 @@ export function DesktopNav({
               >
                 <Icon className="nv-item-icon" aria-hidden="true" />
                 {item.label}
-                <I.Chevron className={`h-3.5 w-3.5 opacity-70 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`} />
+                <I.Chevron
+                  className={`h-3.5 w-3.5 opacity-70 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {megaOpen && <ServicesDropdown onPick={onCloseMega} />}
             </div>
@@ -100,7 +115,9 @@ export function DesktopNav({
           <button
             key={item.key}
             type="button"
-            ref={(node) => { itemRefs.current[item.key] = node; }}
+            ref={(node) => {
+              itemRefs.current[item.key] = node;
+            }}
             onClick={() => onHash(item.key, item.hash)}
             className={`${itemClass(item.key)}${item.key === "partner" ? " hidden xl:inline-flex" : ""}`}
           >

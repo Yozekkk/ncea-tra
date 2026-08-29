@@ -1,158 +1,77 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { I, LOGO_MARK } from "@/components/site/ui";
-import { DesktopNav } from "./DesktopNav";
-import { MobileNav } from "./MobileNav";
-import { useHashNav } from "./useHashNav";
-import { CurrencySwitcher } from "./CurrencySwitcher";
-import type { NavKey } from "./nav-items";
+import { Menu, X } from "lucide-react";
+import { LOGO_MARK } from "@/components/site/ui";
+
+const links = [
+  ["Главная", "/"],
+  ["Услуги", "/services"],
+  ["О нас", "/#about"],
+  ["Работники", "/workers"],
+  ["Отзывы", "/#reviews"],
+  ["Контакты", "/#contacts"],
+] as const;
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mega, setMega] = useState(false);
-  const [sheet, setSheet] = useState(false);
-  const [active, setActive] = useState<NavKey>("home");
-  const closeTimer = useRef<number | null>(null);
-  const rootRef = useRef<HTMLElement>(null);
-  const goHash = useHashNav();
+  const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-
-  const openMega = useCallback(() => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    setMega(true);
-  }, []);
-  const closeMega = useCallback(() => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    setMega(false);
-  }, []);
-  const closeMegaSoon = useCallback(() => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setMega(false), 160);
-  }, []);
-
-  /* scroll state */
+  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        setScrolled(window.scrollY > 12);
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  /* reset on route change */
-  useEffect(() => {
-    setSheet(false);
-    setMega(false);
-    setActive(pathname === "/" ? "home" : "services");
-  }, [pathname]);
-
-  /* section spy on home */
-  useEffect(() => {
-    if (pathname !== "/") return;
-    const ids: NavKey[] = ["home", "about", "portfolio", "team", "partner"];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!visible) return;
-        const key = ids.find((id) => id === visible.target.id);
-        if (key) setActive(key);
-      },
-      { rootMargin: "-25% 0px -55% 0px", threshold: [0.05, 0.2, 0.5] },
-    );
-    ids.forEach((id) => {
-      const node = document.getElementById(id);
-      if (node) observer.observe(node);
-    });
-    return () => observer.disconnect();
-  }, [pathname]);
-
-  /* body scroll lock for the mobile sheet */
-  useEffect(() => {
-    document.body.style.overflow = sheet ? "hidden" : "";
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [sheet]);
-
-  /* esc + outside click */
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setMega(false);
-      setSheet(false);
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setMega(false);
-    };
-    window.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, []);
-
-  const handleHash = useCallback(
-    (key: NavKey, hash: string) => {
-      setMega(false);
-      setActive(key);
-      goHash(hash);
-    },
-    [goHash],
-  );
-
+  }, [open]);
   return (
-    <header ref={rootRef} data-scrolled={scrolled} className="nv-header">
-      <div className="nv-shell">
-        <div className="nv-bar">
-          <Link to="/" aria-label="NCEA — на главную" onClick={() => setActive("home")} className="nv-brand">
-            <img src={LOGO_MARK} alt="" width={34} height={34} className="nv-brand-mark" />
-            <span className="nv-brand-text">
-              NCEA <span className="gradient-text">Event Agency</span>
-            </span>
-          </Link>
-
-          <nav className="hidden lg:flex" aria-label="Основная навигация">
-            <DesktopNav
-              active={active}
-              megaOpen={mega}
-              onHash={handleHash}
-              onHome={() => setActive("home")}
-              onToggleMega={() => (mega ? closeMega() : openMega())}
-              onOpenMega={openMega}
-              onCloseMegaSoon={closeMegaSoon}
-              onCloseMega={closeMega}
-            />
-          </nav>
-
-          <div className="flex shrink-0 items-center gap-2">
-            <CurrencySwitcher />
-            <Link to="/services" onClick={() => setActive("services")} className="nv-cta hidden h-10 px-5 text-sm md:inline-flex">
-              Рассчитать стоимость
-            </Link>
-            <button
-              type="button"
-              aria-label={sheet ? "Закрыть меню" : "Открыть меню"}
-              aria-expanded={sheet}
-              onClick={() => setSheet((value) => !value)}
-              className="nv-icon-btn lg:hidden"
-            >
-              {sheet ? <I.Close className="h-5 w-5" /> : <I.Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
+    <header className="ref-header">
+      <div className="ref-navbar">
+        <Link to="/" className="ref-brand" aria-label="NCEA — на главную">
+          <img src={LOGO_MARK} alt="" width={38} height={38} />
+          <strong>NCEA</strong>
+        </Link>
+        <nav className="ref-desktop-nav" aria-label="Основная навигация">
+          {links.map(([label, href]) =>
+            href === "/" || href === "/services" ? (
+              <Link key={label} to={href} className={pathname === href ? "is-active" : ""}>
+                {label}
+              </Link>
+            ) : (
+              <a key={label} href={href} className={pathname === href ? "is-active" : ""}>
+                {label}
+              </a>
+            ),
+          )}
+        </nav>
+        <a className="ref-nav-order" href="https://t.me/lisiy_bob" target="_blank" rel="noreferrer">
+          Заказать ↗
+        </a>
+        <button
+          className="ref-menu-button"
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? "Закрыть меню" : "Открыть меню"}
+        >
+          {open ? <X /> : <Menu />}
+        </button>
       </div>
-
-      <MobileNav open={sheet} active={active} onClose={() => setSheet(false)} onHash={handleHash} />
+      {open && (
+        <nav className="ref-mobile-nav">
+          {links.map(([label, href]) => (
+            <a key={label} href={href}>
+              {label}
+              <span>↗</span>
+            </a>
+          ))}
+          <a
+            className="ref-mobile-order"
+            href="https://t.me/lisiy_bob"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Заказать в Telegram ↗
+          </a>
+        </nav>
+      )}
     </header>
   );
 }

@@ -1,42 +1,73 @@
 import { Link } from "@tanstack/react-router";
-import { I, LOGO_ROUND } from "@/components/site/ui";
-import { SERVICES } from "@/lib/services";
-import { useHashNav } from "@/components/site/SiteHeader";
-
-const TELEGRAM_URL = "https://t.me/lisiy_bob";
-const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
+import { Lightbulb, Send } from "lucide-react";
+import { LOGO_MARK } from "@/components/site/ui";
 
 export function SiteFooter() {
-  const goHash = useHashNav();
-  const featured = SERVICES.slice(0, 6);
-
   return (
-    <footer className="ar-footer">
-      <div className="ar-footer-cta">
-        <div><span>Готовы начать?</span><h2>Соберите заказ и узнайте<br />предварительную стоимость</h2><p>Выберите услугу, настройте параметры и отправьте готовую заявку менеджеру NCEA.</p></div>
-        <Link to="/services" className="ar-button ar-button-primary">Выбрать услугу <I.Arrow className="h-5 w-5" /></Link>
-      </div>
-
-      <div className="ar-footer-main">
-        <div className="ar-footer-brand">
-          <Link to="/" aria-label="NCEA — на главную"><img src={LOGO_ROUND} alt="Логотип NCEA" /><strong>NCEA</strong></Link>
-          <p>Агентство разработки и оформления Minecraft-проектов: плагины, сборки, сайты, карты, ресурспаки, дизайн и ивенты.</p>
+    <footer className="ref-footer">
+      <div className="ref-footer-grid">
+        <div className="ref-footer-brand">
+          <Link to="/">
+            <img src={LOGO_MARK} alt="" />
+            <strong>NCEA</strong>
+          </Link>
+          <p>Minecraft Digital Agency: разработка, дизайн, контент и поддержка игровых проектов.</p>
+          <small>© {new Date().getFullYear()} NCEA</small>
         </div>
-        <div><span>Услуги</span><ul>{featured.map((service) => <li key={service.id}><Link to={service.path}>{service.title}</Link></li>)}</ul></div>
-        <div><span>Навигация</span><ul>
-          <li><Link to="/">Главная</Link></li><li><Link to="/services">Все услуги</Link></li>
-          <li><button onClick={() => goHash("about")}>О нас</button></li><li><button onClick={() => goHash("portfolio")}>Портфолио</button></li>
-          <li><button onClick={() => goHash("team")}>Отзывы</button></li><li><button onClick={() => goHash("faq")}>FAQ</button></li>
-        </ul></div>
-        <div><span>Связь</span><ul>
-          <li><a href={TELEGRAM_URL} target="_blank" rel="noreferrer">Telegram: @lisiy_bob</a></li>
-          <li><a href={DISCORD_URL} target="_blank" rel="noreferrer">Discord: сервер NCEA</a></li>
-          <li>Заказы принимаются через конфигураторы услуг.</li>
-        </ul></div>
+        <div>
+          <h3>Навигация</h3>
+          <ul>
+            <li>
+              <Link to="/services">Услуги</Link>
+            </li>
+            <li>
+              <a href="/#about">О нас</a>
+            </li>
+            <li>
+              <a href="/workers">Работники</a>
+            </li>
+            <li>
+              <a href="/#reviews">Отзывы</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>Направления</h3>
+          <ul>
+            <li>
+              <Link to="/plugins">Плагины</Link>
+            </li>
+            <li>
+              <Link to="/server-setup">Настройка серверов</Link>
+            </li>
+            <li>
+              <Link to="/websites">Сайты</Link>
+            </li>
+            <li>
+              <Link to="/design">Дизайн</Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>Связь</h3>
+          <ul>
+            <li>
+              <a href="https://t.me/lisiy_bob" target="_blank" rel="noreferrer">
+                <Send /> Написать в ЛС
+              </a>
+            </li>
+            <li>
+              <a href="https://t.me/ncea_official" target="_blank" rel="noreferrer">
+                <Lightbulb /> Telegram-канал
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-
-      <div className="ar-footer-bottom"><span>© {new Date().getFullYear()} NovaCraft Event Agency. Все права защищены.</span><span>NCEA v2 · Minecraft Digital Agency</span></div>
+      <p className="ref-legal">
+        NCEA не связана с Mojang Studios или Microsoft. Minecraft является товарным знаком Mojang
+        Studios. Все упомянутые товарные знаки принадлежат их владельцам.
+      </p>
     </footer>
   );
 }
-

@@ -62,8 +62,9 @@ export function SiteFooter() {
         </div>
       </div>
       <p className="ref-legal">
-        NCEA не связана с Mojang Studios или Microsoft. Minecraft является товарным знаком Mojang
-        Studios. Все упомянутые товарные знаки принадлежат их владельцам.
+        Это не официальный продукт или услуга Minecraft. NCEA не одобрена и не связана с Mojang
+        Studios или Microsoft. Minecraft является товарным знаком Mojang Studios. Все упомянутые
+        товарные знаки принадлежат их владельцам.
       </p>
     </footer>
   );

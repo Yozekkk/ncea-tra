@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SERVICE_ART } from "@/lib/service-art";
 import { SERVICES } from "@/lib/services";
 
 export const Route = createFileRoute("/")({
@@ -53,42 +54,42 @@ const SERVICE_PRESENTATION = [
   {
     icon: Code2,
     label: "Плагины",
-    asset: "/images/voxel/plugin-console.png",
+    assets: SERVICE_ART.plugins,
     layout: "wide",
-    art: "console",
+    art: "command",
   },
   {
     icon: PackageOpen,
     label: "Сборки",
-    asset: "/images/voxel/modpack-chest.png",
+    assets: SERVICE_ART.modpacks,
     layout: "standard",
     art: "chest",
   },
   {
     icon: ServerCog,
     label: "Сервер",
-    asset: "/images/voxel/server-redstone.png",
+    assets: SERVICE_ART.server,
     layout: "standard",
-    art: "block",
+    art: "crafter",
   },
   {
     icon: Monitor,
     label: "Сайты",
-    asset: "/images/voxel/website-workstation.png",
+    assets: SERVICE_ART.websites,
     layout: "feature",
-    art: "workstation",
+    art: "bookshelf",
   },
   {
     icon: Palette,
     label: "Дизайн",
-    asset: "/images/voxel/design-archive.png",
+    assets: SERVICE_ART.design,
     layout: "compact",
-    art: "archive",
+    art: "enchanting",
   },
   {
     icon: CalendarDays,
     label: "Ивенты",
-    asset: "/images/voxel/event-table.png",
+    assets: SERVICE_ART.events,
     layout: "wide-compact",
     art: "event",
   },
@@ -259,7 +260,17 @@ function HomePage() {
                     data-depth={0.72 + (index % 3) * 0.16}
                     aria-hidden="true"
                   >
-                    <img className="ref-voxel" src={presentation.asset} alt="" loading="lazy" />
+                    <span className="ref-voxel-stage">
+                      {presentation.assets.map((asset) => (
+                        <img
+                          className={`ref-voxel ref-voxel--${asset.role}`}
+                          src={asset.src}
+                          alt=""
+                          loading="lazy"
+                          key={asset.src}
+                        />
+                      ))}
+                    </span>
                   </span>
                 </article>
               );

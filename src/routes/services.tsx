@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { I } from "@/components/site/ui";
+import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
 import { GROUPS, SERVICES } from "@/lib/services";
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -13,14 +14,6 @@ export const Route = createFileRoute("/services")({
   }),
   component: ServicesPage,
 });
-const ASSETS = [
-  "/images/voxel/plugin-console.png",
-  "/images/voxel/modpack-chest.png",
-  "/images/voxel/server-redstone.png",
-  "/images/voxel/website-workstation.png",
-  "/images/voxel/design-archive.png",
-  "/images/voxel/event-table.png",
-];
 function ServicesPage() {
   return (
     <div className="ref-site">
@@ -59,7 +52,11 @@ function ServicesPage() {
                         <strong>{service.title}</strong>
                         <small>{service.short}</small>
                       </span>
-                      <img src={ASSETS[index % ASSETS.length]} alt="" loading="lazy" />
+                      <img
+                        src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]}
+                        alt=""
+                        loading="lazy"
+                      />
                       <ArrowUpRight className="ref-catalog-arrow" />
                     </Link>
                   );

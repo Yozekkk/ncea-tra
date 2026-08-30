@@ -2,18 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowUpRight, Check, MessageCircle, Send } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
 import { SERVICES, getService } from "@/lib/services";
 const ORDER = "https://t.me/lisiy_bob",
   CHANNEL = "https://t.me/ncea_official";
-const ASSETS = [
-  "/images/voxel/plugin-console.png",
-  "/images/voxel/modpack-chest.png",
-  "/images/voxel/server-redstone.png",
-  "/images/voxel/website-workstation.png",
-  "/images/voxel/design-archive.png",
-  "/images/voxel/event-table.png",
-];
-
 export function ServicePage({ id }: { id: string }) {
   const service = getService(id);
   const index = Math.max(
@@ -47,7 +39,7 @@ export function ServicePage({ id }: { id: string }) {
               </a>
             </div>
           </div>
-          <img src={ASSETS[index % ASSETS.length]} alt="" />
+          <img src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]} alt="" />
         </section>
         <section className="ref-service-details">
           <div>

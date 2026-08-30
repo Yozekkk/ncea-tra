@@ -38,11 +38,6 @@ export const Route = createFileRoute("/")({
 const TG = "https://t.me/ncea_official",
   ORDER = "https://t.me/lisiy_bob",
   DISCORD = "https://discord.gg/u73vDgBMAn";
-const ASSETS = [
-  "/images/voxel/command-block.png",
-  "/images/voxel/enchanting-table.png",
-  "/images/voxel/project-chest.png",
-];
 const TAGS: Record<string, string[]> = {
   plugins: ["Paper", "Purpur", "Velocity"],
   modpacks: ["Forge", "Fabric", "Квесты"],
@@ -54,7 +49,50 @@ const TAGS: Record<string, string[]> = {
 const featured = ["plugins", "modpacks", "server-setup", "websites", "design", "events"]
   .map((id) => SERVICES.find((s) => s.id === id))
   .filter(Boolean) as typeof SERVICES;
-const SERVICE_ICONS = [Code2, PackageOpen, ServerCog, Monitor, Palette, CalendarDays];
+const SERVICE_PRESENTATION = [
+  {
+    icon: Code2,
+    label: "Плагины",
+    asset: "/images/voxel/plugin-console.png",
+    layout: "wide",
+    art: "console",
+  },
+  {
+    icon: PackageOpen,
+    label: "Сборки",
+    asset: "/images/voxel/modpack-chest.png",
+    layout: "standard",
+    art: "chest",
+  },
+  {
+    icon: ServerCog,
+    label: "Сервер",
+    asset: "/images/voxel/server-redstone.png",
+    layout: "standard",
+    art: "block",
+  },
+  {
+    icon: Monitor,
+    label: "Сайты",
+    asset: "/images/voxel/website-workstation.png",
+    layout: "feature",
+    art: "workstation",
+  },
+  {
+    icon: Palette,
+    label: "Дизайн",
+    asset: "/images/voxel/design-archive.png",
+    layout: "compact",
+    art: "archive",
+  },
+  {
+    icon: CalendarDays,
+    label: "Ивенты",
+    asset: "/images/voxel/event-table.png",
+    layout: "wide-compact",
+    art: "event",
+  },
+] as const;
 
 function HomePage() {
   const siteRef = useRef<HTMLDivElement>(null);
@@ -188,14 +226,18 @@ function HomePage() {
             onPointerLeave={resetVoxelAssets}
           >
             {featured.map((service, index) => {
-              const Icon = SERVICE_ICONS[index];
+              const presentation = SERVICE_PRESENTATION[index];
+              const Icon = presentation.icon;
               return (
-                <article className="ref-service-card" key={service.id}>
+                <article
+                  className={`ref-service-card ref-service-card--${presentation.layout}`}
+                  key={service.id}
+                >
                   <div className="ref-service-content">
                     <div className="ref-service-top">
                       <span>
                         <Icon />
-                        {service.title}
+                        {presentation.label}
                       </span>
                       <a href={ORDER} target="_blank" rel="noreferrer">
                         Заказать <ArrowUpRight />
@@ -212,8 +254,12 @@ function HomePage() {
                       Подробнее о направлении <ArrowUpRight />
                     </Link>
                   </div>
-                  <span className="ref-voxel-wrap" data-depth={0.72 + (index % 3) * 0.16}>
-                    <img className="ref-voxel" src={ASSETS[index % 3]} alt="" loading="lazy" />
+                  <span
+                    className={`ref-voxel-wrap ref-voxel-wrap--${presentation.art}`}
+                    data-depth={0.72 + (index % 3) * 0.16}
+                    aria-hidden="true"
+                  >
+                    <img className="ref-voxel" src={presentation.asset} alt="" loading="lazy" />
                   </span>
                 </article>
               );

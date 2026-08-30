@@ -14,9 +14,12 @@ export const Route = createFileRoute("/services")({
   component: ServicesPage,
 });
 const ASSETS = [
-  "/images/voxel/command-block.png",
-  "/images/voxel/enchanting-table.png",
-  "/images/voxel/project-chest.png",
+  "/images/voxel/plugin-console.png",
+  "/images/voxel/modpack-chest.png",
+  "/images/voxel/server-redstone.png",
+  "/images/voxel/website-workstation.png",
+  "/images/voxel/design-archive.png",
+  "/images/voxel/event-table.png",
 ];
 function ServicesPage() {
   return (
@@ -56,7 +59,7 @@ function ServicesPage() {
                         <strong>{service.title}</strong>
                         <small>{service.short}</small>
                       </span>
-                      <img src={ASSETS[index % 3]} alt="" loading="lazy" />
+                      <img src={ASSETS[index % ASSETS.length]} alt="" loading="lazy" />
                       <ArrowUpRight className="ref-catalog-arrow" />
                     </Link>
                   );

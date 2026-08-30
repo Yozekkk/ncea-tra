@@ -21,9 +21,6 @@ export function SiteFooter() {
               <Link to="/services">Услуги</Link>
             </li>
             <li>
-              <a href="/#about">О нас</a>
-            </li>
-            <li>
               <a href="/workers">Работники</a>
             </li>
             <li>

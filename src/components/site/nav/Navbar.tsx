@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Home,
+  Menu,
+  MessageSquareQuote,
+  Send,
+  UsersRound,
+  X,
+} from "lucide-react";
 import { LOGO_MARK } from "@/components/site/ui";
 
 const links = [
-  ["Главная", "/"],
-  ["Услуги", "/services"],
-  ["О нас", "/#about"],
-  ["Работники", "/workers"],
-  ["Отзывы", "/#reviews"],
-  ["Контакты", "/#contacts"],
+  { label: "Главная", href: "/", icon: Home },
+  { label: "Услуги", href: "/services", icon: BriefcaseBusiness },
+  { label: "Работники", href: "/workers", icon: UsersRound },
+  { label: "Отзывы", href: "/#reviews", icon: MessageSquareQuote },
+  { label: "Контакты", href: "/#contacts", icon: Send },
 ] as const;
 
 export function Navbar() {
@@ -27,24 +35,22 @@ export function Navbar() {
       <div className="ref-navbar">
         <Link to="/" className="ref-brand" aria-label="NCEA — на главную">
           <img src={LOGO_MARK} alt="" width={38} height={38} />
-          <strong>NCEA</strong>
         </Link>
         <nav className="ref-desktop-nav" aria-label="Основная навигация">
-          {links.map(([label, href]) =>
-            href === "/" || href === "/services" ? (
+          {links.map(({ label, href, icon: Icon }) =>
+            href === "/" || href === "/services" || href === "/workers" ? (
               <Link key={label} to={href} className={pathname === href ? "is-active" : ""}>
+                <Icon />
                 {label}
               </Link>
             ) : (
               <a key={label} href={href} className={pathname === href ? "is-active" : ""}>
+                <Icon />
                 {label}
               </a>
             ),
           )}
         </nav>
-        <a className="ref-nav-order" href="https://t.me/lisiy_bob" target="_blank" rel="noreferrer">
-          Заказать ↗
-        </a>
         <button
           className="ref-menu-button"
           type="button"
@@ -56,10 +62,13 @@ export function Navbar() {
       </div>
       {open && (
         <nav className="ref-mobile-nav">
-          {links.map(([label, href]) => (
+          {links.map(({ label, href, icon: Icon }) => (
             <a key={label} href={href}>
-              {label}
-              <span>↗</span>
+              <span>
+                <Icon />
+                {label}
+              </span>
+              <ArrowUpRight />
             </a>
           ))}
           <a
@@ -68,7 +77,7 @@ export function Navbar() {
             target="_blank"
             rel="noreferrer"
           >
-            Заказать в Telegram ↗
+            Заказать в Telegram <ArrowUpRight />
           </a>
         </nav>
       )}

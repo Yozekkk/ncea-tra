@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, UsersRound } from "lucide-react";
+import { UsersRound } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/workers")({
@@ -18,14 +18,10 @@ function WorkersPage() {
             <UsersRound />
           </div>
           <p className="ref-eyebrow">КОМАНДА NCEA</p>
-          <h1>Работники</h1>
+          <h1>Работники скоро будут добавлены</h1>
           <p>
-            Страница сотрудников подготовлена и подключена к навигации. Здесь появятся роли,
-            специализации и контакты участников команды NCEA.
+            Мы готовим аккуратную страницу команды. Здесь появятся только реальные сотрудники NCEA.
           </p>
-          <a href="https://t.me/ncea_official" target="_blank" rel="noreferrer">
-            Следить за новостями <ArrowUpRight />
-          </a>
         </section>
       </main>
       <SiteFooter />

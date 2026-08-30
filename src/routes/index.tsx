@@ -1,18 +1,25 @@
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   BadgeCheck,
   BarChart3,
   Boxes,
+  CalendarDays,
   CheckCircle2,
   Code2,
+  Gamepad2,
   Headphones,
+  MessageSquareQuote,
+  Monitor,
+  PackageOpen,
+  Palette,
   Send,
+  ServerCog,
   UsersRound,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { LOGO_MARK } from "@/components/site/ui";
 import { SERVICES } from "@/lib/services";
 
 export const Route = createFileRoute("/")({
@@ -47,31 +54,67 @@ const TAGS: Record<string, string[]> = {
 const featured = ["plugins", "modpacks", "server-setup", "websites", "design", "events"]
   .map((id) => SERVICES.find((s) => s.id === id))
   .filter(Boolean) as typeof SERVICES;
+const SERVICE_ICONS = [Code2, PackageOpen, ServerCog, Monitor, Palette, CalendarDays];
 
 function HomePage() {
+  const siteRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = siteRef.current;
+    if (!root || !("IntersectionObserver" in window)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const nodes = root.querySelectorAll<HTMLElement>(".ref-reveal");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -36px" },
+    );
+
+    root.classList.add("ref-motion-ready");
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+
+  const moveVoxelAssets = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!window.matchMedia("(min-width: 821px) and (pointer: fine)").matches) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 9;
+    event.currentTarget.querySelectorAll<HTMLElement>(".ref-voxel-wrap").forEach((node) => {
+      const depth = Number(node.dataset.depth ?? 1);
+      node.style.setProperty("--object-x", `${(x * depth).toFixed(2)}px`);
+      node.style.setProperty("--object-y", `${(y * depth).toFixed(2)}px`);
+    });
+  };
+
+  const resetVoxelAssets = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.currentTarget.querySelectorAll<HTMLElement>(".ref-voxel-wrap").forEach((node) => {
+      node.style.setProperty("--object-x", "0px");
+      node.style.setProperty("--object-y", "0px");
+    });
+  };
+
   return (
-    <div className="ref-site">
+    <div className="ref-site" ref={siteRef}>
       <SiteHeader />
       <main>
         <section className="ref-hero" id="home">
-          <div className="ref-hero-mark">
-            <img src={LOGO_MARK} alt="Логотип NCEA" />
-          </div>
-          <p className="ref-eyebrow">MINECRAFT DIGITAL AGENCY</p>
           <h1>NCEA</h1>
           <p className="ref-hero-copy">
-            Разработка, оформление и техническая поддержка Minecraft-проектов.
+            Разработка, оформление и поддержка Minecraft-проектов.
             <br />
-            От первой идеи до стабильного запуска.
+            Плагины, сборки, сайты, дизайн и серверные решения.
+            <br />
+            Для владельцев проектов, команд и сообществ.
           </p>
-          <div className="ref-hero-actions">
-            <a href={ORDER} target="_blank" rel="noreferrer">
-              Заказать проект <ArrowUpRight />
-            </a>
-            <Link to="/services">Смотреть услуги</Link>
-          </div>
         </section>
-        <section className="ref-promos">
+        <section className="ref-promos ref-reveal">
           <a className="ref-promo ref-promo-orange" href={ORDER} target="_blank" rel="noreferrer">
             <span className="ref-promo-icon">
               <BadgeCheck />
@@ -100,7 +143,7 @@ function HomePage() {
             </b>
           </a>
         </section>
-        <section className="ref-stats">
+        <section className="ref-stats ref-reveal">
           <article>
             <UsersRound />
             <span>
@@ -130,7 +173,7 @@ function HomePage() {
             </span>
           </article>
         </section>
-        <section className="ref-services" id="about">
+        <section className="ref-services ref-reveal">
           <header>
             <p>УСЛУГИ NCEA</p>
             <h2>Разработка и контент</h2>
@@ -139,9 +182,13 @@ function HomePage() {
               обсуждаем напрямую.
             </span>
           </header>
-          <div className="ref-service-grid">
+          <div
+            className="ref-service-grid"
+            onPointerMove={moveVoxelAssets}
+            onPointerLeave={resetVoxelAssets}
+          >
             {featured.map((service, index) => {
-              const Icon = index % 2 ? Boxes : Code2;
+              const Icon = SERVICE_ICONS[index];
               return (
                 <article className="ref-service-card" key={service.id}>
                   <div className="ref-service-content">
@@ -162,10 +209,12 @@ function HomePage() {
                       ))}
                     </div>
                     <Link to={service.path} className="ref-service-more">
-                      Подробнее о направлении →
+                      Подробнее о направлении <ArrowUpRight />
                     </Link>
                   </div>
-                  <img className="ref-voxel" src={ASSETS[index % 3]} alt="" loading="lazy" />
+                  <span className="ref-voxel-wrap" data-depth={0.72 + (index % 3) * 0.16}>
+                    <img className="ref-voxel" src={ASSETS[index % 3]} alt="" loading="lazy" />
+                  </span>
                 </article>
               );
             })}
@@ -176,39 +225,20 @@ function HomePage() {
             </Link>
           </div>
         </section>
-        <section className="ref-reviews" id="reviews">
+        <section className="ref-reviews ref-reveal" id="reviews">
           <div className="ref-footer-heading">
             <p>ОТЗЫВЫ</p>
             <h2>Что говорят клиенты</h2>
           </div>
-          <div className="ref-review-grid">
-            <article>
-              <strong>Алексей К.</strong>
-              <small>Владелец сервера</small>
-              <p>
-                «Команда аккуратно настроила сервер, объяснила структуру и осталась на связи после
-                запуска.»
-              </p>
-            </article>
-            <article>
-              <strong>Максим Р.</strong>
-              <small>Разработчик проекта</small>
-              <p>
-                «Получили именно ту механику, которую обсуждали. Правки внесли быстро и без лишней
-                бюрократии.»
-              </p>
-            </article>
-            <article>
-              <strong>Никита Т.</strong>
-              <small>Владелец сообщества</small>
-              <p>
-                «Сайт и оформление выглядят цельно, отлично работают на телефонах и понятны
-                пользователям.»
-              </p>
-            </article>
+          <div className="ref-review-placeholder">
+            <MessageSquareQuote />
+            <span>
+              <strong>Отзывы скоро появятся</strong>
+              <small>Скоро здесь появятся отзывы наших клиентов.</small>
+            </span>
           </div>
         </section>
-        <section className="ref-community" id="contacts">
+        <section className="ref-community ref-reveal" id="contacts">
           <div className="ref-footer-heading">
             <p>СООБЩЕСТВА</p>
             <h2>Оставайтесь на связи</h2>
@@ -231,7 +261,7 @@ function HomePage() {
               rel="noreferrer"
             >
               <span>
-                <b className="ref-discord-glyph">◉</b>
+                <Gamepad2 className="ref-discord-glyph" />
                 <b>Discord</b>
                 <small>Сервер NCEA</small>
               </span>

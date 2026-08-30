@@ -1,9 +1,9 @@
-import { Home, LayoutGrid, Sparkles, Users, Info, Handshake, type LucideIcon } from "lucide-react";
+import { Home, LayoutGrid, Sparkles, Users, Handshake, type LucideIcon } from "lucide-react";
 
 export const DISCORD_URL = "https://discord.gg/u73vDgBMAn";
 export const TELEGRAM_URL = "https://t.me/lisiy_bob";
 
-export type NavKey = "home" | "services" | "portfolio" | "team" | "about" | "partner";
+export type NavKey = "home" | "services" | "portfolio" | "team" | "partner";
 
 export type NavItem =
   | { key: NavKey; label: string; icon: LucideIcon; kind: "route"; to: "/" }
@@ -16,6 +16,5 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "services", label: "Услуги", icon: LayoutGrid, kind: "mega" },
   { key: "portfolio", label: "Портфолио", icon: Sparkles, kind: "hash", hash: "portfolio" },
   { key: "team", label: "Отзывы", icon: Users, kind: "hash", hash: "team" },
-  { key: "about", label: "О нас", icon: Info, kind: "hash", hash: "about" },
   { key: "partner", label: "Сотрудничество", icon: Handshake, kind: "hash", hash: "partner" },
 ];

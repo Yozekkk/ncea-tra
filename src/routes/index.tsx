@@ -1,5 +1,6 @@
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { type PointerEvent as ReactPointerEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -22,6 +23,15 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_ART } from "@/lib/service-art";
 import { SERVICES } from "@/lib/services";
+import {
+  MOTION_DURATION,
+  MOTION_EASE,
+  MOTION_SPRING,
+  MOTION_VIEWPORT,
+  directionalReveal,
+  revealItem,
+  staggerContainer,
+} from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +49,8 @@ export const Route = createFileRoute("/")({
 const TG = "https://t.me/ncea_official",
   ORDER = "https://t.me/lisiy_bob",
   DISCORD = "https://discord.gg/u73vDgBMAn";
+const SOFT_HOVER = { transform: "translate3d(0, -2px, 0)", transition: MOTION_SPRING } as const;
+const CARD_HOVER = { transform: "translate3d(0, -4px, 0)", transition: MOTION_SPRING } as const;
 const TAGS: Record<string, string[]> = {
   plugins: ["Paper", "Purpur", "Velocity"],
   modpacks: ["Forge", "Fabric", "Квесты"],
@@ -96,30 +108,6 @@ const SERVICE_PRESENTATION = [
 ] as const;
 
 function HomePage() {
-  const siteRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = siteRef.current;
-    if (!root || !("IntersectionObserver" in window)) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const nodes = root.querySelectorAll<HTMLElement>(".ref-reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -36px" },
-    );
-
-    root.classList.add("ref-motion-ready");
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, []);
-
   const moveVoxelAssets = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!window.matchMedia("(min-width: 821px) and (pointer: fine)").matches) return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -140,21 +128,57 @@ function HomePage() {
   };
 
   return (
-    <div className="ref-site" ref={siteRef}>
+    <div className="ref-site">
       <SiteHeader />
       <main>
-        <section className="ref-hero" id="home">
-          <h1>NCEA</h1>
-          <p className="ref-hero-copy">
+        <motion.section
+          className="ref-hero"
+          id="home"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h1
+            variants={{
+              hidden: {
+                opacity: 0,
+                clipPath: "inset(0 0 100% 0)",
+                transform: "translate3d(0, 18px, 0)",
+              },
+              visible: {
+                opacity: 1,
+                clipPath: "inset(0 0 0% 0)",
+                transform: "translate3d(0, 0, 0)",
+                transition: { duration: 0.58, ease: MOTION_EASE },
+              },
+            }}
+          >
+            NCEA
+          </motion.h1>
+          <motion.p className="ref-hero-copy" variants={revealItem}>
             Разработка, оформление и поддержка Minecraft-проектов.
             <br />
             Плагины, сборки, сайты, дизайн и серверные решения.
             <br />
             Для владельцев проектов, команд и сообществ.
-          </p>
-        </section>
-        <section className="ref-promos ref-reveal">
-          <a className="ref-promo ref-promo-orange" href={ORDER} target="_blank" rel="noreferrer">
+          </motion.p>
+        </motion.section>
+        <motion.section
+          className="ref-promos"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
+          <motion.a
+            className="ref-promo ref-promo-orange"
+            href={ORDER}
+            target="_blank"
+            rel="noreferrer"
+            variants={directionalReveal("left")}
+            whileHover={SOFT_HOVER}
+            whileTap={{ transform: "scale(0.985)" }}
+          >
             <span className="ref-promo-icon">
               <BadgeCheck />
             </span>
@@ -166,8 +190,16 @@ function HomePage() {
             <b>
               Обсудить проект <ArrowUpRight />
             </b>
-          </a>
-          <a className="ref-promo ref-promo-dark" href={TG} target="_blank" rel="noreferrer">
+          </motion.a>
+          <motion.a
+            className="ref-promo ref-promo-channel"
+            href={TG}
+            target="_blank"
+            rel="noreferrer"
+            variants={directionalReveal("right")}
+            whileHover={SOFT_HOVER}
+            whileTap={{ transform: "scale(0.985)" }}
+          >
             <span className="ref-promo-icon">
               <BarChart3 />
             </span>
@@ -180,47 +212,58 @@ function HomePage() {
             <b>
               Перейти <ArrowUpRight />
             </b>
-          </a>
-        </section>
-        <section className="ref-stats ref-reveal">
-          <article>
+          </motion.a>
+        </motion.section>
+        <motion.section
+          className="ref-stats"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
+          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
             <UsersRound />
             <span>
               <strong>7+</strong>
               <small>специалистов</small>
             </span>
-          </article>
-          <article>
+          </motion.article>
+          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
             <Boxes />
             <span>
               <strong>12</strong>
               <small>направлений</small>
             </span>
-          </article>
-          <article>
+          </motion.article>
+          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
             <CheckCircle2 />
             <span>
               <strong>50+</strong>
               <small>выполненных задач</small>
             </span>
-          </article>
-          <article>
+          </motion.article>
+          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
             <Headphones />
             <span>
               <strong>7/7</strong>
               <small>связь с командой</small>
             </span>
-          </article>
-        </section>
-        <section className="ref-services ref-reveal">
-          <header>
+          </motion.article>
+        </motion.section>
+        <motion.section
+          className="ref-services"
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
+          <motion.header variants={revealItem}>
             <p>УСЛУГИ NCEA</p>
             <h2>Разработка и контент</h2>
             <span>
               Реальные услуги команды — без калькуляторов и скрытых пакетов. Задачу и формат
               обсуждаем напрямую.
             </span>
-          </header>
+          </motion.header>
           <div
             className="ref-service-grid"
             onPointerMove={moveVoxelAssets}
@@ -230,9 +273,15 @@ function HomePage() {
               const presentation = SERVICE_PRESENTATION[index];
               const Icon = presentation.icon;
               return (
-                <article
+                <motion.article
                   className={`ref-service-card ref-service-card--${presentation.layout}`}
                   key={service.id}
+                  variants={directionalReveal(index % 2 === 0 ? "left" : "right", index * 0.045)}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={MOTION_VIEWPORT}
+                  whileHover={CARD_HOVER}
+                  whileTap={{ transform: "translate3d(0, -1px, 0) scale(0.992)" }}
                 >
                   <div className="ref-service-content">
                     <div className="ref-service-top">
@@ -260,19 +309,31 @@ function HomePage() {
                     data-depth={0.72 + (index % 3) * 0.16}
                     aria-hidden="true"
                   >
-                    <span className="ref-voxel-stage">
-                      {presentation.assets.map((asset) => (
-                        <img
-                          className={`ref-voxel ref-voxel--${asset.role}`}
-                          src={asset.src}
-                          alt=""
-                          loading="lazy"
-                          key={asset.src}
-                        />
-                      ))}
-                    </span>
+                    <motion.span
+                      className="ref-voxel-motion"
+                      initial={{ opacity: 0, transform: "translate3d(0, 12px, 0) rotate(-2deg)" }}
+                      whileInView={{ opacity: 1, transform: "translate3d(0, 0, 0) rotate(0deg)" }}
+                      viewport={MOTION_VIEWPORT}
+                      transition={{
+                        delay: 0.16 + index * 0.045,
+                        duration: MOTION_DURATION.reveal,
+                        ease: MOTION_EASE,
+                      }}
+                    >
+                      <span className="ref-voxel-stage">
+                        {presentation.assets.map((asset) => (
+                          <img
+                            className={`ref-voxel ref-voxel--${asset.role}`}
+                            src={asset.src}
+                            alt=""
+                            loading="lazy"
+                            key={asset.src}
+                          />
+                        ))}
+                      </span>
+                    </motion.span>
                   </span>
-                </article>
+                </motion.article>
               );
             })}
           </div>
@@ -281,8 +342,15 @@ function HomePage() {
               Все 12 услуг <ArrowUpRight />
             </Link>
           </div>
-        </section>
-        <section className="ref-reviews ref-reveal" id="reviews">
+        </motion.section>
+        <motion.section
+          className="ref-reviews"
+          id="reviews"
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <div className="ref-footer-heading">
             <p>ОТЗЫВЫ</p>
             <h2>Что говорят клиенты</h2>
@@ -294,14 +362,29 @@ function HomePage() {
               <small>Скоро здесь появятся отзывы наших клиентов.</small>
             </span>
           </div>
-        </section>
-        <section className="ref-community ref-reveal" id="contacts">
+        </motion.section>
+        <motion.section
+          className="ref-community"
+          id="contacts"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <div className="ref-footer-heading">
             <p>СООБЩЕСТВА</p>
             <h2>Оставайтесь на связи</h2>
           </div>
           <div className="ref-community-grid">
-            <a className="ref-social-card ref-telegram" href={TG} target="_blank" rel="noreferrer">
+            <motion.a
+              className="ref-social-card ref-telegram"
+              href={TG}
+              target="_blank"
+              rel="noreferrer"
+              variants={directionalReveal("left")}
+              whileHover={SOFT_HOVER}
+              whileTap={{ transform: "scale(0.985)" }}
+            >
               <span>
                 <Send />
                 <b>Telegram</b>
@@ -310,12 +393,15 @@ function HomePage() {
               <strong>
                 Подписаться <ArrowUpRight />
               </strong>
-            </a>
-            <a
+            </motion.a>
+            <motion.a
               className="ref-social-card ref-discord"
               href={DISCORD}
               target="_blank"
               rel="noreferrer"
+              variants={directionalReveal("right")}
+              whileHover={SOFT_HOVER}
+              whileTap={{ transform: "scale(0.985)" }}
             >
               <span>
                 <Gamepad2 className="ref-discord-glyph" />
@@ -325,9 +411,9 @@ function HomePage() {
               <strong>
                 Вступить <ArrowUpRight />
               </strong>
-            </a>
+            </motion.a>
           </div>
-        </section>
+        </motion.section>
       </main>
       <SiteFooter />
     </div>

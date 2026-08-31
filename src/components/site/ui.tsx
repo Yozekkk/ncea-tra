@@ -1,7 +1,8 @@
 import { toast } from "sonner";
 
-export const LOGO_MARK = "/images/brand/ncea-logo-full.webp";
+export const LOGO_MARK = "/images/brand/ncea-logo-mark.webp";
 export const LOGO_ROUND = "/images/brand/ncea-logo-mark.webp";
+export const LOGO_FULL = "/images/brand/ncea-logo-full.webp";
 
 export const DISCORD_TAG = "@yozekkk";
 export const TELEGRAM_TAG = "@lisiy_bob";

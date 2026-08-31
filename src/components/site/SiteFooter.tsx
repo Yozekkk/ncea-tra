@@ -1,20 +1,41 @@
 import { Link } from "@tanstack/react-router";
 import { Lightbulb, Send } from "lucide-react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import { LOGO_MARK } from "@/components/site/ui";
+import { MOTION_DURATION, MOTION_EASE, MOTION_VIEWPORT, staggerContainer } from "@/lib/motion";
 
 export function SiteFooter() {
+  const reduceMotion = useReducedMotion();
+  const columnVariants: Variants = {
+    hidden: {
+      opacity: 0,
+      transform: reduceMotion ? "none" : "translate3d(0, 14px, 0)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translate3d(0, 0, 0)",
+      transition: { duration: MOTION_DURATION.reveal, ease: MOTION_EASE },
+    },
+  };
+
   return (
     <footer className="ref-footer">
-      <div className="ref-footer-grid">
-        <div className="ref-footer-brand">
+      <motion.div
+        className="ref-footer-grid"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={MOTION_VIEWPORT}
+      >
+        <motion.div className="ref-footer-brand" variants={columnVariants}>
           <Link to="/">
             <img src={LOGO_MARK} alt="" />
             <strong>NCEA</strong>
           </Link>
           <p>Minecraft Digital Agency: разработка, дизайн, контент и поддержка игровых проектов.</p>
           <small>© {new Date().getFullYear()} NCEA</small>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={columnVariants}>
           <h3>Навигация</h3>
           <ul>
             <li>
@@ -27,8 +48,8 @@ export function SiteFooter() {
               <a href="/#reviews">Отзывы</a>
             </li>
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={columnVariants}>
           <h3>Направления</h3>
           <ul>
             <li>
@@ -44,8 +65,8 @@ export function SiteFooter() {
               <Link to="/design">Дизайн</Link>
             </li>
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={columnVariants}>
           <h3>Связь</h3>
           <ul>
             <li>
@@ -59,8 +80,8 @@ export function SiteFooter() {
               </a>
             </li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
       <p className="ref-legal">
         Это не официальный продукт или услуга Minecraft. NCEA не одобрена и не связана с Mojang
         Studios или Microsoft. Minecraft является товарным знаком Mojang Studios. Все упомянутые

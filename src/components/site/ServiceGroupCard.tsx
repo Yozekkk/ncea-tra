@@ -1,12 +1,9 @@
-import {
-  useEffect,
-  useRef,
-  type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import type { Service } from "@/lib/services";
+import { MOTION_DURATION, MOTION_EASE, MOTION_VIEWPORT } from "@/lib/motion";
 
 type GroupVariant = "primary" | "creative" | "compact";
 
@@ -28,10 +25,6 @@ type ServiceGroupCardProps = {
   revealDelay: number;
 };
 
-type GroupStyle = CSSProperties & {
-  "--services-reveal-delay": string;
-};
-
 const ORDER_URL = "https://t.me/lisiy_bob";
 const FINE_POINTER = "(hover: hover) and (pointer: fine) and (min-width: 769px)";
 
@@ -47,6 +40,7 @@ export function ServiceGroupCard({
   ctaCopy,
   revealDelay,
 }: ServiceGroupCardProps) {
+  const reduceMotion = useReducedMotion();
   const cardRef = useRef<HTMLElement>(null);
   const rectRef = useRef<DOMRect | null>(null);
   const frameRef = useRef<number | null>(null);
@@ -104,75 +98,105 @@ export function ServiceGroupCard({
     schedulePaint();
   };
 
+  const entranceDirection = number === "02" ? 1 : -1;
+
   return (
-    <article
-      ref={cardRef}
-      className={`services-group services-group--${variant} services-reveal`}
-      style={{ "--services-reveal-delay": `${revealDelay}ms` } as GroupStyle}
-      onPointerEnter={onPointerEnter}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
+    <motion.div
+      className={`services-group-slot services-group-slot--${variant}`}
+      initial={{
+        opacity: 0,
+        transform: reduceMotion ? "none" : `translate3d(${entranceDirection * 22}px, 18px, 0)`,
+      }}
+      whileInView={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
+      viewport={MOTION_VIEWPORT}
+      transition={{
+        delay: revealDelay / 1000,
+        duration: MOTION_DURATION.reveal,
+        ease: MOTION_EASE,
+      }}
     >
-      <span className="services-group-light" aria-hidden="true" />
-      <span className="services-group-corners" aria-hidden="true" />
-      <span className="services-group-art" aria-hidden="true">
-        {art.map((asset, index) => (
-          <img
-            src={asset.src}
-            alt=""
-            width={280}
-            height={280}
-            loading="lazy"
-            className={`services-group-art-${asset.role}`}
-            key={`${asset.src}-${index}`}
-          />
-        ))}
-      </span>
-
-      <header className="services-group-header">
-        <span className="services-group-number">{number}</span>
-        <span className="services-group-label">{label}</span>
-        <span className="services-group-count">
-          {String(services.length).padStart(2, "0")} направлений
+      <article
+        ref={cardRef}
+        className={`services-group services-group--${variant}`}
+        onPointerEnter={onPointerEnter}
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
+      >
+        <span className="services-group-light" aria-hidden="true" />
+        <span className="services-group-corners" aria-hidden="true" />
+        <span className="services-group-art" aria-hidden="true">
+          <motion.span
+            className="services-group-art-stage"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={MOTION_VIEWPORT}
+            transition={{
+              delay: revealDelay / 1000 + 0.18,
+              duration: MOTION_DURATION.normal,
+              ease: MOTION_EASE,
+            }}
+          >
+            {art.map((asset, index) => (
+              <img
+                src={asset.src}
+                alt=""
+                width={280}
+                height={280}
+                loading="lazy"
+                className={`services-group-art-${asset.role}`}
+                key={`${asset.src}-${index}`}
+              />
+            ))}
+          </motion.span>
         </span>
-      </header>
 
-      <div className="services-group-intro">
-        <h2 aria-label={title.join(" ")}>
-          {title.map((line) => (
-            <span key={line}>{line}</span>
+        <header className="services-group-header">
+          <span className="services-group-number">{number}</span>
+          <span className="services-group-label">{label}</span>
+          <span className="services-group-count">
+            {String(services.length).padStart(2, "0")} направлений
+          </span>
+        </header>
+
+        <div className="services-group-intro">
+          <h2 aria-label={title.join(" ")}>
+            {title.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </h2>
+          <p>{description}</p>
+        </div>
+
+        <nav className="services-group-links" aria-label={`Услуги: ${title.join(" ")}`}>
+          {services.map((service, index) => (
+            <Link to={service.path} className="services-group-link" key={service.id}>
+              <span className="services-group-link-index">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="services-group-link-copy">
+                <strong>{service.title}</strong>
+                <small>{service.short}</small>
+              </span>
+              <span className="services-group-link-arrow" aria-hidden="true">
+                <ArrowUpRight />
+              </span>
+            </Link>
           ))}
-        </h2>
-        <p>{description}</p>
-      </div>
+        </nav>
 
-      <nav className="services-group-links" aria-label={`Услуги: ${title.join(" ")}`}>
-        {services.map((service, index) => (
-          <Link to={service.path} className="services-group-link" key={service.id}>
-            <span className="services-group-link-index">{String(index + 1).padStart(2, "0")}</span>
-            <span className="services-group-link-copy">
-              <strong>{service.title}</strong>
-              <small>{service.short}</small>
-            </span>
-            <span className="services-group-link-arrow" aria-hidden="true">
+        <a className="services-group-cta" href={ORDER_URL} target="_blank" rel="noreferrer">
+          <span>
+            <strong>{ctaTitle}</strong>
+            <small>{ctaCopy}</small>
+          </span>
+          <span className="services-group-cta-action">
+            Обсудить проект
+            <span className="services-inline-arrow" aria-hidden="true">
               <ArrowUpRight />
             </span>
-          </Link>
-        ))}
-      </nav>
-
-      <a className="services-group-cta" href={ORDER_URL} target="_blank" rel="noreferrer">
-        <span>
-          <strong>{ctaTitle}</strong>
-          <small>{ctaCopy}</small>
-        </span>
-        <span className="services-group-cta-action">
-          Обсудить проект
-          <span className="services-inline-arrow" aria-hidden="true">
-            <ArrowUpRight />
           </span>
-        </span>
-      </a>
-    </article>
+        </a>
+      </article>
+    </motion.div>
   );
 }

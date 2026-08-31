@@ -9,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import { MotionConfig } from "motion/react";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -17,8 +18,9 @@ import { CurrencyProvider } from "@/lib/currency";
 import appCss from "../styles.css?url";
 import liquidCss from "../liquid.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { MOTION_DURATION, MOTION_EASE } from "../lib/motion";
 
-const SITE_URL = "https://ncea-tra.vercel.app";
+const SITE_URL = "https://www.ncea-studio.com";
 let motionReady = false;
 
 function RouteEffects() {
@@ -176,20 +178,19 @@ function BrandIntro() {
 
   return (
     <div
-      className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-stone-950"
+      className="ncea-intro fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-white text-stone-950"
       aria-hidden="true"
     >
-      <div className="noise absolute inset-0 opacity-40" />
-      <div className="absolute left-1/2 top-1/2 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-red/16 blur-[120px]" />
+      <div className="noise absolute inset-0 opacity-[.08]" />
+      <div className="absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-orange/10 blur-[70px]" />
       <div className="ncea-intro-scan" />
       <div className="relative flex flex-col items-center px-6 text-center [perspective:900px]">
-        <div className="ncea-wordmark" aria-label="NCEA">
-          <span>N</span>
-          <span>C</span>
-          <span>E</span>
-          <span>A</span>
-        </div>
-        <div className="ncea-intro-caption mt-12 text-[10px] font-semibold uppercase tracking-[.42em] text-white/48 sm:text-xs">
+        <img
+          className="ncea-intro-logo h-28 w-28 object-contain sm:h-36 sm:w-36"
+          src={LOGO_ROUND}
+          alt="NCEA"
+        />
+        <div className="ncea-intro-caption mt-10 text-[10px] font-semibold uppercase tracking-[.42em] text-stone-500 sm:text-xs">
           NovaCraft Event Agency
         </div>
       </div>
@@ -199,11 +200,11 @@ function BrandIntro() {
 
 function NotFoundComponent() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-stone-950 text-white">
-      <div className="noise fixed inset-0 opacity-40 pointer-events-none" />
+    <div className="ncea-status-page relative min-h-screen overflow-hidden bg-white text-stone-950">
+      <div className="noise fixed inset-0 opacity-[.06] pointer-events-none" />
       <SiteHeader />
       <main className="relative z-10 min-h-[82vh] flex items-center justify-center px-4 pt-24 pb-16">
-        <div className="max-w-2xl text-center liquid-panel p-8 sm:p-12">
+        <div className="ncea-status-panel max-w-2xl rounded-3xl border border-stone-200 bg-white p-8 text-center shadow-[0_28px_80px_rgba(24,24,27,.1)] sm:p-12">
           <img
             src={LOGO_ROUND}
             alt="NCEA"
@@ -213,7 +214,7 @@ function NotFoundComponent() {
           />
           <div className="mt-4 font-display text-8xl sm:text-9xl font-black gradient-text">404</div>
           <h1 className="mt-3 font-display text-2xl sm:text-4xl font-bold">Страница не найдена</h1>
-          <p className="mx-auto mt-4 max-w-lg text-sm sm:text-base text-white/55">
+          <p className="mx-auto mt-4 max-w-lg text-sm text-stone-500 sm:text-base">
             Возможно, адрес изменился или такой страницы больше нет. Вернитесь на главную либо
             откройте каталог услуг NCEA.
           </p>
@@ -226,7 +227,7 @@ function NotFoundComponent() {
             </Link>
             <Link
               to="/services"
-              className="liquid-secondary inline-flex h-12 items-center gap-2 px-6 font-medium"
+              className="inline-flex h-12 items-center gap-2 rounded-full border border-stone-200 bg-white px-6 font-medium shadow-sm"
             >
               Посмотреть услуги <I.Arrow className="h-4 w-4" />
             </Link>
@@ -246,12 +247,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-stone-950 px-4 text-white">
-      <div className="noise fixed inset-0 opacity-40 pointer-events-none" />
-      <div className="relative max-w-md text-center liquid-panel p-8">
+    <div className="ncea-status-page relative flex min-h-screen items-center justify-center bg-white px-4 text-stone-950">
+      <div className="noise fixed inset-0 opacity-[.06] pointer-events-none" />
+      <div className="ncea-status-panel relative max-w-md rounded-3xl border border-stone-200 bg-white p-8 text-center shadow-[0_28px_80px_rgba(24,24,27,.1)]">
         <img src={LOGO_ROUND} alt="NCEA" className="round-brand-image mx-auto h-20 w-20" />
         <h1 className="mt-5 font-display text-2xl font-bold">Страница не загрузилась</h1>
-        <p className="mt-3 text-sm text-white/55">
+        <p className="mt-3 text-sm text-stone-500">
           Произошла техническая ошибка. Попробуйте загрузить страницу повторно или вернитесь на
           главную.
         </p>
@@ -267,7 +268,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           </button>
           <a
             href="/"
-            className="liquid-secondary inline-flex h-11 items-center justify-center px-5 text-sm font-medium"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-stone-200 bg-white px-5 text-sm font-medium shadow-sm"
           >
             На главную
           </a>
@@ -282,10 +283,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#050505" },
+      { name: "theme-color", content: "#ffffff" },
       { name: "application-name", content: "NCEA" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { title: "NCEA — разработка и оформление Minecraft-проектов" },
       {
         name: "description",
@@ -317,8 +318,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "/ncea-intro.css" },
       { rel: "canonical", href: SITE_URL },
       { rel: "manifest", href: "/site.webmanifest" },
-      { rel: "icon", type: "image/svg+xml", href: "/ncea-round.svg" },
-      { rel: "apple-touch-icon", href: "/ncea-round.svg" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -329,7 +330,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" data-theme="light" style={{ colorScheme: "light" }}>
       <head>
         <HeadContent />
       </head>
@@ -346,9 +347,14 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
-        <RouteEffects />
-        <Outlet />
-        <Toaster position="bottom-right" theme="light" />
+        <MotionConfig
+          reducedMotion="user"
+          transition={{ duration: MOTION_DURATION.normal, ease: MOTION_EASE }}
+        >
+          <RouteEffects />
+          <Outlet />
+          <Toaster position="bottom-right" theme="light" />
+        </MotionConfig>
       </CurrencyProvider>
     </QueryClientProvider>
   );

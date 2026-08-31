@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowUpRight, Check, MessageCircle, Send } from "lucide-react";
+import { motion } from "motion/react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
 import { SERVICES, getService } from "@/lib/services";
+import { MOTION_VIEWPORT, directionalReveal, revealItem, staggerContainer } from "@/lib/motion";
 const ORDER = "https://t.me/lisiy_bob",
   CHANNEL = "https://t.me/ncea_official";
 export function ServicePage({ id }: { id: string }) {
@@ -18,15 +20,25 @@ export function ServicePage({ id }: { id: string }) {
     <div className="ref-site">
       <SiteHeader />
       <main className="ref-service-page">
-        <nav className="ref-breadcrumbs">
+        <motion.nav
+          className="ref-breadcrumbs"
+          variants={revealItem}
+          initial="hidden"
+          animate="visible"
+        >
           <Link to="/">Главная</Link>
           <span>/</span>
           <Link to="/services">Услуги</Link>
           <span>/</span>
           <b>{service.title}</b>
-        </nav>
-        <section className="ref-service-hero">
-          <div>
+        </motion.nav>
+        <motion.section
+          className="ref-service-hero"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={directionalReveal("left")}>
             <p className="ref-eyebrow">NCEA / УСЛУГА {String(index + 1).padStart(2, "0")}</p>
             <h1>{service.title}</h1>
             <p>{service.desc}</p>
@@ -38,10 +50,18 @@ export function ServicePage({ id }: { id: string }) {
                 <Send /> Telegram-канал
               </a>
             </div>
-          </div>
-          <img src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]} alt="" />
-        </section>
-        <section className="ref-service-details">
+          </motion.div>
+          <motion.div className="ref-service-hero-art" variants={directionalReveal("right")}>
+            <img src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]} alt="" />
+          </motion.div>
+        </motion.section>
+        <motion.section
+          className="ref-service-details"
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <div>
             <p className="ref-eyebrow">ЧТО ВХОДИТ</p>
             <h2>Работа под вашу задачу</h2>
@@ -62,8 +82,14 @@ export function ServicePage({ id }: { id: string }) {
               Связь и согласование результата
             </div>
           </div>
-        </section>
-        <section className="ref-order-banner">
+        </motion.section>
+        <motion.section
+          className="ref-order-banner"
+          variants={directionalReveal("left")}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <div>
             <p>ГОТОВЫ ОБСУДИТЬ?</p>
             <h2>Расскажите о вашем проекте</h2>
@@ -72,8 +98,14 @@ export function ServicePage({ id }: { id: string }) {
           <a href={ORDER} target="_blank" rel="noreferrer">
             Написать в ЛС <ArrowUpRight />
           </a>
-        </section>
-        <section className="ref-related">
+        </motion.section>
+        <motion.section
+          className="ref-related"
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <div className="ref-related-heading">
             <div>
               <p className="ref-eyebrow">ЕЩЁ УСЛУГИ</p>
@@ -94,7 +126,7 @@ export function ServicePage({ id }: { id: string }) {
               </Link>
             ))}
           </div>
-        </section>
+        </motion.section>
         <Link to="/services" className="ref-back">
           <ArrowLeft /> Вернуться к услугам
         </Link>

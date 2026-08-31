@@ -1,11 +1,12 @@
-import { useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
 import { ServiceGroupCard } from "@/components/site/ServiceGroupCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_ART } from "@/lib/service-art";
 import { GROUPS, SERVICES } from "@/lib/services";
+import { MOTION_EASE, MOTION_VIEWPORT, revealItem, staggerContainer } from "@/lib/motion";
 
 const GROUP_PRESENTATIONS = [
   {
@@ -44,41 +45,14 @@ export const Route = createFileRoute("/services")({
     meta: [
       { title: "Услуги NCEA — разработка и контент" },
       { name: "description", content: "Все услуги NCEA для Minecraft-проектов." },
-      { name: "theme-color", content: "#090909" },
+      { name: "theme-color", content: "#ffffff" },
     ],
   }),
   component: ServicesPage,
 });
 function ServicesPage() {
-  const pageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const page = pageRef.current;
-    if (!page) return;
-    const elements = page.querySelectorAll<HTMLElement>(".services-reveal");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
-    page.classList.add("services-motion-ready");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -48px" },
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div className="ref-site services-experience" ref={pageRef}>
+    <div className="ref-site services-experience">
       <a className="services-skip-link" href="#main-content">
         Перейти к каталогу
       </a>
@@ -86,17 +60,55 @@ function ServicesPage() {
       <main className="services-catalog" id="main-content">
         <span className="services-atmosphere services-atmosphere--one" aria-hidden="true" />
         <span className="services-atmosphere services-atmosphere--two" aria-hidden="true" />
-        <section className="services-hero" aria-labelledby="services-title">
-          <div className="services-hero-meta">
+        <motion.section
+          className="services-hero"
+          aria-labelledby="services-title"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="services-hero-meta" variants={revealItem}>
             <span>12 направлений</span>
             <span>NCEA / Service atlas</span>
-          </div>
+          </motion.div>
           <div className="services-hero-copy">
             <h1 id="services-title" aria-label="Услуги NCEA">
-              <span>УСЛУГИ</span>
-              <span>NCEA</span>
+              <motion.span
+                variants={{
+                  hidden: {
+                    opacity: 0,
+                    clipPath: "inset(100% 0 0)",
+                    transform: "translate3d(0, 24px, 0)",
+                  },
+                  visible: {
+                    opacity: 1,
+                    clipPath: "inset(0)",
+                    transform: "translate3d(0, 0, 0)",
+                    transition: { duration: 0.56, ease: MOTION_EASE },
+                  },
+                }}
+              >
+                УСЛУГИ
+              </motion.span>
+              <motion.span
+                variants={{
+                  hidden: {
+                    opacity: 0,
+                    clipPath: "inset(100% 0 0)",
+                    transform: "translate3d(0, 24px, 0)",
+                  },
+                  visible: {
+                    opacity: 1,
+                    clipPath: "inset(0)",
+                    transform: "translate3d(0, 0, 0)",
+                    transition: { duration: 0.56, ease: MOTION_EASE },
+                  },
+                }}
+              >
+                NCEA
+              </motion.span>
             </h1>
-            <div>
+            <motion.div variants={revealItem}>
               <p>
                 Разработка, контент и сопровождение Minecraft-проектов. Выберите направление —
                 детали и формат обсудим напрямую.
@@ -107,14 +119,14 @@ function ServicesPage() {
                   <ArrowDownRight />
                 </span>
               </a>
-            </div>
+            </motion.div>
           </div>
-          <div className="services-hero-line" aria-hidden="true">
+          <motion.div className="services-hero-line" aria-hidden="true" variants={revealItem}>
             <span>DESIGN / CODE / CONTENT / SUPPORT</span>
             <i />
             <b>2026</b>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
 
         <section className="services-groups" id="service-groups" aria-label="Каталог услуг NCEA">
           <span className="services-voxel-ribbon" aria-hidden="true">
@@ -143,7 +155,13 @@ function ServicesPage() {
           })}
         </section>
 
-        <section className="services-bottom services-reveal">
+        <motion.section
+          className="services-bottom"
+          variants={revealItem}
+          initial="hidden"
+          whileInView="visible"
+          viewport={MOTION_VIEWPORT}
+        >
           <span>Не нашли точное направление?</span>
           <h2>Соберём решение вокруг вашей задачи.</h2>
           <a href="https://t.me/lisiy_bob" target="_blank" rel="noreferrer">
@@ -152,7 +170,7 @@ function ServicesPage() {
               <ArrowUpRight />
             </span>
           </a>
-        </section>
+        </motion.section>
       </main>
       <SiteFooter />
     </div>

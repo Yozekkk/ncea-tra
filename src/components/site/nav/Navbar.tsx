@@ -17,7 +17,7 @@ import { MOTION_DURATION, MOTION_EASE, MOTION_SPRING } from "@/lib/motion";
 const links = [
   { label: "Главная", href: "/", icon: Home },
   { label: "Услуги", href: "/services", icon: BriefcaseBusiness },
-  { label: "Работники", href: "/workers", icon: UsersRound },
+  { label: "Сотрудники", href: "/workers", icon: UsersRound },
   { label: "Отзывы", href: "/#reviews", icon: MessageSquareQuote },
   { label: "Контакты", href: "/#contacts", icon: Send },
 ] as const;

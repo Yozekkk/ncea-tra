@@ -42,7 +42,7 @@ export function SiteFooter() {
               <Link to="/services">Услуги</Link>
             </li>
             <li>
-              <a href="/workers">Работники</a>
+              <a href="/workers">Сотрудники</a>
             </li>
             <li>
               <a href="/#reviews">Отзывы</a>

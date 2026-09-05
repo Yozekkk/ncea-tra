@@ -30,6 +30,7 @@ const requiredFiles = [
   "src/routes/__root.tsx",
   "src/components/site/ServicePage.tsx",
   "src/components/site/SiteHeader.tsx",
+  "src/components/site/nav/Navbar.tsx",
   "src/components/site/SiteFooter.tsx",
   "src/components/site/ReviewsSection.tsx",
   "src/lib/services.ts",
@@ -117,6 +118,18 @@ if (reviewEntries.join("|") !== expectedReviewNicks.join("|"))
 if (/₽|руб(?:\.|л|лей)|заказ\s*№|id\s*заказа|\d+\s*(?:дн|час).*назад/i.test(reviewsSource))
   fail("В секции отзывов найдены запрещённые коммерческие метаданные");
 if (!process.exitCode) ok("Все 9 отзывов присутствуют без цен, дат и ID заказа");
+
+const navbarSource = read("src/components/site/nav/Navbar.tsx");
+const stylesSource = read("src/styles.css");
+if (!navbarSource.includes('className="ref-mobile-tabbar"'))
+  fail("Mobile bottom navigation не найден");
+if (!navbarSource.includes("LOGO_MARK"))
+  fail("Mobile navigation не использует официальный логотип");
+if (!/env\(safe-area-inset-bottom/.test(stylesSource))
+  fail("Mobile navigation не учитывает нижнюю safe-area");
+if (!stylesSource.includes(".ref-mobile-tabbar-link.is-active"))
+  fail("Mobile navigation не содержит active state");
+if (!process.exitCode) ok("Mobile bottom navigation использует общий navbar, логотип и safe-area");
 
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");

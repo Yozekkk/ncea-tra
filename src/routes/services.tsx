@@ -6,7 +6,12 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_ART } from "@/lib/service-art";
 import { GROUPS, SERVICES } from "@/lib/services";
-import { MOTION_EASE, MOTION_VIEWPORT, revealItem, staggerContainer } from "@/lib/motion";
+import {
+  WORKERS_MOTION_VIEWPORT,
+  workersHeadingReveal,
+  workersItemReveal,
+  workersStaggerContainer,
+} from "@/lib/motion";
 
 const GROUP_PRESENTATIONS = [
   {
@@ -63,52 +68,20 @@ function ServicesPage() {
         <motion.section
           className="services-hero"
           aria-labelledby="services-title"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           animate="visible"
         >
-          <motion.div className="services-hero-meta" variants={revealItem}>
+          <motion.div className="services-hero-meta" variants={workersItemReveal}>
             <span>12 направлений</span>
             <span>NCEA / Service atlas</span>
           </motion.div>
           <div className="services-hero-copy">
-            <h1 id="services-title" aria-label="Услуги NCEA">
-              <motion.span
-                variants={{
-                  hidden: {
-                    opacity: 0,
-                    clipPath: "inset(100% 0 0)",
-                    transform: "translate3d(0, 24px, 0)",
-                  },
-                  visible: {
-                    opacity: 1,
-                    clipPath: "inset(0)",
-                    transform: "translate3d(0, 0, 0)",
-                    transition: { duration: 0.56, ease: MOTION_EASE },
-                  },
-                }}
-              >
-                УСЛУГИ
-              </motion.span>
-              <motion.span
-                variants={{
-                  hidden: {
-                    opacity: 0,
-                    clipPath: "inset(100% 0 0)",
-                    transform: "translate3d(0, 24px, 0)",
-                  },
-                  visible: {
-                    opacity: 1,
-                    clipPath: "inset(0)",
-                    transform: "translate3d(0, 0, 0)",
-                    transition: { duration: 0.56, ease: MOTION_EASE },
-                  },
-                }}
-              >
-                NCEA
-              </motion.span>
-            </h1>
-            <motion.div variants={revealItem}>
+            <motion.h1 id="services-title" aria-label="Услуги NCEA" variants={workersHeadingReveal}>
+              <span>УСЛУГИ</span>
+              <span>NCEA</span>
+            </motion.h1>
+            <motion.div variants={workersItemReveal}>
               <p>
                 Разработка, контент и сопровождение Minecraft-проектов. Выберите направление —
                 детали и формат обсудим напрямую.
@@ -121,14 +94,26 @@ function ServicesPage() {
               </a>
             </motion.div>
           </div>
-          <motion.div className="services-hero-line" aria-hidden="true" variants={revealItem}>
+          <motion.div
+            className="services-hero-line"
+            aria-hidden="true"
+            variants={workersItemReveal}
+          >
             <span>DESIGN / CODE / CONTENT / SUPPORT</span>
             <i />
             <b>2026</b>
           </motion.div>
         </motion.section>
 
-        <section className="services-groups" id="service-groups" aria-label="Каталог услуг NCEA">
+        <motion.section
+          className="services-groups"
+          id="service-groups"
+          aria-label="Каталог услуг NCEA"
+          variants={workersStaggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={WORKERS_MOTION_VIEWPORT}
+        >
           <span className="services-voxel-ribbon" aria-hidden="true">
             <i />
             <b />
@@ -149,18 +134,17 @@ function ServicesPage() {
                 art={presentation.art}
                 ctaTitle={presentation.ctaTitle}
                 ctaCopy={presentation.ctaCopy}
-                revealDelay={index * 70}
               />
             );
           })}
-        </section>
+        </motion.section>
 
         <motion.section
           className="services-bottom"
-          variants={revealItem}
+          variants={workersItemReveal}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
           <span>Не нашли точное направление?</span>
           <h2>Соберём решение вокруг вашей задачи.</h2>

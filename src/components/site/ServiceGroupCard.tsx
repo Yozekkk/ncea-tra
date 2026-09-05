@@ -1,9 +1,8 @@
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import type { Service } from "@/lib/services";
-import { MOTION_DURATION, MOTION_EASE, MOTION_VIEWPORT } from "@/lib/motion";
+import { workersDirectionalReveal } from "@/lib/motion";
 
 type GroupVariant = "primary" | "creative" | "compact";
 
@@ -22,11 +21,9 @@ type ServiceGroupCardProps = {
   art: readonly ArtAsset[];
   ctaTitle: string;
   ctaCopy: string;
-  revealDelay: number;
 };
 
 const ORDER_URL = "https://t.me/lisiy_bob";
-const FINE_POINTER = "(hover: hover) and (pointer: fine) and (min-width: 769px)";
 
 export function ServiceGroupCard({
   number,
@@ -38,104 +35,19 @@ export function ServiceGroupCard({
   art,
   ctaTitle,
   ctaCopy,
-  revealDelay,
 }: ServiceGroupCardProps) {
-  const reduceMotion = useReducedMotion();
-  const cardRef = useRef<HTMLElement>(null);
-  const rectRef = useRef<DOMRect | null>(null);
-  const frameRef = useRef<number | null>(null);
-  const pointerRef = useRef({ x: 50, y: 50, tiltX: 0, tiltY: 0, artX: 0, artY: 0 });
-
-  useEffect(
-    () => () => {
-      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
-    },
-    [],
-  );
-
-  const paintPointer = () => {
-    frameRef.current = null;
-    const card = cardRef.current;
-    if (!card) return;
-    const pointer = pointerRef.current;
-    card.style.setProperty("--services-mouse-x", `${pointer.x.toFixed(2)}%`);
-    card.style.setProperty("--services-mouse-y", `${pointer.y.toFixed(2)}%`);
-    card.style.setProperty("--services-tilt-x", `${pointer.tiltX.toFixed(3)}deg`);
-    card.style.setProperty("--services-tilt-y", `${pointer.tiltY.toFixed(3)}deg`);
-    card.style.setProperty("--services-art-x", `${pointer.artX.toFixed(2)}px`);
-    card.style.setProperty("--services-art-y", `${pointer.artY.toFixed(2)}px`);
-  };
-
-  const schedulePaint = () => {
-    if (frameRef.current === null) frameRef.current = window.requestAnimationFrame(paintPointer);
-  };
-
-  const onPointerEnter = (event: ReactPointerEvent<HTMLElement>) => {
-    if (!window.matchMedia(FINE_POINTER).matches) return;
-    rectRef.current = event.currentTarget.getBoundingClientRect();
-  };
-
-  const onPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
-    if (!window.matchMedia(FINE_POINTER).matches) return;
-    const rect = rectRef.current ?? event.currentTarget.getBoundingClientRect();
-    rectRef.current = rect;
-    const normalizedX = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-    const normalizedY = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-    pointerRef.current = {
-      x: normalizedX * 100,
-      y: normalizedY * 100,
-      tiltX: (0.5 - normalizedY) * 2.2,
-      tiltY: (normalizedX - 0.5) * 2.2,
-      artX: (normalizedX - 0.5) * 10,
-      artY: (normalizedY - 0.5) * 8,
-    };
-    schedulePaint();
-  };
-
-  const onPointerLeave = () => {
-    rectRef.current = null;
-    pointerRef.current = { x: 50, y: 50, tiltX: 0, tiltY: 0, artX: 0, artY: 0 };
-    schedulePaint();
-  };
-
   const entranceDirection = number === "02" ? 1 : -1;
 
   return (
     <motion.div
       className={`services-group-slot services-group-slot--${variant}`}
-      initial={{
-        opacity: 0,
-        transform: reduceMotion ? "none" : `translate3d(${entranceDirection * 22}px, 18px, 0)`,
-      }}
-      whileInView={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
-      viewport={MOTION_VIEWPORT}
-      transition={{
-        delay: revealDelay / 1000,
-        duration: MOTION_DURATION.reveal,
-        ease: MOTION_EASE,
-      }}
+      variants={workersDirectionalReveal(entranceDirection > 0 ? "right" : "left")}
     >
-      <article
-        ref={cardRef}
-        className={`services-group services-group--${variant}`}
-        onPointerEnter={onPointerEnter}
-        onPointerMove={onPointerMove}
-        onPointerLeave={onPointerLeave}
-      >
+      <article className={`services-group services-group--${variant}`}>
         <span className="services-group-light" aria-hidden="true" />
         <span className="services-group-corners" aria-hidden="true" />
         <span className="services-group-art" aria-hidden="true">
-          <motion.span
-            className="services-group-art-stage"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={MOTION_VIEWPORT}
-            transition={{
-              delay: revealDelay / 1000 + 0.18,
-              duration: MOTION_DURATION.normal,
-              ease: MOTION_EASE,
-            }}
-          >
+          <span className="services-group-art-stage">
             {art.map((asset, index) => (
               <img
                 src={asset.src}
@@ -147,7 +59,7 @@ export function ServiceGroupCard({
                 key={`${asset.src}-${index}`}
               />
             ))}
-          </motion.span>
+          </span>
         </span>
 
         <header className="services-group-header">

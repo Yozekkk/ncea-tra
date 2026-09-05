@@ -1,4 +1,3 @@
-import { type PointerEvent as ReactPointerEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import {
@@ -24,13 +23,11 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_ART } from "@/lib/service-art";
 import { SERVICES } from "@/lib/services";
 import {
-  MOTION_DURATION,
-  MOTION_EASE,
-  MOTION_SPRING,
-  MOTION_VIEWPORT,
-  directionalReveal,
-  revealItem,
-  staggerContainer,
+  WORKERS_MOTION_VIEWPORT,
+  workersDirectionalReveal,
+  workersHeadingReveal,
+  workersItemReveal,
+  workersStaggerContainer,
 } from "@/lib/motion";
 
 export const Route = createFileRoute("/")({
@@ -46,11 +43,11 @@ export const Route = createFileRoute("/")({
   }),
   component: HomePage,
 });
+
 const TG = "https://t.me/ncea_official",
   ORDER = "https://t.me/lisiy_bob",
   DISCORD = "https://discord.gg/u73vDgBMAn";
-const SOFT_HOVER = { transform: "translate3d(0, -2px, 0)", transition: MOTION_SPRING } as const;
-const CARD_HOVER = { transform: "translate3d(0, -4px, 0)", transition: MOTION_SPRING } as const;
+
 const TAGS: Record<string, string[]> = {
   plugins: ["Paper", "Purpur", "Velocity"],
   modpacks: ["Forge", "Fabric", "Квесты"],
@@ -59,9 +56,11 @@ const TAGS: Record<string, string[]> = {
   design: ["Баннеры", "Discord", "Telegram"],
   events: ["Турниры", "Квесты", "Сезоны"],
 };
+
 const featured = ["plugins", "modpacks", "server-setup", "websites", "design", "events"]
-  .map((id) => SERVICES.find((s) => s.id === id))
+  .map((id) => SERVICES.find((service) => service.id === id))
   .filter(Boolean) as typeof SERVICES;
+
 const SERVICE_PRESENTATION = [
   {
     icon: Code2,
@@ -107,26 +106,14 @@ const SERVICE_PRESENTATION = [
   },
 ] as const;
 
+const STATS = [
+  [UsersRound, "7+", "специалистов"],
+  [Boxes, "12", "направлений"],
+  [CheckCircle2, "50+", "выполненных задач"],
+  [Headphones, "7/7", "связь с командой"],
+] as const;
+
 function HomePage() {
-  const moveVoxelAssets = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!window.matchMedia("(min-width: 821px) and (pointer: fine)").matches) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 9;
-    event.currentTarget.querySelectorAll<HTMLElement>(".ref-voxel-wrap").forEach((node) => {
-      const depth = Number(node.dataset.depth ?? 1);
-      node.style.setProperty("--object-x", `${(x * depth).toFixed(2)}px`);
-      node.style.setProperty("--object-y", `${(y * depth).toFixed(2)}px`);
-    });
-  };
-
-  const resetVoxelAssets = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.querySelectorAll<HTMLElement>(".ref-voxel-wrap").forEach((node) => {
-      node.style.setProperty("--object-x", "0px");
-      node.style.setProperty("--object-y", "0px");
-    });
-  };
-
   return (
     <div className="ref-site">
       <SiteHeader />
@@ -134,28 +121,12 @@ function HomePage() {
         <motion.section
           className="ref-hero"
           id="home"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           animate="visible"
         >
-          <motion.h1
-            variants={{
-              hidden: {
-                opacity: 0,
-                clipPath: "inset(0 0 100% 0)",
-                transform: "translate3d(0, 18px, 0)",
-              },
-              visible: {
-                opacity: 1,
-                clipPath: "inset(0 0 0% 0)",
-                transform: "translate3d(0, 0, 0)",
-                transition: { duration: 0.58, ease: MOTION_EASE },
-              },
-            }}
-          >
-            NCEA
-          </motion.h1>
-          <motion.p className="ref-hero-copy" variants={revealItem}>
+          <motion.h1 variants={workersHeadingReveal}>NCEA</motion.h1>
+          <motion.p className="ref-hero-copy" variants={workersItemReveal}>
             Разработка, оформление и поддержка Minecraft-проектов.
             <br />
             Плагины, сборки, сайты, дизайн и серверные решения.
@@ -163,100 +134,75 @@ function HomePage() {
             Для владельцев проектов, команд и сообществ.
           </motion.p>
         </motion.section>
+
         <motion.section
           className="ref-promos"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
-          <motion.a
-            className="ref-promo ref-promo-orange"
-            href={ORDER}
-            target="_blank"
-            rel="noreferrer"
-            variants={directionalReveal("left")}
-            whileHover={SOFT_HOVER}
-            whileTap={{ transform: "scale(0.985)" }}
-          >
-            <span className="ref-promo-icon">
-              <BadgeCheck />
-            </span>
-            <span>
-              <small>РАЗРАБОТКА</small>
-              <strong>Проект под ключ</strong>
-              <em>Плагины · сборка · сайт · оформление</em>
-            </span>
-            <b>
-              Обсудить проект <ArrowUpRight />
-            </b>
-          </motion.a>
-          <motion.a
-            className="ref-promo ref-promo-channel"
-            href={TG}
-            target="_blank"
-            rel="noreferrer"
-            variants={directionalReveal("right")}
-            whileHover={SOFT_HOVER}
-            whileTap={{ transform: "scale(0.985)" }}
-          >
-            <span className="ref-promo-icon">
-              <BarChart3 />
-            </span>
-            <span>
-              <small>СООБЩЕСТВО</small>
-              <strong>Telegram NCEA</strong>
-              <em>Новости, кейсы и обновления агентства</em>
-            </span>
-            <i className="ref-promo-chart" />
-            <b>
-              Перейти <ArrowUpRight />
-            </b>
-          </motion.a>
+          <motion.div className="ref-promo-motion" variants={workersDirectionalReveal("left")}>
+            <a className="ref-promo ref-promo-orange" href={ORDER} target="_blank" rel="noreferrer">
+              <span className="ref-promo-icon">
+                <BadgeCheck />
+              </span>
+              <span>
+                <small>РАЗРАБОТКА</small>
+                <strong>Проект под ключ</strong>
+                <em>Плагины · сборка · сайт · оформление</em>
+              </span>
+              <b>
+                Обсудить проект <ArrowUpRight />
+              </b>
+            </a>
+          </motion.div>
+          <motion.div className="ref-promo-motion" variants={workersDirectionalReveal("right")}>
+            <a className="ref-promo ref-promo-channel" href={TG} target="_blank" rel="noreferrer">
+              <span className="ref-promo-icon">
+                <BarChart3 />
+              </span>
+              <span>
+                <small>СООБЩЕСТВО</small>
+                <strong>Telegram NCEA</strong>
+                <em>Новости, кейсы и обновления агентства</em>
+              </span>
+              <i className="ref-promo-chart" />
+              <b>
+                Перейти <ArrowUpRight />
+              </b>
+            </a>
+          </motion.div>
         </motion.section>
+
         <motion.section
           className="ref-stats"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
-          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
-            <UsersRound />
-            <span>
-              <strong>7+</strong>
-              <small>специалистов</small>
-            </span>
-          </motion.article>
-          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
-            <Boxes />
-            <span>
-              <strong>12</strong>
-              <small>направлений</small>
-            </span>
-          </motion.article>
-          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
-            <CheckCircle2 />
-            <span>
-              <strong>50+</strong>
-              <small>выполненных задач</small>
-            </span>
-          </motion.article>
-          <motion.article variants={revealItem} whileHover={SOFT_HOVER}>
-            <Headphones />
-            <span>
-              <strong>7/7</strong>
-              <small>связь с командой</small>
-            </span>
-          </motion.article>
+          {STATS.map(([Icon, value, label]) => (
+            <motion.div className="ref-stat-motion" variants={workersItemReveal} key={label}>
+              <article>
+                <Icon />
+                <span>
+                  <strong>{value}</strong>
+                  <small>{label}</small>
+                </span>
+              </article>
+            </motion.div>
+          ))}
         </motion.section>
+
         <motion.section
           className="ref-services"
+          variants={workersStaggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
-          <motion.header variants={revealItem}>
+          <motion.header variants={workersHeadingReveal}>
             <p>УСЛУГИ NCEA</p>
             <h2>Разработка и контент</h2>
             <span>
@@ -264,61 +210,41 @@ function HomePage() {
               обсуждаем напрямую.
             </span>
           </motion.header>
-          <div
-            className="ref-service-grid"
-            onPointerMove={moveVoxelAssets}
-            onPointerLeave={resetVoxelAssets}
-          >
+          <motion.div className="ref-service-grid" variants={workersStaggerContainer}>
             {featured.map((service, index) => {
               const presentation = SERVICE_PRESENTATION[index];
               const Icon = presentation.icon;
               return (
-                <motion.article
-                  className={`ref-service-card ref-service-card--${presentation.layout}`}
+                <motion.div
+                  className={`ref-service-card-motion ref-service-card-motion--${presentation.layout}`}
                   key={service.id}
-                  variants={directionalReveal(index % 2 === 0 ? "left" : "right", index * 0.045)}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={MOTION_VIEWPORT}
-                  whileHover={CARD_HOVER}
-                  whileTap={{ transform: "translate3d(0, -1px, 0) scale(0.992)" }}
+                  variants={workersDirectionalReveal(index % 2 === 0 ? "left" : "right")}
                 >
-                  <div className="ref-service-content">
-                    <div className="ref-service-top">
-                      <span>
-                        <Icon />
-                        {presentation.label}
-                      </span>
-                      <a href={ORDER} target="_blank" rel="noreferrer">
-                        Заказать <ArrowUpRight />
-                      </a>
+                  <article className={`ref-service-card ref-service-card--${presentation.layout}`}>
+                    <div className="ref-service-content">
+                      <div className="ref-service-top">
+                        <span>
+                          <Icon />
+                          {presentation.label}
+                        </span>
+                        <a href={ORDER} target="_blank" rel="noreferrer">
+                          Заказать <ArrowUpRight />
+                        </a>
+                      </div>
+                      <h3>{service.title}</h3>
+                      <p>{service.short}</p>
+                      <div className="ref-tags">
+                        {TAGS[service.id].map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                      <Link to={service.path} className="ref-service-more">
+                        Подробнее о направлении <ArrowUpRight />
+                      </Link>
                     </div>
-                    <h3>{service.title}</h3>
-                    <p>{service.short}</p>
-                    <div className="ref-tags">
-                      {TAGS[service.id].map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
-                    <Link to={service.path} className="ref-service-more">
-                      Подробнее о направлении <ArrowUpRight />
-                    </Link>
-                  </div>
-                  <span
-                    className={`ref-voxel-wrap ref-voxel-wrap--${presentation.art}`}
-                    data-depth={0.72 + (index % 3) * 0.16}
-                    aria-hidden="true"
-                  >
-                    <motion.span
-                      className="ref-voxel-motion"
-                      initial={{ opacity: 0, transform: "translate3d(0, 12px, 0) rotate(-2deg)" }}
-                      whileInView={{ opacity: 1, transform: "translate3d(0, 0, 0) rotate(0deg)" }}
-                      viewport={MOTION_VIEWPORT}
-                      transition={{
-                        delay: 0.16 + index * 0.045,
-                        duration: MOTION_DURATION.reveal,
-                        ease: MOTION_EASE,
-                      }}
+                    <span
+                      className={`ref-voxel-wrap ref-voxel-wrap--${presentation.art}`}
+                      aria-hidden="true"
                     >
                       <span className="ref-voxel-stage">
                         {presentation.assets.map((asset) => (
@@ -331,25 +257,26 @@ function HomePage() {
                           />
                         ))}
                       </span>
-                    </motion.span>
-                  </span>
-                </motion.article>
+                    </span>
+                  </article>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
           <div className="ref-all-services">
             <Link to="/services">
               Все 12 услуг <ArrowUpRight />
             </Link>
           </div>
         </motion.section>
+
         <motion.section
           className="ref-reviews"
           id="reviews"
-          variants={revealItem}
+          variants={workersItemReveal}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
           <div className="ref-footer-heading">
             <p>ОТЗЫВЫ</p>
@@ -363,56 +290,61 @@ function HomePage() {
             </span>
           </div>
         </motion.section>
+
         <motion.section
           className="ref-community"
           id="contacts"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
-          <div className="ref-footer-heading">
+          <motion.div className="ref-footer-heading" variants={workersHeadingReveal}>
             <p>СООБЩЕСТВА</p>
             <h2>Оставайтесь на связи</h2>
-          </div>
-          <div className="ref-community-grid">
-            <motion.a
-              className="ref-social-card ref-telegram"
-              href={TG}
-              target="_blank"
-              rel="noreferrer"
-              variants={directionalReveal("left")}
-              whileHover={SOFT_HOVER}
-              whileTap={{ transform: "scale(0.985)" }}
+          </motion.div>
+          <motion.div className="ref-community-grid" variants={workersStaggerContainer}>
+            <motion.div
+              className="ref-social-card-motion"
+              variants={workersDirectionalReveal("left")}
             >
-              <span>
-                <Send />
-                <b>Telegram</b>
-                <small>@ncea_official</small>
-              </span>
-              <strong>
-                Подписаться <ArrowUpRight />
-              </strong>
-            </motion.a>
-            <motion.a
-              className="ref-social-card ref-discord"
-              href={DISCORD}
-              target="_blank"
-              rel="noreferrer"
-              variants={directionalReveal("right")}
-              whileHover={SOFT_HOVER}
-              whileTap={{ transform: "scale(0.985)" }}
+              <a
+                className="ref-social-card ref-telegram"
+                href={TG}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>
+                  <Send />
+                  <b>Telegram</b>
+                  <small>@ncea_official</small>
+                </span>
+                <strong>
+                  Подписаться <ArrowUpRight />
+                </strong>
+              </a>
+            </motion.div>
+            <motion.div
+              className="ref-social-card-motion"
+              variants={workersDirectionalReveal("right")}
             >
-              <span>
-                <Gamepad2 className="ref-discord-glyph" />
-                <b>Discord</b>
-                <small>Сервер NCEA</small>
-              </span>
-              <strong>
-                Вступить <ArrowUpRight />
-              </strong>
-            </motion.a>
-          </div>
+              <a
+                className="ref-social-card ref-discord"
+                href={DISCORD}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>
+                  <Gamepad2 className="ref-discord-glyph" />
+                  <b>Discord</b>
+                  <small>Сервер NCEA</small>
+                </span>
+                <strong>
+                  Вступить <ArrowUpRight />
+                </strong>
+              </a>
+            </motion.div>
+          </motion.div>
         </motion.section>
       </main>
       <SiteFooter />

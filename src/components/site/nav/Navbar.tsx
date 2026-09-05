@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { LOGO_MARK } from "@/components/site/ui";
-import { MOTION_DURATION, MOTION_EASE, MOTION_SPRING } from "@/lib/motion";
+import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE, CHROME_MOTION_SPRING } from "@/lib/motion";
 
 const links = [
   { label: "Главная", href: "/", icon: Home },
@@ -24,7 +24,6 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const reduceMotion = useReducedMotion();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -38,10 +37,10 @@ export function Navbar() {
       className="ref-header"
       initial={{
         opacity: 0,
-        transform: reduceMotion ? "none" : "translate3d(0, -16px, 0)",
+        transform: "translate3d(0, -16px, 0)",
       }}
       animate={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
-      transition={{ duration: MOTION_DURATION.reveal, ease: MOTION_EASE }}
+      transition={{ duration: CHROME_MOTION_DURATION.reveal, ease: CHROME_MOTION_EASE }}
     >
       <div className="ref-navbar">
         <Link to="/" className="ref-brand" aria-label="NCEA — на главную">
@@ -57,7 +56,7 @@ export function Navbar() {
                   <motion.span
                     className="ref-nav-indicator"
                     layoutId="ref-nav-indicator"
-                    transition={reduceMotion ? { duration: 0 } : MOTION_SPRING}
+                    transition={CHROME_MOTION_SPRING}
                   />
                 )}
               </Link>
@@ -74,8 +73,8 @@ export function Navbar() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Закрыть меню" : "Открыть меню"}
-          whileTap={reduceMotion ? undefined : { transform: "scale(0.97)" }}
-          transition={{ duration: MOTION_DURATION.fast, ease: MOTION_EASE }}
+          whileTap={{ transform: "scale(0.97)" }}
+          transition={{ duration: CHROME_MOTION_DURATION.fast, ease: CHROME_MOTION_EASE }}
         >
           {open ? <X /> : <Menu />}
         </motion.button>
@@ -86,16 +85,16 @@ export function Navbar() {
             className="ref-mobile-nav"
             initial={{
               opacity: 0,
-              transform: reduceMotion ? "none" : "translate3d(0, -10px, 0) scale(0.98)",
+              transform: "translate3d(0, -10px, 0) scale(0.98)",
             }}
             animate={{ opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" }}
             exit={{
               opacity: 0,
-              transform: reduceMotion ? "none" : "translate3d(0, -6px, 0) scale(0.985)",
+              transform: "translate3d(0, -6px, 0) scale(0.985)",
             }}
             transition={{
-              duration: reduceMotion ? MOTION_DURATION.fast : MOTION_DURATION.normal,
-              ease: MOTION_EASE,
+              duration: CHROME_MOTION_DURATION.normal,
+              ease: CHROME_MOTION_EASE,
             }}
           >
             {links.map(({ label, href, icon: Icon }) => (

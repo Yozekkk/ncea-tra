@@ -5,7 +5,13 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
 import { SERVICES, getService } from "@/lib/services";
-import { MOTION_VIEWPORT, directionalReveal, revealItem, staggerContainer } from "@/lib/motion";
+import {
+  WORKERS_MOTION_VIEWPORT,
+  workersDirectionalReveal,
+  workersHeadingReveal,
+  workersItemReveal,
+  workersStaggerContainer,
+} from "@/lib/motion";
 const ORDER = "https://t.me/lisiy_bob",
   CHANNEL = "https://t.me/ncea_official";
 export function ServicePage({ id }: { id: string }) {
@@ -22,7 +28,7 @@ export function ServicePage({ id }: { id: string }) {
       <main className="ref-service-page">
         <motion.nav
           className="ref-breadcrumbs"
-          variants={revealItem}
+          variants={workersHeadingReveal}
           initial="hidden"
           animate="visible"
         >
@@ -34,11 +40,11 @@ export function ServicePage({ id }: { id: string }) {
         </motion.nav>
         <motion.section
           className="ref-service-hero"
-          variants={staggerContainer}
+          variants={workersStaggerContainer}
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={directionalReveal("left")}>
+          <motion.div variants={workersDirectionalReveal("left")}>
             <p className="ref-eyebrow">NCEA / УСЛУГА {String(index + 1).padStart(2, "0")}</p>
             <h1>{service.title}</h1>
             <p>{service.desc}</p>
@@ -51,16 +57,16 @@ export function ServicePage({ id }: { id: string }) {
               </a>
             </div>
           </motion.div>
-          <motion.div className="ref-service-hero-art" variants={directionalReveal("right")}>
+          <motion.div className="ref-service-hero-art" variants={workersDirectionalReveal("right")}>
             <img src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]} alt="" />
           </motion.div>
         </motion.section>
         <motion.section
           className="ref-service-details"
-          variants={revealItem}
+          variants={workersItemReveal}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
           <div>
             <p className="ref-eyebrow">ЧТО ВХОДИТ</p>
@@ -85,10 +91,10 @@ export function ServicePage({ id }: { id: string }) {
         </motion.section>
         <motion.section
           className="ref-order-banner"
-          variants={directionalReveal("left")}
+          variants={workersDirectionalReveal("left")}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
           <div>
             <p>ГОТОВЫ ОБСУДИТЬ?</p>
@@ -101,10 +107,10 @@ export function ServicePage({ id }: { id: string }) {
         </motion.section>
         <motion.section
           className="ref-related"
-          variants={revealItem}
+          variants={workersItemReveal}
           initial="hidden"
           whileInView="visible"
-          viewport={MOTION_VIEWPORT}
+          viewport={WORKERS_MOTION_VIEWPORT}
         >
           <div className="ref-related-heading">
             <div>

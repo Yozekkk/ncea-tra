@@ -1,20 +1,24 @@
 import { Link } from "@tanstack/react-router";
 import { Lightbulb, Send } from "lucide-react";
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import { LOGO_MARK } from "@/components/site/ui";
-import { MOTION_DURATION, MOTION_EASE, MOTION_VIEWPORT, staggerContainer } from "@/lib/motion";
+import {
+  CHROME_MOTION_DURATION,
+  CHROME_MOTION_EASE,
+  CHROME_MOTION_VIEWPORT,
+  chromeStaggerContainer,
+} from "@/lib/motion";
 
 export function SiteFooter() {
-  const reduceMotion = useReducedMotion();
   const columnVariants: Variants = {
     hidden: {
       opacity: 0,
-      transform: reduceMotion ? "none" : "translate3d(0, 14px, 0)",
+      transform: "translate3d(0, 14px, 0)",
     },
     visible: {
       opacity: 1,
       transform: "translate3d(0, 0, 0)",
-      transition: { duration: MOTION_DURATION.reveal, ease: MOTION_EASE },
+      transition: { duration: CHROME_MOTION_DURATION.reveal, ease: CHROME_MOTION_EASE },
     },
   };
 
@@ -22,10 +26,10 @@ export function SiteFooter() {
     <footer className="ref-footer">
       <motion.div
         className="ref-footer-grid"
-        variants={staggerContainer}
+        variants={chromeStaggerContainer}
         initial="hidden"
         whileInView="visible"
-        viewport={MOTION_VIEWPORT}
+        viewport={CHROME_MOTION_VIEWPORT}
       >
         <motion.div className="ref-footer-brand" variants={columnVariants}>
           <Link to="/">

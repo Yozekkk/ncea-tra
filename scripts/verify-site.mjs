@@ -31,7 +31,9 @@ const requiredFiles = [
   "src/components/site/ServicePage.tsx",
   "src/components/site/SiteHeader.tsx",
   "src/components/site/SiteFooter.tsx",
+  "src/components/site/ReviewsSection.tsx",
   "src/lib/services.ts",
+  "public/images/reviews/minecraft-client-reviews.webp",
   "public/robots.txt",
   "public/sitemap.xml",
   "public/site.webmanifest",
@@ -95,6 +97,26 @@ for (const file of checkedFiles) {
   }
 }
 if (!process.exitCode) ok("Ссылки-заглушки и старые логотипы не найдены");
+
+const reviewsSource = read("src/components/site/ReviewsSection.tsx");
+const expectedReviewNicks = [
+  "ArseniyInvesto",
+  "jofi8k",
+  "Bondar3501",
+  "Rewards",
+  "Hinti22",
+  "momoakk1",
+  "Bondar3501",
+  "Rewards",
+  "zoomer0k",
+];
+const reviewEntries = [...reviewsSource.matchAll(/nick:\s*"([^"]+)"/g)].map((match) => match[1]);
+if (reviewEntries.length !== 9) fail(`Ожидалось 9 отзывов, найдено: ${reviewEntries.length}`);
+if (reviewEntries.join("|") !== expectedReviewNicks.join("|"))
+  fail("Ники или порядок отзывов не соответствуют утверждённому списку");
+if (/₽|руб(?:\.|л|лей)|заказ\s*№|id\s*заказа|\d+\s*(?:дн|час).*назад/i.test(reviewsSource))
+  fail("В секции отзывов найдены запрещённые коммерческие метаданные");
+if (!process.exitCode) ok("Все 9 отзывов присутствуют без цен, дат и ID заказа");
 
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");

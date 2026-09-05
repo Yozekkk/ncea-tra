@@ -10,7 +10,6 @@ import {
   Code2,
   Gamepad2,
   Headphones,
-  MessageSquareQuote,
   Monitor,
   PackageOpen,
   Palette,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { ReviewsSection } from "@/components/site/ReviewsSection";
 import { SERVICE_ART } from "@/lib/service-art";
 import { SERVICES } from "@/lib/services";
 import {
@@ -270,26 +270,7 @@ function HomePage() {
           </div>
         </motion.section>
 
-        <motion.section
-          className="ref-reviews"
-          id="reviews"
-          variants={workersItemReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
-          <div className="ref-footer-heading">
-            <p>ОТЗЫВЫ</p>
-            <h2>Что говорят клиенты</h2>
-          </div>
-          <div className="ref-review-placeholder">
-            <MessageSquareQuote />
-            <span>
-              <strong>Отзывы скоро появятся</strong>
-              <small>Скоро здесь появятся отзывы наших клиентов.</small>
-            </span>
-          </div>
-        </motion.section>
+        <ReviewsSection />
 
         <motion.section
           className="ref-community"

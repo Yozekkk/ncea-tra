@@ -33,7 +33,13 @@ const requiredFiles = [
   "src/components/site/nav/Navbar.tsx",
   "src/components/site/SiteFooter.tsx",
   "src/components/site/ReviewsSection.tsx",
+  "src/components/site/TikTokSection.tsx",
+  "src/components/site/InteractiveGridBackground.tsx",
   "src/lib/services.ts",
+  "src/lib/supabase.ts",
+  "supabase/migrations/20260905220000_ncea_platform_foundation.sql",
+  "docs/ncea-platform.md",
+  ".env.example",
   "public/images/reviews/minecraft-client-reviews.webp",
   "public/robots.txt",
   "public/sitemap.xml",
@@ -130,6 +136,53 @@ if (!/env\(safe-area-inset-bottom/.test(stylesSource))
 if (!stylesSource.includes(".ref-mobile-tabbar-link.is-active"))
   fail("Mobile navigation не содержит active state");
 if (!process.exitCode) ok("Mobile bottom navigation использует общий navbar, логотип и safe-area");
+
+const tiktokSource = read("src/components/site/TikTokSection.tsx");
+const homeSource = read("src/routes/index.tsx");
+for (const url of [
+  "https://www.tiktok.com/@ncea_argentia",
+  "https://www.tiktok.com/@ncea_kreativ",
+]) {
+  if (!tiktokSource.includes(url)) fail(`TikTok-ссылка отсутствует: ${url}`);
+}
+if (!homeSource.includes("<TikTokSection />")) fail("TikTok showcase не подключён на главной");
+if (!homeSource.includes("ref-community-tiktok")) fail("TikTok-ссылки не добавлены в контакты");
+if (!/target="_blank"[\s\S]*?rel="noopener noreferrer"/.test(tiktokSource))
+  fail("TikTok showcase не использует безопасные внешние ссылки");
+if (!process.exitCode) ok("Оба TikTok-направления добавлены на главную и в контакты");
+
+const backgroundSource = read("src/components/site/InteractiveGridBackground.tsx");
+if (!backgroundSource.includes("requestAnimationFrame")) fail("Canvas-grid не использует rAF");
+if (!backgroundSource.includes("prefers-reduced-motion"))
+  fail("Canvas-grid не учитывает reduced motion");
+if (!backgroundSource.includes('removeEventListener("pointermove"'))
+  fail("Canvas-grid не очищает pointer listener");
+if (!process.exitCode) ok("Interactive canvas-grid оптимизирован и поддерживает reduced motion");
+
+const supabaseSource = read("src/lib/supabase.ts");
+const envExample = read(".env.example");
+const migrationSource = read("supabase/migrations/20260905220000_ncea_platform_foundation.sql");
+const foundationTables = [
+  "profiles",
+  "user_roles",
+  "forum_categories",
+  "forum_topics",
+  "forum_posts",
+  "marketplace_categories",
+  "marketplace_listings",
+  "marketplace_listing_images",
+];
+if (!supabaseSource.includes("VITE_SUPABASE_PUBLISHABLE_KEY"))
+  fail("Supabase client не использует publishable key");
+if (/SERVICE_ROLE/i.test(supabaseSource + envExample))
+  fail("Во frontend-конфигурации найден service role key");
+for (const table of foundationTables) {
+  if (!migrationSource.includes(`create table public.${table}`))
+    fail(`В foundation migration отсутствует таблица ${table}`);
+  if (!migrationSource.includes(`alter table public.${table} enable row level security`))
+    fail(`RLS не включён для ${table}`);
+}
+if (!process.exitCode) ok("Supabase foundation использует только publishable key и RLS");
 
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");

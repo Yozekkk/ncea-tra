@@ -13,6 +13,7 @@ import { MotionConfig } from "motion/react";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { InteractiveGridBackground } from "@/components/site/InteractiveGridBackground";
 import { I, LOGO_ROUND } from "@/components/site/ui";
 import { CurrencyProvider } from "@/lib/currency";
 import appCss from "../styles.css?url";
@@ -182,6 +183,7 @@ function RootComponent() {
           reducedMotion="user"
           transition={{ duration: CHROME_MOTION_DURATION.normal, ease: CHROME_MOTION_EASE }}
         >
+          <InteractiveGridBackground />
           <RouteEffects />
           <Outlet />
           <Toaster position="bottom-right" theme="light" />

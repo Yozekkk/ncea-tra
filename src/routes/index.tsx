@@ -20,6 +20,7 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ReviewsSection } from "@/components/site/ReviewsSection";
+import { TikTokMark, TikTokSection, TIKTOK_CHANNELS } from "@/components/site/TikTokSection";
 import { SERVICE_ART } from "@/lib/service-art";
 import { SERVICES } from "@/lib/services";
 import {
@@ -272,6 +273,8 @@ function HomePage() {
 
         <ReviewsSection />
 
+        <TikTokSection />
+
         <motion.section
           className="ref-community"
           id="contacts"
@@ -325,6 +328,29 @@ function HomePage() {
                 </strong>
               </a>
             </motion.div>
+          </motion.div>
+          <motion.div className="ref-community-tiktok" variants={workersStaggerContainer}>
+            {TIKTOK_CHANNELS.map((channel) => (
+              <motion.a
+                href={channel.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`ref-community-tiktok-link ref-community-tiktok-link--${channel.kind}`}
+                variants={workersItemReveal}
+                whileTap={{ scale: 0.985 }}
+                aria-label={`Открыть TikTok ${channel.name} в новой вкладке`}
+                key={channel.href}
+              >
+                <span className="ref-community-tiktok-icon">
+                  <TikTokMark />
+                </span>
+                <span>
+                  <small>TikTok · {channel.badge}</small>
+                  <strong>{channel.name}</strong>
+                </span>
+                <ArrowUpRight />
+              </motion.a>
+            ))}
           </motion.div>
         </motion.section>
       </main>

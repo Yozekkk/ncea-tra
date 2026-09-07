@@ -1,7 +1,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Publishable credentials are intentionally safe to ship to browsers. Environment
+// variables can override them, while the NCEA defaults keep Git deployments usable.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://bualqaeinwifoopzflbt.supabase.co";
+const supabasePublishableKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_rPbG4EP0YEypHLKVMHEYpA_pGVFQX0M";
 let client: SupabaseClient | undefined;
 
 export function isSupabaseConfigured() {

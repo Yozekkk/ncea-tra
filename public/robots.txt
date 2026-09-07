@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ncea-tra.vercel.app/sitemap.xml
+Sitemap: https://www.ncea-studio.com/sitemap.xml

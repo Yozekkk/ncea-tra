@@ -49,6 +49,12 @@ export function SiteFooter() {
               <a href="/workers">Сотрудники</a>
             </li>
             <li>
+              <Link to="/forum">Форум</Link>
+            </li>
+            <li>
+              <Link to="/marketplace">Маркетплейс</Link>
+            </li>
+            <li>
               <a href="/#reviews">Отзывы</a>
             </li>
           </ul>

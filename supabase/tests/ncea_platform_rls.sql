@@ -14,6 +14,23 @@ update public.user_roles
 set role = 'admin'
 where user_id = '10000000-0000-4000-8000-000000000003';
 
+update public.profiles
+set username = 'CaseSensitive'
+where id = '10000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  begin
+    update public.profiles
+    set username = 'casesensitive'
+    where id = '10000000-0000-4000-8000-000000000002';
+    raise exception 'Username uniqueness is case-sensitive';
+  exception
+    when unique_violation then null;
+  end;
+end;
+$$;
+
 insert into public.forum_categories (id, slug, name, sort_order)
 values (900001, 'rls-test', 'RLS Test', 1);
 insert into public.marketplace_categories (id, slug, name, sort_order)
@@ -57,6 +74,22 @@ values (
 );
 
 do $$
+declare created_topic uuid;
+begin
+  select public.create_forum_topic(
+    900001,
+    'Atomic topic',
+    'atomic-topic-1234abcd',
+    'Atomic original post'
+  ) into created_topic;
+  if (select count(*) from public.forum_posts where topic_id = created_topic) <> 1 then
+    raise exception 'Atomic topic RPC did not create exactly one original post';
+  end if;
+  delete from public.forum_topics where id = created_topic;
+end;
+$$;
+
+do $$
 declare affected integer;
 begin
   update public.user_roles
@@ -72,6 +105,15 @@ begin
     set status = 'published'
     where id = '40000000-0000-4000-8000-000000000001';
     raise exception 'A seller self-published a listing';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  begin
+    update public.forum_topics
+    set author_id = '10000000-0000-4000-8000-000000000002'
+    where id = '20000000-0000-4000-8000-000000000001';
+    raise exception 'A topic owner reassigned author_id';
   exception
     when insufficient_privilege then null;
   end;
@@ -138,6 +180,37 @@ set is_locked = true, is_pinned = true
 where id = '20000000-0000-4000-8000-000000000001';
 delete from public.forum_posts
 where id = '30000000-0000-4000-8000-000000000001';
+update public.marketplace_listings
+set status = 'published'
+where id = '40000000-0000-4000-8000-000000000001';
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated"}',
+  true
+);
+
+update public.marketplace_listings
+set status = 'archived'
+where id = '40000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  if not exists (
+    select 1 from public.marketplace_listings
+    where id = '40000000-0000-4000-8000-000000000001' and status = 'archived'
+  ) then
+    raise exception 'Seller could not archive their published listing';
+  end if;
+end;
+$$;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated"}',
+  true
+);
+
 update public.marketplace_listings
 set status = 'published'
 where id = '40000000-0000-4000-8000-000000000001';

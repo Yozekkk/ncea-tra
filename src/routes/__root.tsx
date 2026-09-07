@@ -16,6 +16,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { InteractiveGridBackground } from "@/components/site/InteractiveGridBackground";
 import { I, LOGO_ROUND } from "@/components/site/ui";
 import { CurrencyProvider } from "@/lib/currency";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE } from "../lib/motion";
@@ -178,17 +179,19 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CurrencyProvider>
-        <MotionConfig
-          reducedMotion="user"
-          transition={{ duration: CHROME_MOTION_DURATION.normal, ease: CHROME_MOTION_EASE }}
-        >
-          <InteractiveGridBackground />
-          <RouteEffects />
-          <Outlet />
-          <Toaster position="bottom-right" theme="light" />
-        </MotionConfig>
-      </CurrencyProvider>
+      <AuthProvider>
+        <CurrencyProvider>
+          <MotionConfig
+            reducedMotion="user"
+            transition={{ duration: CHROME_MOTION_DURATION.normal, ease: CHROME_MOTION_EASE }}
+          >
+            <InteractiveGridBackground />
+            <RouteEffects />
+            <Outlet />
+            <Toaster position="bottom-right" theme="light" />
+          </MotionConfig>
+        </CurrencyProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

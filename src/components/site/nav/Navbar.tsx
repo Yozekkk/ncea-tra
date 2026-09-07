@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { BriefcaseBusiness, Home, MessageSquareQuote, Send, UsersRound } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Home,
+  MessageCircle,
+  MessageSquareQuote,
+  Send,
+  ShoppingBag,
+  UsersRound,
+} from "lucide-react";
 import { LOGO_MARK } from "@/components/site/ui";
 import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE, CHROME_MOTION_SPRING } from "@/lib/motion";
+import { AccountMenu } from "@/features/auth/AccountMenu";
 
 const links = [
   { label: "Главная", href: "/", icon: Home },
   { label: "Услуги", href: "/services", icon: BriefcaseBusiness },
   { label: "Сотрудники", href: "/workers", icon: UsersRound },
+  { label: "Форум", href: "/forum", icon: MessageCircle },
+  { label: "Маркетплейс", href: "/marketplace", icon: ShoppingBag },
   { label: "Отзывы", href: "/#reviews", icon: MessageSquareQuote },
   { label: "Контакты", href: "/#contacts", icon: Send },
 ] as const;
@@ -54,13 +65,12 @@ export function Navbar() {
           <nav className="ref-desktop-nav" aria-label="Основная навигация">
             {links.map(({ label, href, icon: Icon }) => {
               const active = isActive(href);
-              return href === "/" || href === "/services" || href === "/workers" ? (
-                <Link
+              return (
+                <a
                   key={label}
-                  to={href}
+                  href={href}
                   className={active ? "is-active" : ""}
                   aria-current={active ? "page" : undefined}
-                  activeOptions={{ exact: true, includeHash: true }}
                 >
                   <Icon aria-hidden="true" />
                   {label}
@@ -71,20 +81,13 @@ export function Navbar() {
                       transition={CHROME_MOTION_SPRING}
                     />
                   )}
-                </Link>
-              ) : (
-                <a
-                  key={label}
-                  href={href}
-                  className={active ? "is-active" : ""}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <Icon aria-hidden="true" />
-                  {label}
                 </a>
               );
             })}
           </nav>
+          <div className="ref-navbar-account">
+            <AccountMenu />
+          </div>
         </div>
       </motion.header>
 
@@ -98,40 +101,34 @@ export function Navbar() {
           <img src={LOGO_MARK} alt="" width={40} height={40} />
         </Link>
         <div className="ref-mobile-tabbar-links">
-          {links.map(({ label, href, icon: Icon }) => {
-            const active = isActive(href);
-            const content = (
-              <>
-                <span className="ref-mobile-tabbar-icon" aria-hidden="true">
-                  <Icon />
-                </span>
-                <span className="ref-mobile-tabbar-label">{label}</span>
-              </>
-            );
+          {links
+            .filter(({ href }) => ["/", "/services", "/forum", "/marketplace"].includes(href))
+            .map(({ label, href, icon: Icon }) => {
+              const active = isActive(href);
+              const content = (
+                <>
+                  <span className="ref-mobile-tabbar-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span className="ref-mobile-tabbar-label">{label}</span>
+                </>
+              );
 
-            return href === "/" || href === "/services" || href === "/workers" ? (
-              <Link
-                key={label}
-                to={href}
-                className={`ref-mobile-tabbar-link${active ? " is-active" : ""}`}
-                aria-label={label}
-                aria-current={active ? "page" : undefined}
-                activeOptions={{ exact: true, includeHash: true }}
-              >
-                {content}
-              </Link>
-            ) : (
-              <a
-                key={label}
-                href={href}
-                className={`ref-mobile-tabbar-link${active ? " is-active" : ""}`}
-                aria-label={label}
-                aria-current={active ? "page" : undefined}
-              >
-                {content}
-              </a>
-            );
-          })}
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  className={`ref-mobile-tabbar-link${active ? " is-active" : ""}`}
+                  aria-label={label}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {content}
+                </a>
+              );
+            })}
+          <div className="ref-mobile-account">
+            <AccountMenu compact />
+          </div>
         </div>
       </nav>
     </>

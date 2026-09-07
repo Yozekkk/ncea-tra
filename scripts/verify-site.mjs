@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = process.cwd();
+const canonicalOrigin = "https://www.ncea-studio.com";
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const fail = (message) => {
   console.error(`\n❌ ${message}`);
@@ -26,6 +27,12 @@ const expectedServices = [
 
 const requiredFiles = [
   "src/routes/index.tsx",
+  "src/routes/login.tsx",
+  "src/routes/register.tsx",
+  "src/routes/profile.tsx",
+  "src/routes/forum.index.tsx",
+  "src/routes/marketplace.index.tsx",
+  "src/routes/admin.tsx",
   "src/routes/services.tsx",
   "src/routes/__root.tsx",
   "src/components/site/ServicePage.tsx",
@@ -38,6 +45,13 @@ const requiredFiles = [
   "src/lib/services.ts",
   "src/lib/supabase.ts",
   "supabase/migrations/20260905220000_ncea_platform_foundation.sql",
+  "supabase/migrations/20260907194500_ncea_community_platform.sql",
+  "supabase/migrations/20260907201500_ncea_username_fallback_collision_fix.sql",
+  "supabase/migrations/20260907213000_ncea_forum_topic_route_invariant.sql",
+  "supabase/functions/register-account/index.ts",
+  "supabase/tests/ncea_api_verification.mjs",
+  "supabase/tests/ncea_platform_rls.sql",
+  "tests/validation.test.ts",
   "docs/ncea-platform.md",
   ".env.example",
   "public/images/reviews/minecraft-client-reviews.webp",
@@ -60,10 +74,16 @@ for (const [id, route] of expectedServices) {
   const pathPattern = new RegExp(`path:\\s*[\"']${route}[\"']`);
   if (!idPattern.test(servicesSource)) fail(`В каталоге услуг отсутствует id: ${id}`);
   if (!pathPattern.test(servicesSource)) fail(`В каталоге услуг отсутствует маршрут: ${route}`);
-  if (!sitemap.includes(`<loc>https://ncea-tra.vercel.app${route}</loc>`))
+  if (!sitemap.includes(`<loc>${canonicalOrigin}${route}</loc>`))
     fail(`Маршрут ${route} отсутствует в sitemap.xml`);
 }
 if (!process.exitCode) ok("Все 12 услуг и маршрутов зарегистрированы");
+
+for (const route of ["/forum", "/marketplace"]) {
+  if (!sitemap.includes(`<loc>${canonicalOrigin}${route}</loc>`))
+    fail(`Публичный маршрут ${route} отсутствует в sitemap.xml`);
+}
+if (!process.exitCode) ok("Forum и Marketplace добавлены в canonical sitemap");
 
 const baseMatches = [...servicesSource.matchAll(/base:\s*(-?\d+(?:\.\d+)?)/g)].map((match) =>
   Number(match[1]),

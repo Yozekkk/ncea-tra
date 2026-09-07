@@ -10,13 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FancymenuRouteImport } from './routes/fancymenu'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LogosRouteImport } from './routes/logos'
 import { Route as MapsRouteImport } from './routes/maps'
 import { Route as ModpacksRouteImport } from './routes/modpacks'
 import { Route as PluginsRouteImport } from './routes/plugins'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResourcepacksRouteImport } from './routes/resourcepacks'
 import { Route as ServerSetupRouteImport } from './routes/server-setup'
 import { Route as ServicesRouteImport } from './routes/services'
@@ -24,10 +28,23 @@ import { Route as SkinsRouteImport } from './routes/skins'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as WebsitesRouteImport } from './routes/websites'
 import { Route as WorkersRouteImport } from './routes/workers'
+import { Route as ForumIndexRouteImport } from './routes/forum.index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
+import { Route as MarketplaceMyRouteImport } from './routes/marketplace.my'
+import { Route as MarketplaceNewRouteImport } from './routes/marketplace.new'
+import { Route as ForumCategorySlugRouteImport } from './routes/forum.category.$slug'
+import { Route as ForumTopicSlugRouteImport } from './routes/forum.topic.$slug'
+import { Route as MarketplaceSlugEditRouteImport } from './routes/marketplace.$slug.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignRoute = DesignRouteImport.update({
@@ -43,6 +60,11 @@ const EventsRoute = EventsRouteImport.update({
 const FancymenuRoute = FancymenuRouteImport.update({
   id: '/fancymenu',
   path: '/fancymenu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogosRoute = LogosRouteImport.update({
@@ -63,6 +85,16 @@ const ModpacksRoute = ModpacksRouteImport.update({
 const PluginsRoute = PluginsRouteImport.update({
   id: '/plugins',
   path: '/plugins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcepacksRoute = ResourcepacksRouteImport.update({
@@ -100,16 +132,60 @@ const WorkersRoute = WorkersRouteImport.update({
   path: '/workers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForumIndexRoute = ForumIndexRouteImport.update({
+  id: '/forum/',
+  path: '/forum/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/marketplace/$slug',
+  path: '/marketplace/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceMyRoute = MarketplaceMyRouteImport.update({
+  id: '/marketplace/my',
+  path: '/marketplace/my',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceNewRoute = MarketplaceNewRouteImport.update({
+  id: '/marketplace/new',
+  path: '/marketplace/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumCategorySlugRoute = ForumCategorySlugRouteImport.update({
+  id: '/forum/category/$slug',
+  path: '/forum/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumTopicSlugRoute = ForumTopicSlugRouteImport.update({
+  id: '/forum/topic/$slug',
+  path: '/forum/topic/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceSlugEditRoute = MarketplaceSlugEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => MarketplaceSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/design': typeof DesignRoute
   '/events': typeof EventsRoute
   '/fancymenu': typeof FancymenuRoute
+  '/login': typeof LoginRoute
   '/logos': typeof LogosRoute
   '/maps': typeof MapsRoute
   '/modpacks': typeof ModpacksRoute
   '/plugins': typeof PluginsRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
   '/services': typeof ServicesRoute
@@ -117,16 +193,28 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/my': typeof MarketplaceMyRoute
+  '/marketplace/new': typeof MarketplaceNewRoute
+  '/forum/': typeof ForumIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/forum/category/$slug': typeof ForumCategorySlugRoute
+  '/forum/topic/$slug': typeof ForumTopicSlugRoute
+  '/marketplace/$slug/edit': typeof MarketplaceSlugEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/design': typeof DesignRoute
   '/events': typeof EventsRoute
   '/fancymenu': typeof FancymenuRoute
+  '/login': typeof LoginRoute
   '/logos': typeof LogosRoute
   '/maps': typeof MapsRoute
   '/modpacks': typeof ModpacksRoute
   '/plugins': typeof PluginsRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
   '/services': typeof ServicesRoute
@@ -134,17 +222,29 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/my': typeof MarketplaceMyRoute
+  '/marketplace/new': typeof MarketplaceNewRoute
+  '/forum': typeof ForumIndexRoute
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/forum/category/$slug': typeof ForumCategorySlugRoute
+  '/forum/topic/$slug': typeof ForumTopicSlugRoute
+  '/marketplace/$slug/edit': typeof MarketplaceSlugEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/design': typeof DesignRoute
   '/events': typeof EventsRoute
   '/fancymenu': typeof FancymenuRoute
+  '/login': typeof LoginRoute
   '/logos': typeof LogosRoute
   '/maps': typeof MapsRoute
   '/modpacks': typeof ModpacksRoute
   '/plugins': typeof PluginsRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/resourcepacks': typeof ResourcepacksRoute
   '/server-setup': typeof ServerSetupRoute
   '/services': typeof ServicesRoute
@@ -152,18 +252,30 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/my': typeof MarketplaceMyRoute
+  '/marketplace/new': typeof MarketplaceNewRoute
+  '/forum/': typeof ForumIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/forum/category/$slug': typeof ForumCategorySlugRoute
+  '/forum/topic/$slug': typeof ForumTopicSlugRoute
+  '/marketplace/$slug/edit': typeof MarketplaceSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/design'
     | '/events'
     | '/fancymenu'
+    | '/login'
     | '/logos'
     | '/maps'
     | '/modpacks'
     | '/plugins'
+    | '/profile'
+    | '/register'
     | '/resourcepacks'
     | '/server-setup'
     | '/services'
@@ -171,16 +283,28 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/marketplace/$slug'
+    | '/marketplace/my'
+    | '/marketplace/new'
+    | '/forum/'
+    | '/marketplace/'
+    | '/forum/category/$slug'
+    | '/forum/topic/$slug'
+    | '/marketplace/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/design'
     | '/events'
     | '/fancymenu'
+    | '/login'
     | '/logos'
     | '/maps'
     | '/modpacks'
     | '/plugins'
+    | '/profile'
+    | '/register'
     | '/resourcepacks'
     | '/server-setup'
     | '/services'
@@ -188,16 +312,28 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/marketplace/$slug'
+    | '/marketplace/my'
+    | '/marketplace/new'
+    | '/forum'
+    | '/marketplace'
+    | '/forum/category/$slug'
+    | '/forum/topic/$slug'
+    | '/marketplace/$slug/edit'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/design'
     | '/events'
     | '/fancymenu'
+    | '/login'
     | '/logos'
     | '/maps'
     | '/modpacks'
     | '/plugins'
+    | '/profile'
+    | '/register'
     | '/resourcepacks'
     | '/server-setup'
     | '/services'
@@ -205,17 +341,29 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/marketplace/$slug'
+    | '/marketplace/my'
+    | '/marketplace/new'
+    | '/forum/'
+    | '/marketplace/'
+    | '/forum/category/$slug'
+    | '/forum/topic/$slug'
+    | '/marketplace/$slug/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DesignRoute: typeof DesignRoute
   EventsRoute: typeof EventsRoute
   FancymenuRoute: typeof FancymenuRoute
+  LoginRoute: typeof LoginRoute
   LogosRoute: typeof LogosRoute
   MapsRoute: typeof MapsRoute
   ModpacksRoute: typeof ModpacksRoute
   PluginsRoute: typeof PluginsRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
   ResourcepacksRoute: typeof ResourcepacksRoute
   ServerSetupRoute: typeof ServerSetupRoute
   ServicesRoute: typeof ServicesRoute
@@ -223,6 +371,13 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   WebsitesRoute: typeof WebsitesRoute
   WorkersRoute: typeof WorkersRoute
+  MarketplaceSlugRoute: typeof MarketplaceSlugRouteWithChildren
+  MarketplaceMyRoute: typeof MarketplaceMyRoute
+  MarketplaceNewRoute: typeof MarketplaceNewRoute
+  ForumIndexRoute: typeof ForumIndexRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  ForumCategorySlugRoute: typeof ForumCategorySlugRoute
+  ForumTopicSlugRoute: typeof ForumTopicSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design': {
@@ -253,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/fancymenu'
       fullPath: '/fancymenu'
       preLoaderRoute: typeof FancymenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logos': {
@@ -281,6 +450,20 @@ declare module '@tanstack/react-router' {
       path: '/plugins'
       fullPath: '/plugins'
       preLoaderRoute: typeof PluginsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resourcepacks': {
@@ -332,18 +515,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forum/': {
+      id: '/forum/'
+      path: '/forum'
+      fullPath: '/forum/'
+      preLoaderRoute: typeof ForumIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/marketplace/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/my': {
+      id: '/marketplace/my'
+      path: '/marketplace/my'
+      fullPath: '/marketplace/my'
+      preLoaderRoute: typeof MarketplaceMyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/new': {
+      id: '/marketplace/new'
+      path: '/marketplace/new'
+      fullPath: '/marketplace/new'
+      preLoaderRoute: typeof MarketplaceNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum/category/$slug': {
+      id: '/forum/category/$slug'
+      path: '/forum/category/$slug'
+      fullPath: '/forum/category/$slug'
+      preLoaderRoute: typeof ForumCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum/topic/$slug': {
+      id: '/forum/topic/$slug'
+      path: '/forum/topic/$slug'
+      fullPath: '/forum/topic/$slug'
+      preLoaderRoute: typeof ForumTopicSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$slug/edit': {
+      id: '/marketplace/$slug/edit'
+      path: '/edit'
+      fullPath: '/marketplace/$slug/edit'
+      preLoaderRoute: typeof MarketplaceSlugEditRouteImport
+      parentRoute: typeof MarketplaceSlugRoute
+    }
   }
 }
 
+interface MarketplaceSlugRouteChildren {
+  MarketplaceSlugEditRoute: typeof MarketplaceSlugEditRoute
+}
+
+const MarketplaceSlugRouteChildren: MarketplaceSlugRouteChildren = {
+  MarketplaceSlugEditRoute: MarketplaceSlugEditRoute,
+}
+
+const MarketplaceSlugRouteWithChildren = MarketplaceSlugRoute._addFileChildren(
+  MarketplaceSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DesignRoute: DesignRoute,
   EventsRoute: EventsRoute,
   FancymenuRoute: FancymenuRoute,
+  LoginRoute: LoginRoute,
   LogosRoute: LogosRoute,
   MapsRoute: MapsRoute,
   ModpacksRoute: ModpacksRoute,
   PluginsRoute: PluginsRoute,
+  ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
   ResourcepacksRoute: ResourcepacksRoute,
   ServerSetupRoute: ServerSetupRoute,
   ServicesRoute: ServicesRoute,
@@ -351,6 +606,13 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   WebsitesRoute: WebsitesRoute,
   WorkersRoute: WorkersRoute,
+  MarketplaceSlugRoute: MarketplaceSlugRouteWithChildren,
+  MarketplaceMyRoute: MarketplaceMyRoute,
+  MarketplaceNewRoute: MarketplaceNewRoute,
+  ForumIndexRoute: ForumIndexRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
+  ForumCategorySlugRoute: ForumCategorySlugRoute,
+  ForumTopicSlugRoute: ForumTopicSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -47,7 +47,13 @@ function ListingPage() {
             {item.marketplace_listing_images?.length ? (
               item.marketplace_listing_images.map((image) =>
                 image.signed_url ? (
-                  <img key={image.id} src={image.signed_url} alt={image.alt_text ?? item.title} />
+                  <img
+                    key={image.id}
+                    src={image.signed_url}
+                    alt={image.alt_text ?? item.title}
+                    width={1200}
+                    height={800}
+                  />
                 ) : null,
               )
             ) : (
@@ -63,6 +69,7 @@ function ListingPage() {
             <strong className="listing-price">
               {formatListingPrice(item.price_amount, item.currency_code)}
             </strong>
+            <p className="listing-lead">{item.short_description}</p>
             <p className="user-content">{item.description}</p>
             <dl>
               <div>
@@ -73,6 +80,18 @@ function ListingPage() {
                 <dt>Создано</dt>
                 <dd>{formatCommunityDate(item.created_at)}</dd>
               </div>
+              {item.minecraft_version ? (
+                <div>
+                  <dt>Версия Minecraft</dt>
+                  <dd>{item.minecraft_version}</dd>
+                </div>
+              ) : null}
+              {item.platform ? (
+                <div>
+                  <dt>Платформа</dt>
+                  <dd>{item.platform}</dd>
+                </div>
+              ) : null}
             </dl>
           </div>
         </article>

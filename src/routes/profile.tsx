@@ -10,6 +10,7 @@ import { updateProfile } from "@/features/auth/api";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { profileSchema, type ProfileValues } from "@/features/auth/schemas";
 import { CommunityHero, CommunityShell, LoadingPanel } from "@/features/community/CommunityShell";
+import { StreakCard } from "@/features/streak/components";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Профиль — NCEA" }] }),
@@ -75,6 +76,7 @@ function ProfileEditor() {
           title={auth.profile?.username ?? "Профиль"}
           description="Короткая публичная карточка участника NCEA."
         />
+        <StreakCard />
         <form className="profile-card" onSubmit={submit}>
           <div className="form-field">
             <Label htmlFor="profile-username">Username</Label>

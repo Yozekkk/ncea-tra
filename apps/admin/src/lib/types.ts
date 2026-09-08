@@ -1,7 +1,7 @@
 import type { Tables } from "./database.types";
 
 export type AppRole = "user" | "moderator" | "admin";
-export type ListingStatus = "draft" | "published" | "archived";
+export type ListingStatus = "draft" | "pending_review" | "published" | "archived";
 export type Profile = Tables<"profiles">;
 export type UserRole = Tables<"user_roles">;
 export type ForumCategory = Tables<"forum_categories">;

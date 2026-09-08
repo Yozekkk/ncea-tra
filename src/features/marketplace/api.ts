@@ -4,32 +4,92 @@ import type {
   MarketplaceCategory,
   MarketplaceListing,
 } from "@/features/community/types";
-import { makeListingSlug, validateMarketplaceImage, type ListingValues } from "./schemas";
+import { rankMarketplaceListings } from "@/features/streak/model";
+import {
+  makeListingSlug,
+  MARKETPLACE_IMAGE_MAX_COUNT,
+  validateMarketplaceImage,
+  type ListingValues,
+} from "./schemas";
 
 const listingSelect =
   "*, profiles(username, avatar_url), marketplace_categories(name, slug), marketplace_listing_images(*)";
 const bucket = "marketplace-listings";
 
+type FeedRow = Omit<
+  MarketplaceListing,
+  "profiles" | "marketplace_categories" | "marketplace_listing_images"
+> & {
+  seller_username: string;
+  seller_avatar_url: string | null;
+  category_name: string;
+  category_slug: string;
+  effective_streak: number;
+  promotion_eligible: boolean;
+  last_bumped_at: string | null;
+};
+
 function fail(error: { message: string } | null, fallback: string): never {
   throw new Error(error?.message ?? fallback);
 }
 
+function normalizeValues(values: ListingValues) {
+  return {
+    _category_id: values.categoryId,
+    _title: values.title,
+    _short_description: values.shortDescription,
+    _description: values.description,
+    _price_amount: typeof values.priceAmount === "number" ? values.priceAmount : null,
+    _currency_code: values.currencyCode,
+    _minecraft_version: values.minecraftVersion ?? "",
+    _platform: values.platform ?? "",
+  };
+}
+
 async function signImages(listings: MarketplaceListing[]) {
-  const supabase = getSupabaseClient();
-  return Promise.all(
-    listings.map(async (listing) => {
-      const images = await Promise.all(
-        (listing.marketplace_listing_images ?? [])
-          .sort((a, b) => a.sort_order - b.sort_order)
-          .map(async (image) => {
-            const { data } = await supabase.storage
-              .from(bucket)
-              .createSignedUrl(image.storage_path, 3600);
-            return { ...image, signed_url: data?.signedUrl };
-          }),
-      );
-      return { ...listing, marketplace_listing_images: images };
-    }),
+  const paths = listings.flatMap((listing) =>
+    (listing.marketplace_listing_images ?? []).map((image) => image.storage_path),
+  );
+  if (!paths.length) return listings;
+
+  const { data, error } = await getSupabaseClient()
+    .storage.from(bucket)
+    .createSignedUrls(paths, 3600);
+  if (error) fail(error, "Не удалось загрузить ссылки на изображения");
+  const signedByPath = new Map(
+    (data ?? []).map((item) => [item.path, item.signedUrl ?? undefined] as const),
+  );
+
+  return listings.map((listing) => ({
+    ...listing,
+    marketplace_listing_images: [...(listing.marketplace_listing_images ?? [])]
+      .sort((left, right) => left.sort_order - right.sort_order)
+      .map((image) => ({ ...image, signed_url: signedByPath.get(image.storage_path) })),
+  }));
+}
+
+async function attachImages(listings: MarketplaceListing[]) {
+  if (!listings.length) return listings;
+  const { data, error } = await getSupabaseClient()
+    .from("marketplace_listing_images")
+    .select("*")
+    .in(
+      "listing_id",
+      listings.map((listing) => listing.id),
+    )
+    .order("sort_order");
+  if (error) fail(error, "Не удалось загрузить изображения объявлений");
+  const imagesByListing = new Map<string, ListingImage[]>();
+  for (const image of (data ?? []) as ListingImage[]) {
+    const images = imagesByListing.get(image.listing_id) ?? [];
+    images.push(image);
+    imagesByListing.set(image.listing_id, images);
+  }
+  return signImages(
+    listings.map((listing) => ({
+      ...listing,
+      marketplace_listing_images: imagesByListing.get(listing.id) ?? [],
+    })),
   );
 }
 
@@ -45,14 +105,27 @@ export async function getMarketplaceCategories() {
 
 export async function getPublishedListings(categoryId?: number) {
   let query = getSupabaseClient()
-    .from("marketplace_listings")
-    .select(listingSelect)
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+    .from("marketplace_feed")
+    .select("*")
+    .order("promotion_eligible", { ascending: false })
+    .order("effective_streak", { ascending: false })
+    .order("last_bumped_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: true })
+    .limit(60);
   if (categoryId) query = query.eq("category_id", categoryId);
   const { data, error } = await query;
   if (error) fail(error, "Не удалось загрузить объявления");
-  return signImages(data as unknown as MarketplaceListing[]);
+
+  const listings = ((data ?? []) as FeedRow[]).map(
+    ({ seller_username, seller_avatar_url, category_name, category_slug, ...listing }) => ({
+      ...listing,
+      profiles: { username: seller_username, avatar_url: seller_avatar_url },
+      marketplace_categories: { name: category_name, slug: category_slug },
+      marketplace_listing_images: [],
+    }),
+  );
+  return attachImages(rankMarketplaceListings(listings));
 }
 
 export async function getMyListings(userId: string) {
@@ -60,7 +133,8 @@ export async function getMyListings(userId: string) {
     .from("marketplace_listings")
     .select(listingSelect)
     .eq("seller_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
   if (error) fail(error, "Не удалось загрузить ваши объявления");
   return signImages(data as unknown as MarketplaceListing[]);
 }
@@ -75,42 +149,35 @@ export async function getListing(slug: string) {
   return (await signImages([data as unknown as MarketplaceListing]))[0];
 }
 
-export async function createListing(userId: string, values: ListingValues) {
-  const slug = makeListingSlug(values.title);
+async function getListingById(id: string) {
   const { data, error } = await getSupabaseClient()
     .from("marketplace_listings")
-    .insert({
-      seller_id: userId,
-      category_id: values.categoryId,
-      title: values.title,
-      slug,
-      description: values.description,
-      price_amount: typeof values.priceAmount === "number" ? values.priceAmount : null,
-      currency_code: values.currencyCode,
-      status: "draft",
-    })
     .select("*")
+    .eq("id", id)
     .single();
-  if (error) fail(error, "Не удалось создать объявление");
+  if (error) fail(error, "Не удалось получить сохранённое объявление");
   return data as MarketplaceListing;
 }
 
-export async function updateListing(id: string, values: ListingValues) {
-  const { data, error } = await getSupabaseClient()
-    .from("marketplace_listings")
-    .update({
-      category_id: values.categoryId,
-      title: values.title,
-      description: values.description,
-      price_amount: typeof values.priceAmount === "number" ? values.priceAmount : null,
-      currency_code: values.currencyCode,
-      status: "draft",
-    })
-    .eq("id", id)
-    .select("*")
-    .single();
+export async function createListing(values: ListingValues, submit = false) {
+  const slug = makeListingSlug(values.title);
+  const { data: id, error } = await getSupabaseClient().rpc("create_marketplace_listing", {
+    ...normalizeValues(values),
+    _slug: slug,
+    _submit: submit,
+  });
+  if (error) fail(error, "Не удалось создать объявление");
+  return getListingById(id as string);
+}
+
+export async function updateListing(id: string, values: ListingValues, submit = false) {
+  const { data, error } = await getSupabaseClient().rpc("update_marketplace_listing", {
+    ...normalizeValues(values),
+    _listing_id: id,
+    _submit: submit,
+  });
   if (error) fail(error, "Не удалось сохранить объявление");
-  return data as MarketplaceListing;
+  return getListingById(data as string);
 }
 
 export async function archiveListing(id: string) {
@@ -138,20 +205,21 @@ export async function uploadListingImages(
   files: File[],
   startOrder = 0,
 ) {
+  if (startOrder + files.length > MARKETPLACE_IMAGE_MAX_COUNT)
+    throw new Error(`Можно загрузить не более ${MARKETPLACE_IMAGE_MAX_COUNT} изображений`);
+
   const supabase = getSupabaseClient();
   const uploaded: ListingImage[] = [];
+  const extensionByType: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/avif": "avif",
+  };
   for (const [index, file] of files.entries()) {
     const validationError = validateMarketplaceImage(file);
     if (validationError) throw new Error(`${file.name}: ${validationError}`);
-    const extension =
-      file.name
-        .split(".")
-        .pop()
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]/g, "") ||
-      file.type.split("/")[1] ||
-      "bin";
-    const path = `${userId}/${listingId}/${crypto.randomUUID()}.${extension}`;
+    const path = `${userId}/${listingId}/${crypto.randomUUID()}.${extensionByType[file.type]}`;
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(path, file, { contentType: file.type, upsert: false });

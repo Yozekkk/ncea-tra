@@ -75,10 +75,11 @@ export async function createTopic(values: TopicValues) {
   return { id: data as string, slug };
 }
 
-export async function createReply(topicId: string, authorId: string, body: string) {
-  const { error } = await getSupabaseClient()
-    .from("forum_posts")
-    .insert({ topic_id: topicId, author_id: authorId, body: body.trim() });
+export async function createReply(topicId: string, body: string) {
+  const { error } = await getSupabaseClient().rpc("create_forum_reply", {
+    _topic_id: topicId,
+    _body: body,
+  });
   if (error) fail(error, "Не удалось отправить ответ");
 }
 

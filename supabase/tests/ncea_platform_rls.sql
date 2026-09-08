@@ -55,17 +55,20 @@ values (
   '10000000-0000-4000-8000-000000000001', 'User A post'
 );
 insert into public.marketplace_listings (
-  id, category_id, seller_id, title, slug, description, price_amount, currency_code
+  id, category_id, seller_id, title, slug, short_description, description,
+  price_amount, currency_code
 )
 values (
   '40000000-0000-4000-8000-000000000001', 900001,
   '10000000-0000-4000-8000-000000000001', 'User A listing',
-  'user-a-listing', 'Draft listing', 10, 'EUR'
+  'user-a-listing-1234abcd', 'Temporary listing summary',
+  'Temporary draft listing used by the RLS verification.', 10, 'EUR'
 );
-insert into storage.objects (bucket_id, name)
+insert into storage.objects (bucket_id, name, metadata)
 values (
   'marketplace-listings',
-  '10000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001/a.webp'
+  '10000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001/a.webp',
+  '{"mimetype":"image/webp","size":128}'::jsonb
 );
 insert into public.marketplace_listing_images (listing_id, storage_path)
 values (

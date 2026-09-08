@@ -9,8 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
-import type { AppRole, Profile } from "@/features/community/types";
+import type { ActivityStreak, AppRole, Profile } from "@/features/community/types";
 
 type AuthState = {
   ready: boolean;
@@ -18,6 +17,7 @@ type AuthState = {
   user: User | null;
   profile: Profile | null;
   role: AppRole | null;
+  streak: ActivityStreak | null;
   isStaff: boolean;
   isAdmin: boolean;
   refreshProfile: () => Promise<void>;
@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [streak, setStreak] = useState<ActivityStreak | null>(null);
   const sessionRef = useRef<Session | null>(null);
 
   const hydrate = useCallback(async (nextSession: Session | null) => {
@@ -39,36 +40,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!nextSession) {
       setProfile(null);
       setRole(null);
+      setStreak(null);
       setReady(true);
       return;
     }
+    const [{ getSupabaseClient }, { recordDailyActivity }] = await Promise.all([
+      import("@/lib/supabase"),
+      import("@/features/streak/api"),
+    ]);
     const supabase = getSupabaseClient();
-    const [{ data: nextProfile }, { data: nextRole }] = await Promise.all([
+    const [{ data: nextProfile }, { data: nextRole }, nextStreak] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", nextSession.user.id).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", nextSession.user.id).maybeSingle(),
+      recordDailyActivity().catch(() => null),
     ]);
     if (sessionRef.current?.user.id === nextSession.user.id) {
       setProfile((nextProfile as Profile | null) ?? null);
       setRole((nextRole?.role as AppRole | undefined) ?? "user");
+      setStreak(nextStreak);
       setReady(true);
     }
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setReady(true);
-      return;
-    }
-    const supabase = getSupabaseClient();
-    void supabase.auth.getSession().then(({ data }) => hydrate(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      queueMicrotask(() => void hydrate(nextSession));
-    });
-    return () => data.subscription.unsubscribe();
+    let unsubscribe: (() => void) | undefined;
+    let active = true;
+    void import("@/lib/supabase")
+      .then(({ getSupabaseClient, isSupabaseConfigured }) => {
+        if (!active) return;
+        if (!isSupabaseConfigured()) {
+          setReady(true);
+          return;
+        }
+        const supabase = getSupabaseClient();
+        void supabase.auth.getSession().then(({ data }) => {
+          if (active) return hydrate(data.session);
+        });
+        const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+          queueMicrotask(() => active && void hydrate(nextSession));
+        });
+        unsubscribe = () => data.subscription.unsubscribe();
+      })
+      .catch(() => {
+        if (active) setReady(true);
+      });
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, [hydrate]);
 
   const refreshProfile = useCallback(async () => hydrate(sessionRef.current), [hydrate]);
   const logout = useCallback(async () => {
+    const { getSupabaseClient, isSupabaseConfigured } = await import("@/lib/supabase");
     if (isSupabaseConfigured()) await getSupabaseClient().auth.signOut();
     await hydrate(null);
   }, [hydrate]);
@@ -80,12 +104,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user ?? null,
       profile,
       role,
+      streak,
       isStaff: role === "moderator" || role === "admin",
       isAdmin: role === "admin",
       refreshProfile,
       logout,
     }),
-    [ready, session, profile, role, refreshProfile, logout],
+    [ready, session, profile, role, streak, refreshProfile, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

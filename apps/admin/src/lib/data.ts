@@ -156,7 +156,22 @@ export async function setListingStatus(id: string, status: ListingStatus): Promi
 }
 
 export async function deleteListing(id: string): Promise<void> {
-  const { error } = await getSupabase().from("marketplace_listings").delete().eq("id", id);
+  const supabase = getSupabase();
+  const { data: images, error: imageError } = await supabase
+    .from("marketplace_listing_images")
+    .select("storage_path")
+    .eq("listing_id", id);
+  if (imageError) fail("Could not load listing images before deletion", imageError);
+
+  const storagePaths = (images ?? []).map((image) => image.storage_path);
+  if (storagePaths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from("marketplace-listings")
+      .remove(storagePaths);
+    if (storageError) fail("Could not delete listing images", storageError);
+  }
+
+  const { error } = await supabase.from("marketplace_listings").delete().eq("id", id);
   if (error) fail("Could not delete listing", error);
 }
 

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Archive, ArrowRight, ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Flame, ImagePlus, Pencil, Plus, Send, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,12 @@ import {
   updateListing,
   uploadListingImages,
 } from "./api";
-import { listingSchema, validateMarketplaceImage, type ListingValues } from "./schemas";
+import {
+  listingSchema,
+  MARKETPLACE_IMAGE_MAX_COUNT,
+  validateMarketplaceImage,
+  type ListingValues,
+} from "./schemas";
 
 export const marketplaceKeys = {
   all: ["marketplace"] as const,
@@ -46,7 +51,12 @@ export function formatListingPrice(amount: number | null, currency: string) {
 }
 
 export function StatusBadge({ status }: { status: MarketplaceListing["status"] }) {
-  const labels = { draft: "Черновик", published: "Опубликовано", archived: "В архиве" };
+  const labels = {
+    draft: "Черновик",
+    pending_review: "На проверке",
+    published: "Опубликовано",
+    archived: "В архиве",
+  };
   return <span className={`listing-status listing-status-${status}`}>{labels[status]}</span>;
 }
 
@@ -61,7 +71,13 @@ export function ListingCard({
   return (
     <Link to="/marketplace/$slug" params={{ slug: listing.slug }} className="listing-card">
       {cover?.signed_url ? (
-        <img src={cover.signed_url} alt={cover.alt_text ?? ""} loading="lazy" />
+        <img
+          src={cover.signed_url}
+          alt={cover.alt_text ?? ""}
+          width={640}
+          height={360}
+          loading="lazy"
+        />
       ) : (
         <div className="listing-placeholder">
           <ImagePlus aria-hidden="true" />
@@ -70,10 +86,15 @@ export function ListingCard({
       <div className="listing-card-body">
         <div className="listing-card-kicker">
           <span>{listing.marketplace_categories?.name}</span>
+          {listing.promotion_eligible ? (
+            <span className="listing-promotion">
+              <Flame aria-hidden="true" /> Серия {listing.effective_streak}
+            </span>
+          ) : null}
           {ownerView ? <StatusBadge status={listing.status} /> : null}
         </div>
         <h2>{listing.title}</h2>
-        <p>{listing.description}</p>
+        <p>{listing.short_description}</p>
         <div className="listing-card-footer">
           <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
           <span>
@@ -116,31 +137,41 @@ export function MarketplaceCreatePrompt() {
   return auth.user ? (
     <Link to="/marketplace/new" className="community-button">
       <Plus />
-      Создать объявление
+      Добавить товар
     </Link>
   ) : (
     <LoginPrompt action="создать объявление" redirect="/marketplace/new" />
   );
 }
 
-function ImagePicker({ onFiles }: { onFiles: (files: File[]) => void }) {
+function ImagePicker({
+  currentCount,
+  onFiles,
+}: {
+  currentCount: number;
+  onFiles: (files: File[]) => void;
+}) {
   const [error, setError] = useState("");
   return (
     <div className="form-field">
       <Label htmlFor="listing-images">Изображения</Label>
       <label className="image-picker" htmlFor="listing-images">
         <ImagePlus />
-        <span>JPEG, PNG, WebP или AVIF · до 10 МБ</span>
+        <span>JPEG, PNG, WebP или AVIF · до 10 МБ · максимум 6</span>
       </label>
       <Input
         id="listing-images"
+        name="listing-images"
         className="sr-only"
         type="file"
         accept="image/jpeg,image/png,image/webp,image/avif"
         multiple
         onChange={(event) => {
           const files = Array.from(event.target.files ?? []);
-          const issue = files.map(validateMarketplaceImage).find(Boolean);
+          const issue =
+            currentCount + files.length > MARKETPLACE_IMAGE_MAX_COUNT
+              ? `Можно загрузить не более ${MARKETPLACE_IMAGE_MAX_COUNT} изображений`
+              : files.map(validateMarketplaceImage).find(Boolean);
           setError(issue ?? "");
           if (!issue) onFiles(files);
         }}
@@ -175,16 +206,19 @@ export function ListingForm({
     defaultValues: {
       categoryId: listing?.category_id ?? categories[0]?.id,
       title: listing?.title ?? "",
+      shortDescription: listing?.short_description ?? "",
       description: listing?.description ?? "",
       priceAmount: listing?.price_amount ?? null,
       currencyCode: (listing?.currency_code as "EUR" | "USD" | "RUB") ?? "EUR",
+      minecraftVersion: listing?.minecraft_version ?? "",
+      platform: listing?.platform ?? "",
     },
   });
   const mutation = useMutation({
-    mutationFn: async (values: ListingValues) => {
-      const saved = listing
-        ? await updateListing(listing.id, values)
-        : await createListing(auth.user!.id, values);
+    mutationFn: async ({ values, submit }: { values: ListingValues; submit: boolean }) => {
+      let saved = listing
+        ? await updateListing(listing.id, values, false)
+        : await createListing(values, false);
       if (files.length)
         await uploadListingImages(
           auth.user!.id,
@@ -192,6 +226,7 @@ export function ListingForm({
           files,
           listing?.marketplace_listing_images?.length ?? 0,
         );
+      if (submit) saved = await updateListing(saved.id, values, true);
       return saved;
     },
     onSuccess: async (saved) => {
@@ -199,6 +234,14 @@ export function ListingForm({
       await navigate({ to: "/marketplace/$slug", params: { slug: saved.slug } });
     },
   });
+  useEffect(() => {
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      if (!form.formState.isDirty || mutation.isPending) return;
+      event.preventDefault();
+    };
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, [form.formState.isDirty, mutation.isPending]);
   if (!auth.user)
     return (
       <LoginPrompt
@@ -209,17 +252,17 @@ export function ListingForm({
   return (
     <form
       className="listing-form"
-      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      onSubmit={form.handleSubmit((values) => mutation.mutate({ values, submit: false }))}
     >
       <div className="form-field">
-        <Label>Категория</Label>
+        <Label htmlFor="listing-category">Категория</Label>
         <Select
           value={String(form.watch("categoryId") ?? "")}
           onValueChange={(value) =>
             form.setValue("categoryId", Number(value), { shouldValidate: true })
           }
         >
-          <SelectTrigger>
+          <SelectTrigger id="listing-category" aria-label="Категория">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -233,47 +276,101 @@ export function ListingForm({
       </div>
       <div className="form-field">
         <Label htmlFor="listing-title">Название</Label>
-        <Input id="listing-title" maxLength={180} {...form.register("title")} />
+        <Input id="listing-title" autoComplete="off" maxLength={180} {...form.register("title")} />
+        <span className="field-help">{form.watch("title").length}/180</span>
         {form.formState.errors.title ? (
-          <p className="field-error">{form.formState.errors.title.message}</p>
+          <p className="field-error" role="alert">
+            {form.formState.errors.title.message}
+          </p>
         ) : null}
       </div>
       <div className="form-field">
-        <Label htmlFor="listing-description">Описание</Label>
+        <Label htmlFor="listing-short-description">Краткое описание</Label>
+        <Textarea
+          id="listing-short-description"
+          autoComplete="off"
+          rows={3}
+          maxLength={280}
+          {...form.register("shortDescription")}
+        />
+        <span className="field-help">{form.watch("shortDescription").length}/280</span>
+        {form.formState.errors.shortDescription ? (
+          <p className="field-error" role="alert">
+            {form.formState.errors.shortDescription.message}
+          </p>
+        ) : null}
+      </div>
+      <div className="form-field">
+        <Label htmlFor="listing-description">Полное описание</Label>
         <Textarea
           id="listing-description"
+          autoComplete="off"
           rows={9}
           maxLength={20000}
           {...form.register("description")}
         />
+        <span className="field-help">{form.watch("description").length}/20 000</span>
         {form.formState.errors.description ? (
-          <p className="field-error">{form.formState.errors.description.message}</p>
+          <p className="field-error" role="alert">
+            {form.formState.errors.description.message}
+          </p>
         ) : null}
+      </div>
+      <div className="price-fields listing-metadata-fields">
+        <div className="form-field">
+          <Label htmlFor="minecraft-version">Версия Minecraft</Label>
+          <Input
+            id="minecraft-version"
+            autoComplete="off"
+            maxLength={40}
+            placeholder="Например, 1.21.4…"
+            {...form.register("minecraftVersion")}
+          />
+        </div>
+        <div className="form-field">
+          <Label htmlFor="listing-platform">Ядро / платформа</Label>
+          <Input
+            id="listing-platform"
+            autoComplete="off"
+            maxLength={40}
+            list="marketplace-platforms"
+            placeholder="Paper, Fabric, Forge…"
+            {...form.register("platform")}
+          />
+          <datalist id="marketplace-platforms">
+            {["Paper", "Purpur", "Spigot", "Fabric", "Forge", "NeoForge", "Velocity"].map(
+              (platform) => (
+                <option value={platform} key={platform} />
+              ),
+            )}
+          </datalist>
+        </div>
       </div>
       <div className="price-fields">
         <div className="form-field">
           <Label htmlFor="listing-price">Цена</Label>
           <Input
             id="listing-price"
+            autoComplete="off"
             type="number"
             min="0"
             step="0.01"
             inputMode="decimal"
-            placeholder="По запросу"
+            placeholder="По запросу…"
             {...form.register("priceAmount", {
               setValueAs: (value) => (value === "" ? null : Number(value)),
             })}
           />
         </div>
         <div className="form-field">
-          <Label>Валюта</Label>
+          <Label htmlFor="listing-currency">Валюта</Label>
           <Select
             value={form.watch("currencyCode")}
             onValueChange={(value) =>
               form.setValue("currencyCode", value as ListingValues["currencyCode"])
             }
           >
-            <SelectTrigger>
+            <SelectTrigger id="listing-currency" aria-label="Валюта">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -286,11 +383,14 @@ export function ListingForm({
           </Select>
         </div>
       </div>
-      <ImagePicker onFiles={setFiles} />
+      <ImagePicker
+        currentCount={listing?.marketplace_listing_images?.length ?? 0}
+        onFiles={setFiles}
+      />
       {previews.length ? (
         <div className="image-preview-grid">
           {previews.map(({ file, url }) => (
-            <img key={url} src={url} alt={`Предпросмотр ${file.name}`} />
+            <img key={url} src={url} alt={`Предпросмотр ${file.name}`} width={320} height={180} />
           ))}
         </div>
       ) : null}
@@ -300,12 +400,22 @@ export function ListingForm({
         </p>
       ) : null}
       <div className="community-actions">
-        <Button className="rounded-full" disabled={mutation.isPending}>
+        <Button type="submit" className="rounded-full" disabled={mutation.isPending}>
           {mutation.isPending
             ? "Сохранение…"
             : listing
               ? "Сохранить как черновик"
               : "Создать черновик"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-full"
+          disabled={mutation.isPending}
+          onClick={form.handleSubmit((values) => mutation.mutate({ values, submit: true }))}
+        >
+          <Send />
+          Отправить на проверку
         </Button>
         <Link
           to={listing ? "/marketplace/$slug" : "/marketplace/my"}
@@ -346,8 +456,10 @@ export function ListingOwnerActions({ listing }: { listing: MarketplaceListing }
         <strong>Управление объявлением</strong>
         <p>
           {listing.status === "published"
-            ? "Изменение вернёт объявление в черновики."
-            : "Черновики видны только вам и администраторам."}
+            ? "Изменение вернёт товар в черновик или отправит его на повторную проверку."
+            : listing.status === "pending_review"
+              ? "Товар ожидает решения администратора. Вы можете вернуть его в черновик."
+              : "Черновики и архив видны только вам и администраторам."}
         </p>
       </div>
       <div className="community-actions">
@@ -389,7 +501,15 @@ export function ListingImageManager({ listing }: { listing: MarketplaceListing }
     <div className="listing-image-manager">
       {listing.marketplace_listing_images.map((image) => (
         <div key={image.id}>
-          {image.signed_url ? <img src={image.signed_url} alt={image.alt_text ?? ""} /> : null}
+          {image.signed_url ? (
+            <img
+              src={image.signed_url}
+              alt={image.alt_text ?? ""}
+              width={640}
+              height={480}
+              loading="lazy"
+            />
+          ) : null}
           <Button
             variant="destructive"
             size="icon"

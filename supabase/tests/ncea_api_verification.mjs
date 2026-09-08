@@ -78,6 +78,59 @@ if (
 const state = JSON.parse(readFileSync(statePath, "utf8"));
 const accounts = state.accounts;
 check(Array.isArray(accounts) && accounts.length === 3, "Invalid API test state");
+
+if (mode === "cleanup") {
+  const cleanupAdmin = client();
+  const adminAccount = accounts.find((account) => account.label === "admin");
+  if (!adminAccount) throw new Error("Cleanup state has no admin account");
+  const { error: loginError } = await cleanupAdmin.auth.signInWithPassword({
+    email: adminAccount.email,
+    password: adminAccount.password,
+  });
+  if (loginError) throw new Error(`Cleanup admin login: ${loginError.message}`);
+
+  for (const account of accounts) {
+    const { data: listingFolders, error: folderError } = await cleanupAdmin.storage
+      .from("marketplace-listings")
+      .list(account.id, { limit: 100 });
+    if (folderError) throw new Error(`Cleanup folder list: ${folderError.message}`);
+    for (const folder of listingFolders ?? []) {
+      const prefix = `${account.id}/${folder.name}`;
+      const { data: files, error: fileError } = await cleanupAdmin.storage
+        .from("marketplace-listings")
+        .list(prefix, { limit: 100 });
+      if (fileError) throw new Error(`Cleanup file list: ${fileError.message}`);
+      const paths = (files ?? []).map((file) => `${prefix}/${file.name}`);
+      if (paths.length > 0) {
+        const { error: removeError } = await cleanupAdmin.storage
+          .from("marketplace-listings")
+          .remove(paths);
+        if (removeError) throw new Error(`Cleanup storage remove: ${removeError.message}`);
+      }
+    }
+  }
+
+  const ids = accounts.map((account) => account.id);
+  const { error: listingCleanupError } = await cleanupAdmin
+    .from("marketplace_listings")
+    .delete()
+    .in("seller_id", ids);
+  if (listingCleanupError) throw listingCleanupError;
+  const { error: postCleanupError } = await cleanupAdmin
+    .from("forum_posts")
+    .delete()
+    .in("author_id", ids);
+  if (postCleanupError) throw postCleanupError;
+  const { error: topicCleanupError } = await cleanupAdmin
+    .from("forum_topics")
+    .delete()
+    .in("author_id", ids);
+  if (topicCleanupError) throw topicCleanupError;
+  await cleanupAdmin.auth.signOut();
+  process.stdout.write("NCEA API test content and Storage cleanup passed.\n");
+  process.exit(0);
+}
+
 const clients = accounts.map(() => client());
 for (let index = 0; index < clients.length; index += 1) {
   const { error } = await clients[index].auth.signInWithPassword({
@@ -89,6 +142,22 @@ for (let index = 0; index < clients.length; index += 1) {
 const [userA, userB, admin] = clients;
 const [accountA, accountB, accountAdmin] = accounts;
 const anonymous = client();
+
+const { data: firstActivity, error: firstActivityError } = await userA.rpc("record_daily_activity");
+if (firstActivityError) throw firstActivityError;
+const { data: repeatedActivity, error: repeatedActivityError } =
+  await userA.rpc("record_daily_activity");
+if (repeatedActivityError) throw repeatedActivityError;
+check(firstActivity?.[0]?.current_streak >= 1, "User A activity streak was not created");
+check(
+  repeatedActivity?.[0]?.current_streak === firstActivity?.[0]?.current_streak,
+  "Repeated same-day activity incremented User A streak",
+);
+const { error: forgedStreakError } = await userA
+  .from("user_activity_streaks")
+  .update({ current_streak: 999 })
+  .eq("user_id", accountA.id);
+check(Boolean(forgedStreakError), "User A changed their streak through the client");
 
 const { data: profileA } = await userA
   .from("profiles")
@@ -155,16 +224,15 @@ const { error: ownershipError } = await userA
   .eq("id", topicId);
 check(Boolean(ownershipError), "User A changed topic author_id to User B");
 
-const { data: reply, error: replyError } = await userA
-  .from("forum_posts")
-  .insert({ topic_id: topicId, author_id: accountA.id, body: "Owner reply" })
-  .select()
-  .single();
-if (replyError) throw replyError;
+const { data: reply, error: replyError } = await userA.rpc("create_forum_reply", {
+  _topic_id: topicId,
+  _body: "Owner reply",
+});
+if (replyError || !reply) throw replyError ?? new Error("Owner reply RPC returned no id");
 const { data: editedReply, error: editReplyError } = await userA
   .from("forum_posts")
   .update({ body: "Owner reply edited" })
-  .eq("id", reply.id)
+  .eq("id", reply)
   .select("body")
   .single();
 if (editReplyError || editedReply?.body !== "Owner reply edited") {
@@ -173,18 +241,24 @@ if (editReplyError || editedReply?.body !== "Owner reply edited") {
 const { data: bPostUpdate } = await userB
   .from("forum_posts")
   .update({ body: "Unauthorized" })
-  .eq("id", reply.id)
+  .eq("id", reply)
   .select();
 check(bPostUpdate?.length === 0, "User B could update User A post");
 const { error: guestWriteError } = await anonymous
   .from("forum_posts")
   .insert({ topic_id: topicId, author_id: accountA.id, body: "Guest write" });
 check(Boolean(guestWriteError), "Guest could write a forum post");
+const { data: userBReply, error: userBReplyError } = await userB.rpc("create_forum_reply", {
+  _topic_id: topicId,
+  _body: "User B reply",
+});
+if (userBReplyError || !userBReply)
+  throw userBReplyError ?? new Error("User B reply RPC returned no id");
 
 const { data: marketCategory, error: marketCategoryError } = await anonymous
   .from("marketplace_categories")
   .select("id")
-  .eq("slug", "development")
+  .eq("slug", "plugins")
   .single();
 if (marketCategoryError) throw marketCategoryError;
 const { error: guestListingError } = await anonymous.from("marketplace_listings").insert({
@@ -192,34 +266,46 @@ const { error: guestListingError } = await anonymous.from("marketplace_listings"
   seller_id: accountA.id,
   title: "Guest listing must fail",
   slug: `guest-verification-${suffix}`,
-  description: "Guest write",
+  short_description: "Guest listing summary",
+  description: "Guest listing write must be rejected by ownership rules.",
   currency_code: "EUR",
 });
 check(Boolean(guestListingError), "Guest could create a marketplace listing");
-const { data: listing, error: listingError } = await userA
+const listingSlug = `api-verification-${suffix}`;
+const listingValues = {
+  _category_id: marketCategory.id,
+  _title: "API verification listing",
+  _short_description: "Temporary listing summary",
+  _description: "Temporary verification listing with a complete safe description.",
+  _price_amount: 25,
+  _currency_code: "EUR",
+  _minecraft_version: "1.21.4",
+  _platform: "Paper",
+};
+const { data: listingId, error: listingError } = await userA.rpc("create_marketplace_listing", {
+  ...listingValues,
+  _slug: listingSlug,
+  _submit: false,
+});
+if (listingError || !listingId) throw listingError ?? new Error("Listing RPC returned no id");
+const { data: listing, error: listingReadError } = await userA
   .from("marketplace_listings")
-  .insert({
-    category_id: marketCategory.id,
-    seller_id: accountA.id,
-    title: "API verification listing",
-    slug: `api-verification-${suffix}`,
-    description: "Temporary verification listing",
-    price_amount: 25,
-    currency_code: "EUR",
-  })
-  .select()
+  .select("*")
+  .eq("id", listingId)
   .single();
-if (listingError) throw listingError;
-const { data: editedListing, error: editListingError } = await userA
-  .from("marketplace_listings")
-  .update({ title: "API verification listing edited" })
-  .eq("id", listing.id)
-  .select("title")
-  .single();
-if (editListingError || editedListing?.title !== "API verification listing edited") {
-  throw new Error(
-    `User A could not edit own listing: ${editListingError?.message ?? "wrong title"}`,
-  );
+if (listingReadError || !listing) throw listingReadError ?? new Error("Listing was not readable");
+check(listing.seller_id === accountA.id, "Listing RPC did not derive seller_id from auth.uid()");
+const { data: editedListingId, error: editListingError } = await userA.rpc(
+  "update_marketplace_listing",
+  {
+    ...listingValues,
+    _listing_id: listing.id,
+    _title: "API verification listing edited",
+    _submit: false,
+  },
+);
+if (editListingError || editedListingId !== listing.id) {
+  throw new Error(`User A could not edit own listing: ${editListingError?.message ?? "wrong id"}`);
 }
 const { data: bListingUpdate, error: bListingUpdateError } = await userB
   .from("marketplace_listings")
@@ -227,6 +313,12 @@ const { data: bListingUpdate, error: bListingUpdateError } = await userB
   .eq("id", listing.id)
   .select();
 check(!bListingUpdateError && bListingUpdate?.length === 0, "User B could update User A listing");
+const { data: bListingDelete, error: bListingDeleteError } = await userB
+  .from("marketplace_listings")
+  .delete()
+  .eq("id", listing.id)
+  .select("id");
+check(!bListingDeleteError && bListingDelete?.length === 0, "User B could delete User A listing");
 const path = `${accountA.id}/${listing.id}/verification.png`;
 const png = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10]);
 const { error: uploadError } = await userA.storage
@@ -259,6 +351,25 @@ const { error: imageReassignError } = await userA
   .eq("id", image.id);
 check(Boolean(imageReassignError), "Owner reassigned listing image outside owned listing");
 
+const { error: submitError } = await userA.rpc("update_marketplace_listing", {
+  ...listingValues,
+  _listing_id: listing.id,
+  _title: "API verification listing edited",
+  _submit: true,
+});
+if (submitError) throw submitError;
+const { data: submittedListing } = await userA
+  .from("marketplace_listings")
+  .select("status")
+  .eq("id", listing.id)
+  .single();
+check(submittedListing?.status === "pending_review", "Listing did not enter pending_review");
+const { data: hiddenPending } = await anonymous
+  .from("marketplace_feed")
+  .select("id")
+  .eq("id", listing.id);
+check(hiddenPending?.length === 0, "Pending-review listing leaked into the public feed");
+
 const { data: selfPublish, error: selfPublishError } = await userA
   .from("marketplace_listings")
   .update({ status: "published" })
@@ -271,7 +382,7 @@ const { error: publishError } = await admin
   .eq("id", listing.id);
 if (publishError) throw publishError;
 const { data: publicListing } = await anonymous
-  .from("marketplace_listings")
+  .from("marketplace_feed")
   .select("id")
   .eq("id", listing.id)
   .single();
@@ -287,6 +398,11 @@ const { error: archiveError } = await userA
   .eq("id", listing.id);
 if (archiveError)
   throw new Error(`Owner cannot archive published listing: ${archiveError.message}`);
+const { data: archivedPublicListing } = await anonymous
+  .from("marketplace_feed")
+  .select("id")
+  .eq("id", listing.id);
+check(archivedPublicListing?.length === 0, "Archived listing remained in the public feed");
 const { error: republishError } = await admin
   .from("marketplace_listings")
   .update({ status: "published" })
@@ -297,9 +413,10 @@ const { error: lockError } = await admin
   .update({ is_locked: true, is_pinned: true })
   .eq("id", topicId);
 if (lockError) throw lockError;
-const { error: lockedReplyError } = await userA
-  .from("forum_posts")
-  .insert({ topic_id: topicId, author_id: accountA.id, body: "Locked reply" });
+const { error: lockedReplyError } = await userA.rpc("create_forum_reply", {
+  _topic_id: topicId,
+  _body: "Locked reply",
+});
 check(Boolean(lockedReplyError), "User replied to a locked topic");
 
 await admin.storage.from("marketplace-listings").remove([path]);

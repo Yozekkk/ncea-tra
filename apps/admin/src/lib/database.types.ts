@@ -198,41 +198,59 @@ export type Database = {
       };
       marketplace_listings: {
         Row: {
+          archived_at: string | null;
           category_id: number;
           created_at: string;
           currency_code: string;
           description: string;
           id: string;
+          minecraft_version: string | null;
+          platform: string | null;
           price_amount: number | null;
+          published_at: string | null;
           seller_id: string;
+          short_description: string;
           slug: string;
           status: Database["public"]["Enums"]["marketplace_listing_status"];
+          submitted_at: string | null;
           title: string;
           updated_at: string;
         };
         Insert: {
+          archived_at?: string | null;
           category_id: number;
           created_at?: string;
           currency_code?: string;
           description: string;
           id?: string;
+          minecraft_version?: string | null;
+          platform?: string | null;
           price_amount?: number | null;
+          published_at?: string | null;
           seller_id: string;
+          short_description: string;
           slug: string;
           status?: Database["public"]["Enums"]["marketplace_listing_status"];
+          submitted_at?: string | null;
           title: string;
           updated_at?: string;
         };
         Update: {
+          archived_at?: string | null;
           category_id?: number;
           created_at?: string;
           currency_code?: string;
           description?: string;
           id?: string;
+          minecraft_version?: string | null;
+          platform?: string | null;
           price_amount?: number | null;
+          published_at?: string | null;
           seller_id?: string;
+          short_description?: string;
           slug?: string;
           status?: Database["public"]["Enums"]["marketplace_listing_status"];
+          submitted_at?: string | null;
           title?: string;
           updated_at?: string;
         };
@@ -310,7 +328,7 @@ export type Database = {
     };
     Enums: {
       app_role: "user" | "moderator" | "admin";
-      marketplace_listing_status: "draft" | "published" | "archived";
+      marketplace_listing_status: "draft" | "pending_review" | "published" | "archived";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -433,7 +451,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
-      marketplace_listing_status: ["draft", "published", "archived"],
+      marketplace_listing_status: ["draft", "pending_review", "published", "archived"],
     },
   },
 } as const;

@@ -5115,7 +5115,10 @@ video {
   color: #777982;
   font-size: 11px;
 }
-.marketplace-filters span {
+.marketplace-filters span,
+.marketplace-filters a {
+  display: inline-flex;
+  align-items: center;
   padding: 7px 10px;
   border: 1px solid #e6e6e8;
   border-radius: 999px;
@@ -5124,6 +5127,44 @@ video {
 .marketplace-filters span:first-child {
   border: 0;
   background: transparent;
+}
+.marketplace-filters a {
+  font: inherit;
+  color: #55575f;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.marketplace-filters a:hover,
+.marketplace-filters a:focus-visible,
+.marketplace-filters a.is-active {
+  border-color: #ff8a58;
+  color: #b43b0e;
+  background: #fff5ef;
+}
+.community-subheading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 28px 0 18px;
+}
+.community-subheading span {
+  color: #e55216;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+.community-subheading h2 {
+  margin: 4px 0 0;
+  font-size: clamp(28px, 4vw, 42px);
+}
+.community-subheading p {
+  max-width: 440px;
+  margin: 0;
+  color: #777982;
+  font-size: 12px;
+  line-height: 1.6;
 }
 .listing-grid {
   display: grid;
@@ -5170,6 +5211,16 @@ video {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+.listing-promotion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #b43b0e;
+}
+.listing-promotion svg {
+  width: 12px;
+  height: 12px;
+}
 .listing-card h2 {
   margin: 10px 0 8px;
   font-size: 20px;
@@ -5208,6 +5259,10 @@ video {
 .listing-status-draft {
   color: #805500;
   background: #fff3c4;
+}
+.listing-status-pending_review {
+  color: #704300;
+  background: #ffe7ad;
 }
 .listing-status-published {
   color: #12602e;
@@ -5295,6 +5350,13 @@ video {
 .listing-copy .user-content {
   padding: 22px 0;
 }
+.listing-lead {
+  margin: 18px 0 0;
+  color: #55575f;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.65;
+}
 .listing-price {
   display: block;
   font-size: 22px;
@@ -5325,6 +5387,64 @@ video {
   margin: 5px 0 0;
   color: #777982;
   font-size: 11px;
+}
+.streak-card {
+  display: flex;
+  max-width: 720px;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 0 0 22px;
+  padding: 20px;
+  border: 1px solid #ffd8c7;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fffaf7, #fff);
+}
+.streak-card-compact {
+  max-width: none;
+  padding: 15px 18px;
+}
+.streak-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #ff1738, #ff8a22);
+}
+.streak-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.streak-copy {
+  width: min(100%, 520px);
+}
+.streak-copy p {
+  margin: 4px 0 10px;
+  color: #71717a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.streak-copy small {
+  display: block;
+  margin-top: 6px;
+  color: #85868d;
+  font-size: 10px;
+}
+.streak-progress {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1e6df;
+}
+.streak-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff1738, #ff8a22);
+  transition: width 240ms ease;
 }
 .admin-section {
   margin-top: 34px;
@@ -5431,7 +5551,8 @@ video {
   }
   .write-prompt,
   .owner-panel,
-  .admin-list article {
+  .admin-list article,
+  .community-subheading {
     align-items: stretch;
     flex-direction: column;
   }

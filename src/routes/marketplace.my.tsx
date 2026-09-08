@@ -11,6 +11,7 @@ import {
 import { LoginPrompt } from "@/features/forum/components";
 import { getMyListings } from "@/features/marketplace/api";
 import { ListingGrid, marketplaceKeys } from "@/features/marketplace/components";
+import { StreakCard } from "@/features/streak/components";
 
 export const Route = createFileRoute("/marketplace/my")({
   head: () => ({
@@ -53,6 +54,7 @@ function MyListingsPage() {
             </Link>
           }
         />
+        <StreakCard compact />
         {listings.isLoading ? (
           <LoadingPanel />
         ) : listings.error ? (

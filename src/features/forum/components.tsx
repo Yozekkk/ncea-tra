@@ -144,14 +144,14 @@ export function TopicComposer({
       </summary>
       <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <div className="form-field">
-          <Label>Категория</Label>
+          <Label htmlFor="topic-category">Категория</Label>
           <Select
             value={String(form.watch("categoryId") ?? "")}
             onValueChange={(value) =>
               form.setValue("categoryId", Number(value), { shouldValidate: true })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger id="topic-category" aria-label="Категория">
               <SelectValue placeholder="Выберите категорию" />
             </SelectTrigger>
             <SelectContent>
@@ -163,21 +163,33 @@ export function TopicComposer({
             </SelectContent>
           </Select>
           {form.formState.errors.categoryId ? (
-            <p className="field-error">{form.formState.errors.categoryId.message}</p>
+            <p className="field-error" role="alert">
+              {form.formState.errors.categoryId.message}
+            </p>
           ) : null}
         </div>
         <div className="form-field">
           <Label htmlFor="topic-title">Заголовок</Label>
-          <Input id="topic-title" maxLength={180} {...form.register("title")} />
+          <Input id="topic-title" autoComplete="off" maxLength={180} {...form.register("title")} />
           {form.formState.errors.title ? (
-            <p className="field-error">{form.formState.errors.title.message}</p>
+            <p className="field-error" role="alert">
+              {form.formState.errors.title.message}
+            </p>
           ) : null}
         </div>
         <div className="form-field">
           <Label htmlFor="topic-body">Первое сообщение</Label>
-          <Textarea id="topic-body" rows={7} maxLength={20000} {...form.register("body")} />
+          <Textarea
+            id="topic-body"
+            autoComplete="off"
+            rows={7}
+            maxLength={20000}
+            {...form.register("body")}
+          />
           {form.formState.errors.body ? (
-            <p className="field-error">{form.formState.errors.body.message}</p>
+            <p className="field-error" role="alert">
+              {form.formState.errors.body.message}
+            </p>
           ) : null}
         </div>
         {mutation.error ? (
@@ -203,7 +215,7 @@ export function ReplyComposer({ topic }: { topic: ForumTopic }) {
     mode: "onBlur",
   });
   const mutation = useMutation({
-    mutationFn: (values: PostValues) => createReply(topic.id, auth.user!.id, values.body),
+    mutationFn: (values: PostValues) => createReply(topic.id, values.body),
     onSuccess: async () => {
       form.reset();
       await queryClient.invalidateQueries({ queryKey: forumKeys.posts(topic.id) });
@@ -226,13 +238,16 @@ export function ReplyComposer({ topic }: { topic: ForumTopic }) {
       <Label htmlFor="reply-body">Ваш ответ</Label>
       <Textarea
         id="reply-body"
+        autoComplete="off"
         rows={6}
         maxLength={20000}
         placeholder="Напишите по существу…"
         {...form.register("body")}
       />
       {form.formState.errors.body ? (
-        <p className="field-error">{form.formState.errors.body.message}</p>
+        <p className="field-error" role="alert">
+          {form.formState.errors.body.message}
+        </p>
       ) : null}
       {mutation.error ? (
         <p className="form-error-summary" role="alert">
@@ -353,6 +368,8 @@ export function PostCard({
       {editing ? (
         <div className="post-editor">
           <Textarea
+            aria-label="Изменить сообщение"
+            autoComplete="off"
             value={body}
             onChange={(event) => setBody(event.target.value)}
             rows={7}

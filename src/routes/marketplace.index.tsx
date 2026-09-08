@@ -13,8 +13,11 @@ import {
   MarketplaceCreatePrompt,
   marketplaceKeys,
 } from "@/features/marketplace/components";
+import { StreakCard } from "@/features/streak/components";
 
 export const Route = createFileRoute("/marketplace/")({
+  validateSearch: (search: Record<string, unknown>): { category?: string } =>
+    typeof search.category === "string" ? { category: search.category } : {},
   head: () => ({
     meta: [
       { title: "Маркетплейс — NCEA" },
@@ -28,13 +31,15 @@ export const Route = createFileRoute("/marketplace/")({
 });
 
 function MarketplacePage() {
+  const { category: categorySlug } = Route.useSearch();
   const categories = useQuery({
     queryKey: marketplaceKeys.categories,
     queryFn: getMarketplaceCategories,
   });
+  const categoryId = categories.data?.find((item) => item.slug === categorySlug)?.id;
   const listings = useQuery({
-    queryKey: marketplaceKeys.published(),
-    queryFn: () => getPublishedListings(),
+    queryKey: marketplaceKeys.published(categoryId),
+    queryFn: () => getPublishedListings(categoryId),
   });
   return (
     <CommunityShell>
@@ -53,6 +58,7 @@ function MarketplacePage() {
             </div>
           }
         />
+        <StreakCard compact />
         {categories.isLoading ? (
           <LoadingPanel />
         ) : categories.error ? (
@@ -60,11 +66,32 @@ function MarketplacePage() {
         ) : (
           <div className="marketplace-filters">
             <span>Категории:</span>
+            <Link
+              to="/marketplace"
+              search={{ category: undefined }}
+              className={!categoryId ? "is-active" : ""}
+            >
+              Все
+            </Link>
             {categories.data?.map((category) => (
-              <span key={category.id}>{category.name}</span>
+              <Link
+                to="/marketplace"
+                search={{ category: category.slug }}
+                className={categoryId === category.id ? "is-active" : ""}
+                key={category.id}
+              >
+                {category.name}
+              </Link>
             ))}
           </div>
         )}
+        <div className="community-subheading">
+          <div>
+            <span>ВИТРИНА СООБЩЕСТВА</span>
+            <h2>От пользователей</h2>
+          </div>
+          <p>Активные авторы с серией от трёх дней поднимаются выше в динамической выдаче.</p>
+        </div>
         {listings.isLoading ? (
           <LoadingPanel />
         ) : listings.error ? (

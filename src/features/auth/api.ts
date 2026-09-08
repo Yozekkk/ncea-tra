@@ -35,6 +35,12 @@ export async function registerAccount(values: RegisterValues) {
     }
     if (code === "account_exists") throw new Error("Аккаунт с таким email уже существует");
     if (code === "invalid_password") throw new Error("Пароль не соответствует требованиям Auth");
+    if (code === "rate_limited")
+      throw new Error("Слишком много попыток регистрации. Попробуйте снова через час");
+    if (code === "compromised_password")
+      throw new Error("Этот пароль найден в известных утечках. Выберите другой пароль");
+    if (code === "password_check_unavailable")
+      throw new Error("Проверка безопасности пароля временно недоступна. Попробуйте позже");
     throw new Error("Не удалось создать аккаунт. Попробуйте ещё раз позже");
   }
   return login({ email: values.email, password: values.password });

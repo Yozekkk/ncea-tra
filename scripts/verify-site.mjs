@@ -48,9 +48,15 @@ const requiredFiles = [
   "supabase/migrations/20260907194500_ncea_community_platform.sql",
   "supabase/migrations/20260907201500_ncea_username_fallback_collision_fix.sql",
   "supabase/migrations/20260907213000_ncea_forum_topic_route_invariant.sql",
+  "supabase/migrations/20260908120000_ncea_marketplace_pending_review_status.sql",
+  "supabase/migrations/20260908121000_ncea_marketplace_streak_and_hardening.sql",
+  "supabase/migrations/20260908122000_ncea_marketplace_rpc_enum_cast.sql",
+  "supabase/migrations/20260908123000_ncea_storage_policy_upload_compatibility.sql",
+  "supabase/migrations/20260908124000_ncea_registration_rate_limit_saturation.sql",
   "supabase/functions/register-account/index.ts",
   "supabase/tests/ncea_api_verification.mjs",
   "supabase/tests/ncea_platform_rls.sql",
+  "supabase/tests/ncea_streak_marketplace_rls.sql",
   "tests/validation.test.ts",
   "docs/ncea-platform.md",
   ".env.example",
@@ -203,6 +209,23 @@ for (const table of foundationTables) {
     fail(`RLS не включён для ${table}`);
 }
 if (!process.exitCode) ok("Supabase foundation использует только publishable key и RLS");
+
+const communityHardening = read(
+  "supabase/migrations/20260908121000_ncea_marketplace_streak_and_hardening.sql",
+);
+for (const invariant of [
+  "create table public.user_activity_streaks",
+  "create or replace function public.record_daily_activity()",
+  "create or replace function public.create_marketplace_listing",
+  "create or replace view public.marketplace_feed",
+  "seller_id = (select auth.uid())",
+  "with (security_invoker = true)",
+]) {
+  if (!communityHardening.includes(invariant))
+    fail(`В community hardening migration отсутствует invariant: ${invariant}`);
+}
+if (!process.exitCode)
+  ok("Streak, Marketplace RPC и security-invoker feed зафиксированы миграцией");
 
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");

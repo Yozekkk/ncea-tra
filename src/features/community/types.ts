@@ -1,5 +1,12 @@
 export type AppRole = "user" | "moderator" | "admin";
-export type ListingStatus = "draft" | "published" | "archived";
+export type ListingStatus = "draft" | "pending_review" | "published" | "archived";
+
+export interface ActivityStreak {
+  current_streak: number;
+  last_active_date: string;
+  streak_started_on: string;
+  last_bumped_at: string;
+}
 
 export interface Profile {
   id: string;
@@ -64,12 +71,21 @@ export interface MarketplaceListing {
   seller_id: string;
   title: string;
   slug: string;
+  short_description: string;
   description: string;
   price_amount: number | null;
   currency_code: string;
+  minecraft_version: string | null;
+  platform: string | null;
   status: ListingStatus;
+  submitted_at: string | null;
+  published_at: string | null;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
+  effective_streak?: number;
+  promotion_eligible?: boolean;
+  last_bumped_at?: string | null;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
   marketplace_categories?: Pick<MarketplaceCategory, "name" | "slug"> | null;
   marketplace_listing_images?: ListingImage[];

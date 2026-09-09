@@ -98,17 +98,32 @@ export async function saveForumCategory(
 }
 
 export async function updateTopic(id: string, values: TablesUpdate<"forum_topics">): Promise<void> {
-  const { error } = await getSupabase().from("forum_topics").update(values).eq("id", id);
+  const { error } = await getSupabase()
+    .from("forum_topics")
+    .update(values)
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail("Could not update topic", error);
 }
 
 export async function deleteTopic(id: string): Promise<void> {
-  const { error } = await getSupabase().from("forum_topics").delete().eq("id", id);
+  const { error } = await getSupabase()
+    .from("forum_topics")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail("Could not delete topic", error);
 }
 
 export async function deletePost(id: string): Promise<void> {
-  const { error } = await getSupabase().from("forum_posts").delete().eq("id", id);
+  const { error } = await getSupabase()
+    .from("forum_posts")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail("Could not moderate post", error);
 }
 
@@ -151,8 +166,42 @@ export async function setListingStatus(id: string, status: ListingStatus): Promi
   const { error } = await getSupabase()
     .from("marketplace_listings")
     .update({ status })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail("Could not update listing status", error);
+}
+
+export async function saveAgencyListing(
+  id: string | null,
+  values: Pick<
+    TablesInsert<"marketplace_listings">,
+    | "category_id"
+    | "title"
+    | "slug"
+    | "short_description"
+    | "description"
+    | "price_amount"
+    | "currency_code"
+    | "minecraft_version"
+    | "platform"
+    | "sort_order"
+  >,
+): Promise<void> {
+  const payload = { ...values, listing_source: "agency" as const };
+  const { data: authData, error: authError } = await getSupabase().auth.getUser();
+  if (authError || !authData.user) fail("Could not identify the official listing owner", authError);
+  const query = id
+    ? getSupabase()
+        .from("marketplace_listings")
+        .update(payload)
+        .eq("id", id)
+        .eq("listing_source", "agency")
+    : getSupabase()
+        .from("marketplace_listings")
+        .insert({ ...payload, seller_id: authData.user.id, status: "draft" });
+  const { error } = await query.select("id").single();
+  if (error) fail("Could not save official listing", error);
 }
 
 export async function deleteListing(id: string): Promise<void> {
@@ -171,7 +220,12 @@ export async function deleteListing(id: string): Promise<void> {
     if (storageError) fail("Could not delete listing images", storageError);
   }
 
-  const { error } = await supabase.from("marketplace_listings").delete().eq("id", id);
+  const { error } = await supabase
+    .from("marketplace_listings")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail("Could not delete listing", error);
 }
 

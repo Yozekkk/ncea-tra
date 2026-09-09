@@ -174,6 +174,25 @@ function HomePage() {
               </b>
             </a>
           </motion.div>
+          <motion.div className="ref-promo-motion ref-partner-motion" variants={workersItemReveal}>
+            <a
+              className="ref-partner"
+              href="https://my.awas.ovh/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="ref-partner-mark" aria-hidden="true">
+                <ServerCog />
+              </span>
+              <span className="ref-partner-copy">
+                <small>ОФИЦИАЛЬНЫЙ ПАРТНЁР NCEA</small>
+                <strong>Надёжный хостинг для ваших игровых проектов</strong>
+              </span>
+              <span className="ref-partner-action">
+                Перейти на хостинг <ArrowUpRight aria-hidden="true" />
+              </span>
+            </a>
+          </motion.div>
         </motion.section>
 
         <motion.section

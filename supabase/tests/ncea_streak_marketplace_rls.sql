@@ -231,6 +231,7 @@ declare
 begin
   select id into first_listing
   from public.marketplace_feed
+  where category_id = 900002
   order by
     promotion_eligible desc,
     effective_streak desc,
@@ -242,7 +243,7 @@ begin
   if first_listing <> current_setting('ncea.test_listing_a')::uuid then
     raise exception 'Higher live streak did not rank first';
   end if;
-  if (select count(*) from public.marketplace_feed) <> 2 then
+  if (select count(*) from public.marketplace_feed where category_id = 900002) <> 2 then
     raise exception 'Draft or review listing leaked into the public feed';
   end if;
 end;

@@ -4,9 +4,12 @@ import { LockKeyhole, LogIn, ShieldX } from "lucide-react";
 import { getCurrentRole } from "../lib/data";
 import { getSupabase, supabaseConfig } from "../lib/supabase";
 import { Button, ErrorState, LoadingState } from "./ui";
+import type { AppRole } from "../lib/types";
+import { AdminAccessContext, type StaffRole } from "./AdminAccess";
 
 export function AuthGate({ children }: PropsWithChildren) {
-  const [status, setStatus] = useState<"loading" | "login" | "denied" | "admin">("loading");
+  const [status, setStatus] = useState<"loading" | "login" | "denied" | "staff">("loading");
+  const [role, setRole] = useState<AppRole | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -26,7 +29,8 @@ export function AuthGate({ children }: PropsWithChildren) {
       }
       try {
         const role = await getCurrentRole(nextUser.id);
-        if (role === "admin") setStatus("admin");
+        setRole(role);
+        if (role === "admin" || role === "moderator") setStatus("staff");
         else setStatus("denied");
       } catch (reason) {
         setError(reason instanceof Error ? reason.message : "Authorization failed.");
@@ -75,7 +79,7 @@ export function AuthGate({ children }: PropsWithChildren) {
           </div>
           <p className="eyebrow">PRIVATE SYSTEM</p>
           <h1>NCEA Admin</h1>
-          <p>Sign in with an account assigned the protected admin role.</p>
+          <p>Sign in with an account assigned the admin or moderator role.</p>
           {error && <ErrorState message={error} />}
           <form onSubmit={login}>
             <label>
@@ -103,7 +107,7 @@ export function AuthGate({ children }: PropsWithChildren) {
             <ShieldX size={20} />
           </div>
           <p className="eyebrow">ACCESS DENIED</p>
-          <h1>Administrator role required</h1>
+          <h1>Staff role required</h1>
           <p>{error || `${user?.email ?? "This account"} does not have access to NCEA Admin.`}</p>
           <Button onClick={logout}>End session</Button>
         </section>
@@ -111,5 +115,9 @@ export function AuthGate({ children }: PropsWithChildren) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <AdminAccessContext.Provider value={{ role: role as StaffRole }}>
+      {children}
+    </AdminAccessContext.Provider>
+  );
 }

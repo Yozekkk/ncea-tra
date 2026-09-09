@@ -23,11 +23,14 @@ import {
   Modal,
   PageHeader,
 } from "../components/ui";
+import { useAdminAccess } from "../components/AdminAccess";
 
 type Tab = "categories" | "topics" | "posts";
 
 export function ForumPage() {
-  const [tab, setTab] = useState<Tab>("categories");
+  const { role } = useAdminAccess();
+  const isAdmin = role === "admin";
+  const [tab, setTab] = useState<Tab>(isAdmin ? "categories" : "topics");
   const categories = useAsync(getForumCategories);
   const topics = useAsync(getTopics);
   const posts = useAsync(getPosts);
@@ -69,7 +72,7 @@ export function ForumPage() {
         title="Forum"
         description="Categories, topics and post moderation."
         action={
-          tab === "categories" ? (
+          tab === "categories" && isAdmin ? (
             <Button onClick={() => setEditing("new")}>
               <Plus size={17} /> New category
             </Button>
@@ -77,7 +80,10 @@ export function ForumPage() {
         }
       />
       <div className="tabs" role="tablist">
-        {(["categories", "topics", "posts"] as Tab[]).map((item) => (
+        {(isAdmin
+          ? (["categories", "topics", "posts"] as Tab[])
+          : (["topics", "posts"] as Tab[])
+        ).map((item) => (
           <button
             role="tab"
             aria-selected={tab === item}
@@ -163,40 +169,47 @@ export function ForumPage() {
                       <div className="badge-row">
                         {item.is_pinned && <Badge tone="live">pinned</Badge>}
                         {item.is_locked && <Badge tone="warning">locked</Badge>}
-                        {!item.is_pinned && !item.is_locked && <Badge>open</Badge>}
+                        {item.is_protected && <Badge tone="muted">protected</Badge>}
+                        {!item.is_pinned && !item.is_locked && !item.is_protected && (
+                          <Badge>open</Badge>
+                        )}
                       </div>
                     </td>
                     <td>
-                      <div className="action-row">
-                        <IconButton
-                          aria-label={item.is_pinned ? "Unpin topic" : "Pin topic"}
-                          onClick={() =>
-                            void perform(
-                              () => updateTopic(item.id, { is_pinned: !item.is_pinned }),
-                              topics.reload,
-                            )
-                          }
-                        >
-                          {item.is_pinned ? <PinOff size={17} /> : <Pin size={17} />}
-                        </IconButton>
-                        <IconButton
-                          aria-label={item.is_locked ? "Unlock topic" : "Lock topic"}
-                          onClick={() =>
-                            void perform(
-                              () => updateTopic(item.id, { is_locked: !item.is_locked }),
-                              topics.reload,
-                            )
-                          }
-                        >
-                          {item.is_locked ? <Unlock size={17} /> : <Lock size={17} />}
-                        </IconButton>
-                        <ConfirmButton
-                          confirmLabel={`Delete topic “${item.title}” and all of its posts?`}
-                          onConfirm={() => perform(() => deleteTopic(item.id), topics.reload)}
-                        >
-                          Delete
-                        </ConfirmButton>
-                      </div>
+                      {item.is_protected && !isAdmin ? (
+                        <Badge tone="muted">protected</Badge>
+                      ) : (
+                        <div className="action-row">
+                          <IconButton
+                            aria-label={item.is_pinned ? "Unpin topic" : "Pin topic"}
+                            onClick={() =>
+                              void perform(
+                                () => updateTopic(item.id, { is_pinned: !item.is_pinned }),
+                                topics.reload,
+                              )
+                            }
+                          >
+                            {item.is_pinned ? <PinOff size={17} /> : <Pin size={17} />}
+                          </IconButton>
+                          <IconButton
+                            aria-label={item.is_locked ? "Unlock topic" : "Lock topic"}
+                            onClick={() =>
+                              void perform(
+                                () => updateTopic(item.id, { is_locked: !item.is_locked }),
+                                topics.reload,
+                              )
+                            }
+                          >
+                            {item.is_locked ? <Unlock size={17} /> : <Lock size={17} />}
+                          </IconButton>
+                          <ConfirmButton
+                            confirmLabel={`Delete topic “${item.title}” and all of its posts?`}
+                            onConfirm={() => perform(() => deleteTopic(item.id), topics.reload)}
+                          >
+                            Delete
+                          </ConfirmButton>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -231,12 +244,16 @@ export function ForumPage() {
                     <td>{item.topic}</td>
                     <td>{formatDate(item.created_at)}</td>
                     <td>
-                      <ConfirmButton
-                        confirmLabel="Remove this post?"
-                        onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
-                      >
-                        Moderate
-                      </ConfirmButton>
+                      {item.is_protected && !isAdmin ? (
+                        <Badge tone="muted">protected</Badge>
+                      ) : (
+                        <ConfirmButton
+                          confirmLabel="Remove this post?"
+                          onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
+                        >
+                          Moderate
+                        </ConfirmButton>
+                      )}
                     </td>
                   </tr>
                 ))}

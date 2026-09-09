@@ -125,4 +125,80 @@ describe("activity streak presentation and promotion order", () => {
       ["a", "d", "b", "c"],
     );
   });
+
+  it("always ranks agency listings before promoted and regular user listings", () => {
+    const ranked = rankMarketplaceListings([
+      {
+        id: "user-promoted",
+        listing_source: "user" as const,
+        sort_order: null,
+        effective_streak: 30,
+        last_bumped_at: "2026-09-09T10:00:00Z",
+        created_at: "2026-09-09T10:00:00Z",
+      },
+      {
+        id: "agency-second",
+        listing_source: "agency" as const,
+        sort_order: 20,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-08-01T10:00:00Z",
+      },
+      {
+        id: "user-regular",
+        listing_source: "user" as const,
+        sort_order: null,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-09-09T12:00:00Z",
+      },
+      {
+        id: "agency-first",
+        listing_source: "agency" as const,
+        sort_order: 10,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-09-01T10:00:00Z",
+      },
+    ]);
+
+    assert.deepEqual(
+      ranked.map((item) => item.id),
+      ["agency-first", "agency-second", "user-promoted", "user-regular"],
+    );
+  });
+
+  it("uses agency creation time and id as deterministic tie-breakers", () => {
+    const ranked = rankMarketplaceListings([
+      {
+        id: "agency-c",
+        listing_source: "agency" as const,
+        sort_order: 10,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-09-02T10:00:00Z",
+      },
+      {
+        id: "agency-b",
+        listing_source: "agency" as const,
+        sort_order: 10,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-09-01T10:00:00Z",
+      },
+      {
+        id: "agency-a",
+        listing_source: "agency" as const,
+        sort_order: 10,
+        effective_streak: 0,
+        last_bumped_at: null,
+        created_at: "2026-09-01T10:00:00Z",
+      },
+    ]);
+
+    assert.deepEqual(
+      ranked.map((item) => item.id),
+      ["agency-a", "agency-b", "agency-c"],
+    );
+  });
 });

@@ -27,7 +27,13 @@ type FeedRow = Omit<
   effective_streak: number;
   promotion_eligible: boolean;
   last_bumped_at: string | null;
+  feed_group: number;
+  agency_sort_order: number | null;
+  agency_created_at: string | null;
+  user_created_at: string | null;
 };
+
+export type MarketplaceSourceFilter = "all" | "agency" | "user";
 
 function fail(error: { message: string } | null, fallback: string): never {
   throw new Error(error?.message ?? fallback);
@@ -103,22 +109,38 @@ export async function getMarketplaceCategories() {
   return data as MarketplaceCategory[];
 }
 
-export async function getPublishedListings(categoryId?: number) {
+export async function getPublishedListings(
+  categoryId?: number,
+  source: MarketplaceSourceFilter = "all",
+) {
   let query = getSupabaseClient()
     .from("marketplace_feed")
     .select("*")
-    .order("promotion_eligible", { ascending: false })
+    .order("feed_group", { ascending: true })
+    .order("agency_sort_order", { ascending: true, nullsFirst: false })
+    .order("agency_created_at", { ascending: true, nullsFirst: false })
     .order("effective_streak", { ascending: false })
     .order("last_bumped_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false })
+    .order("user_created_at", { ascending: false, nullsFirst: false })
     .order("id", { ascending: true })
     .limit(60);
   if (categoryId) query = query.eq("category_id", categoryId);
+  if (source !== "all") query = query.eq("listing_source", source);
   const { data, error } = await query;
   if (error) fail(error, "Не удалось загрузить объявления");
 
   const listings = ((data ?? []) as FeedRow[]).map(
-    ({ seller_username, seller_avatar_url, category_name, category_slug, ...listing }) => ({
+    ({
+      seller_username,
+      seller_avatar_url,
+      category_name,
+      category_slug,
+      feed_group: _feedGroup,
+      agency_sort_order: _agencySortOrder,
+      agency_created_at: _agencyCreatedAt,
+      user_created_at: _userCreatedAt,
+      ...listing
+    }) => ({
       ...listing,
       profiles: { username: seller_username, avatar_url: seller_avatar_url },
       marketplace_categories: { name: category_name, slug: category_slug },

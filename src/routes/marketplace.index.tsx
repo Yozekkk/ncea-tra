@@ -7,7 +7,11 @@ import {
   ErrorPanel,
   LoadingPanel,
 } from "@/features/community/CommunityShell";
-import { getMarketplaceCategories, getPublishedListings } from "@/features/marketplace/api";
+import {
+  getMarketplaceCategories,
+  getPublishedListings,
+  type MarketplaceSourceFilter,
+} from "@/features/marketplace/api";
 import {
   ListingGrid,
   MarketplaceCreatePrompt,
@@ -16,8 +20,12 @@ import {
 import { StreakCard } from "@/features/streak/components";
 
 export const Route = createFileRoute("/marketplace/")({
-  validateSearch: (search: Record<string, unknown>): { category?: string } =>
-    typeof search.category === "string" ? { category: search.category } : {},
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { category?: string; source?: Exclude<MarketplaceSourceFilter, "all"> } => ({
+    ...(typeof search.category === "string" ? { category: search.category } : {}),
+    ...(search.source === "agency" || search.source === "user" ? { source: search.source } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Маркетплейс — NCEA" },
@@ -31,15 +39,16 @@ export const Route = createFileRoute("/marketplace/")({
 });
 
 function MarketplacePage() {
-  const { category: categorySlug } = Route.useSearch();
+  const { category: categorySlug, source: sourceParam } = Route.useSearch();
+  const source: MarketplaceSourceFilter = sourceParam ?? "all";
   const categories = useQuery({
     queryKey: marketplaceKeys.categories,
     queryFn: getMarketplaceCategories,
   });
   const categoryId = categories.data?.find((item) => item.slug === categorySlug)?.id;
   const listings = useQuery({
-    queryKey: marketplaceKeys.published(categoryId),
-    queryFn: () => getPublishedListings(categoryId),
+    queryKey: marketplaceKeys.published(categoryId, source),
+    queryFn: () => getPublishedListings(categoryId, source),
   });
   return (
     <CommunityShell>
@@ -59,6 +68,28 @@ function MarketplacePage() {
           }
         />
         <StreakCard compact />
+        <nav className="marketplace-source-filters" aria-label="Источник предложений">
+          {(
+            [
+              ["all", "Все"],
+              ["agency", "От агентства"],
+              ["user", "От пользователей"],
+            ] as const
+          ).map(([value, label]) => (
+            <Link
+              key={value}
+              to="/marketplace"
+              search={{
+                category: categorySlug,
+                source: value === "all" ? undefined : value,
+              }}
+              className={source === value ? "is-active" : ""}
+              aria-current={source === value ? "page" : undefined}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
         {categories.isLoading ? (
           <LoadingPanel />
         ) : categories.error ? (
@@ -68,7 +99,7 @@ function MarketplacePage() {
             <span>Категории:</span>
             <Link
               to="/marketplace"
-              search={{ category: undefined }}
+              search={{ category: undefined, source: sourceParam }}
               className={!categoryId ? "is-active" : ""}
             >
               Все
@@ -76,7 +107,7 @@ function MarketplacePage() {
             {categories.data?.map((category) => (
               <Link
                 to="/marketplace"
-                search={{ category: category.slug }}
+                search={{ category: category.slug, source: sourceParam }}
                 className={categoryId === category.id ? "is-active" : ""}
                 key={category.id}
               >
@@ -88,9 +119,18 @@ function MarketplacePage() {
         <div className="community-subheading">
           <div>
             <span>ВИТРИНА СООБЩЕСТВА</span>
-            <h2>От пользователей</h2>
+            <h2>
+              {source === "agency"
+                ? "Официальные предложения"
+                : source === "user"
+                  ? "От пользователей"
+                  : "Все предложения"}
+            </h2>
           </div>
-          <p>Активные авторы с серией от трёх дней поднимаются выше в динамической выдаче.</p>
+          <p>
+            Сначала решения NCEA, затем товары активных авторов с серией от 3 дней и остальные
+            предложения сообщества.
+          </p>
         </div>
         {listings.isLoading ? (
           <LoadingPanel />

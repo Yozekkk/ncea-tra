@@ -1,5 +1,6 @@
 export type AppRole = "user" | "moderator" | "admin";
 export type ListingStatus = "draft" | "pending_review" | "published" | "archived";
+export type ListingSource = "agency" | "user";
 
 export interface ActivityStreak {
   current_streak: number;
@@ -36,6 +37,7 @@ export interface ForumTopic {
   slug: string;
   is_pinned: boolean;
   is_locked: boolean;
+  is_protected: boolean;
   created_at: string;
   updated_at: string;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
@@ -48,6 +50,7 @@ export interface ForumPost {
   topic_id: string;
   author_id: string;
   body: string;
+  is_protected: boolean;
   created_at: string;
   updated_at: string;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
@@ -78,6 +81,8 @@ export interface MarketplaceListing {
   minecraft_version: string | null;
   platform: string | null;
   status: ListingStatus;
+  listing_source: ListingSource;
+  sort_order: number | null;
   submitted_at: string | null;
   published_at: string | null;
   archived_at: string | null;

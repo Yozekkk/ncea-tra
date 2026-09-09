@@ -36,13 +36,14 @@ import {
 export const marketplaceKeys = {
   all: ["marketplace"] as const,
   categories: ["marketplace", "categories"] as const,
-  published: (category?: number) => ["marketplace", "published", category ?? "all"] as const,
+  published: (category?: number, source: "all" | "agency" | "user" = "all") =>
+    ["marketplace", "published", category ?? "all", source] as const,
   mine: (userId: string) => ["marketplace", "mine", userId] as const,
   listing: (slug: string) => ["marketplace", "listing", slug] as const,
 };
 
 export function formatListingPrice(amount: number | null, currency: string) {
-  if (amount === null) return "Цена по запросу";
+  if (amount === null) return "Цена скоро будет добавлена";
   return new Intl.NumberFormat("ru-RU", {
     style: "currency",
     currency,
@@ -68,41 +69,89 @@ export function ListingCard({
   ownerView?: boolean;
 }) {
   const cover = listing.marketplace_listing_images?.[0];
+  const isAgency = listing.listing_source === "agency";
   return (
-    <Link to="/marketplace/$slug" params={{ slug: listing.slug }} className="listing-card">
-      {cover?.signed_url ? (
-        <img
-          src={cover.signed_url}
-          alt={cover.alt_text ?? ""}
-          width={640}
-          height={360}
-          loading="lazy"
-        />
+    <Link
+      to="/marketplace/$slug"
+      params={{ slug: listing.slug }}
+      className={`listing-card ${isAgency ? "listing-card-agency" : "listing-card-user"}`}
+    >
+      {isAgency ? (
+        <>
+          <span className="listing-agency-geometry" aria-hidden="true" />
+          <div className="listing-card-body">
+            <div className="listing-card-kicker">
+              <span className="listing-agency-badge">От агентства</span>
+              <span>{listing.marketplace_categories?.name}</span>
+              {ownerView ? <StatusBadge status={listing.status} /> : null}
+            </div>
+            <h2>{listing.title}</h2>
+            <p>{listing.short_description}</p>
+            <div className="listing-agency-media">
+              {cover?.signed_url ? (
+                <img
+                  src={cover.signed_url}
+                  alt={cover.alt_text ?? listing.title}
+                  width={640}
+                  height={480}
+                  loading="lazy"
+                />
+              ) : (
+                <span className="listing-placeholder-copy">
+                  <ImagePlus aria-hidden="true" />
+                  Скоро будет добавлена картинка
+                </span>
+              )}
+            </div>
+            <div className="listing-card-footer">
+              <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
+              <span className="listing-card-action">Подробнее →</span>
+            </div>
+          </div>
+        </>
       ) : (
-        <div className="listing-placeholder">
-          <ImagePlus aria-hidden="true" />
-        </div>
+        <>
+          <div className="listing-user-preview">
+            <span className="listing-category-pill">{listing.marketplace_categories?.name}</span>
+            {cover?.signed_url ? (
+              <img
+                src={cover.signed_url}
+                alt={cover.alt_text ?? listing.title}
+                width={640}
+                height={480}
+                loading="lazy"
+              />
+            ) : (
+              <span className="listing-placeholder-copy">
+                <ImagePlus aria-hidden="true" />
+                Скоро будет добавлена картинка
+              </span>
+            )}
+          </div>
+          <div className="listing-card-body">
+            <div className="listing-card-kicker">
+              {listing.promotion_eligible ? (
+                <span className="listing-promotion">
+                  <Flame aria-hidden="true" /> Серия {listing.effective_streak}
+                </span>
+              ) : (
+                <span>От пользователя</span>
+              )}
+              {ownerView ? <StatusBadge status={listing.status} /> : null}
+            </div>
+            <h2>{listing.title}</h2>
+            <p>{listing.short_description}</p>
+            <div className="listing-card-footer">
+              <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
+              <span>
+                {listing.profiles?.username ?? "Участник NCEA"} ·{" "}
+                {formatCommunityDate(listing.created_at)}
+              </span>
+              <span className="listing-card-action">Подробнее →</span>
+            </div>
+          </div>
+        </>
       )}
-      <div className="listing-card-body">
-        <div className="listing-card-kicker">
-          <span>{listing.marketplace_categories?.name}</span>
-          {listing.promotion_eligible ? (
-            <span className="listing-promotion">
-              <Flame aria-hidden="true" /> Серия {listing.effective_streak}
-            </span>
-          ) : null}
-          {ownerView ? <StatusBadge status={listing.status} /> : null}
-        </div>
-        <h2>{listing.title}</h2>
-        <p>{listing.short_description}</p>
-        <div className="listing-card-footer">
-          <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
-          <span>
-            {listing.profiles?.username ?? "Продавец NCEA"} ·{" "}
-            {formatCommunityDate(listing.created_at)}
-          </span>
-        </div>
-      </div>
     </Link>
   );
 }

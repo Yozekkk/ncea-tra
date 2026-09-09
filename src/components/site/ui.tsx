@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 export const LOGO_MARK = "/images/brand/ncea-logo-mark.webp";
 export const LOGO_ROUND = "/images/brand/ncea-logo-mark.webp";
 export const LOGO_FULL = "/images/brand/ncea-logo-full.webp";
@@ -372,13 +370,6 @@ export const I = {
     </svg>
   ),
 };
-
-export function copyWithToast(text: string, label: string) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => toast.success(`${label} скопировано`))
-    .catch(() => toast.error("Не удалось скопировать"));
-}
 
 export function Blob({ className = "" }: { className?: string }) {
   return <div className={`absolute rounded-full blur-3xl pointer-events-none ${className}`} />;

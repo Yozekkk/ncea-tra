@@ -227,6 +227,40 @@ for (const invariant of [
 if (!process.exitCode)
   ok("Streak, Marketplace RPC и security-invoker feed зафиксированы миграцией");
 
+const agencyMigration = read(
+  "supabase/migrations/20260909172147_ncea_agency_marketplace_and_role_boundaries.sql",
+);
+const marketplaceRoute = read("src/routes/marketplace.index.tsx");
+const marketplaceCards = read("src/features/marketplace/components.tsx");
+for (const invariant of [
+  "marketplace_listing_source",
+  "protect_marketplace_listing_fields",
+  "listing_source = 'agency'",
+  "user_is_admin",
+  "is_protected",
+  "with (security_invoker = true)",
+]) {
+  if (!agencyMigration.includes(invariant))
+    fail(`В agency migration отсутствует invariant: ${invariant}`);
+}
+for (const label of ["Все", "От агентства", "От пользователей"]) {
+  if (!marketplaceRoute.includes(label)) fail(`Marketplace не содержит фильтр: ${label}`);
+}
+for (const copy of ["Цена скоро будет добавлена", "Скоро будет добавлена картинка"]) {
+  if (!marketplaceCards.includes(copy)) fail(`Marketplace не содержит текст: ${copy}`);
+}
+if (!homeSource.includes("https://my.awas.ovh/")) fail("Ссылка официального партнёра отсутствует");
+if (!homeSource.includes("Надёжный хостинг для ваших игровых проектов"))
+  fail("Текст официального партнёра отсутствует");
+if (
+  !/href="https:\/\/my\.awas\.ovh\/"[\s\S]*?target="_blank"[\s\S]*?rel="noopener noreferrer"/.test(
+    homeSource,
+  )
+)
+  fail("Ссылка официального партнёра открывается небезопасно");
+if (!process.exitCode)
+  ok("Официальный партнёр и защищённый agency Marketplace зафиксированы в UI и миграции");
+
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");
 } else {

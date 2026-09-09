@@ -57,12 +57,15 @@ function ListingPage() {
                 ) : null,
               )
             ) : (
-              <div className="listing-placeholder">Изображений пока нет</div>
+              <div className="listing-placeholder">Скоро будет добавлена картинка</div>
             )}
           </div>
           <div className="listing-copy">
             <div className="listing-card-kicker">
               <span>{item.marketplace_categories?.name}</span>
+              {item.listing_source === "agency" ? (
+                <span className="listing-agency-badge">От агентства</span>
+              ) : null}
               <StatusBadge status={item.status} />
             </div>
             <h1>{item.title}</h1>

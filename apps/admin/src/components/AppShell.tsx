@@ -25,8 +25,13 @@ const navigation = [
 export function AppShell({
   path,
   navigate,
+  role,
   children,
-}: PropsWithChildren<{ path: string; navigate: (path: string) => void }>) {
+}: PropsWithChildren<{
+  path: string;
+  navigate: (path: string) => void;
+  role: "moderator" | "admin";
+}>) {
   const [menuOpen, setMenuOpen] = useState(false);
   const move = (next: string) => {
     navigate(next);
@@ -57,16 +62,21 @@ export function AppShell({
           </IconButton>
         </div>
         <nav aria-label="Admin navigation">
-          {navigation.map(({ path: itemPath, label, icon: Icon }) => (
-            <button
-              key={itemPath}
-              className={path === itemPath ? "nav-item active" : "nav-item"}
-              onClick={() => move(itemPath)}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </button>
-          ))}
+          {navigation
+            .filter(
+              ({ path: itemPath }) =>
+                role === "admin" || !["/users", "/settings"].includes(itemPath),
+            )
+            .map(({ path: itemPath, label, icon: Icon }) => (
+              <button
+                key={itemPath}
+                className={path === itemPath ? "nav-item active" : "nav-item"}
+                onClick={() => move(itemPath)}
+              >
+                <Icon size={18} />
+                <span>{label}</span>
+              </button>
+            ))}
         </nav>
         <button className="nav-item sign-out" onClick={() => void getSupabase().auth.signOut()}>
           <LogOut size={18} />

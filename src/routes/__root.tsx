@@ -8,9 +8,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { MotionConfig } from "motion/react";
-import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { InteractiveGridBackground } from "@/components/site/InteractiveGridBackground";
@@ -22,6 +21,24 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE } from "../lib/motion";
 
 const SITE_URL = "https://www.ncea-studio.com";
+const Toaster = lazy(() =>
+  import("@/components/ui/sonner").then((module) => ({ default: module.Toaster })),
+);
+
+function DeferredToaster() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const schedule = window.requestIdleCallback ?? ((callback) => window.setTimeout(callback, 600));
+    const cancel = window.cancelIdleCallback ?? window.clearTimeout;
+    const handle = schedule(() => setReady(true));
+    return () => cancel(handle);
+  }, []);
+  return ready ? (
+    <Suspense fallback={null}>
+      <Toaster position="bottom-right" theme="light" />
+    </Suspense>
+  ) : null;
+}
 
 function RouteEffects() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -192,7 +209,7 @@ function RootComponent() {
             <InteractiveGridBackground />
             <RouteEffects />
             <Outlet />
-            <Toaster position="bottom-right" theme="light" />
+            <DeferredToaster />
           </MotionConfig>
         </CurrencyProvider>
       </AuthProvider>

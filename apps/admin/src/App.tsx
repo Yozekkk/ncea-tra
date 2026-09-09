@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { AuthGate } from "./components/AuthGate";
+import { useAdminAccess } from "./components/AdminAccess";
 import { Dashboard } from "./pages/Dashboard";
 import { ForumPage } from "./pages/ForumPage";
 import { MarketplacePage } from "./pages/MarketplacePage";
@@ -18,6 +19,15 @@ const routes: Record<string, React.ComponentType> = {
 };
 
 export function App() {
+  return (
+    <AuthGate>
+      <AuthorizedApp />
+    </AuthGate>
+  );
+}
+
+function AuthorizedApp() {
+  const { role } = useAdminAccess();
   const [path, setPath] = useState(normalizePath(window.location.pathname));
   useEffect(() => {
     const onPopState = () => setPath(normalizePath(window.location.pathname));
@@ -30,13 +40,13 @@ export function App() {
     setPath(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const Page = routes[path] ?? Dashboard;
+  const allowedPath =
+    role === "admin" || !["/users", "/settings"].includes(path) ? path : "/moderation";
+  const Page = routes[allowedPath] ?? (role === "admin" ? Dashboard : ModerationPage);
   return (
-    <AuthGate>
-      <AppShell path={routes[path] ? path : "/"} navigate={navigate}>
-        <Page />
-      </AppShell>
-    </AuthGate>
+    <AppShell path={allowedPath} navigate={navigate} role={role}>
+      <Page />
+    </AppShell>
   );
 }
 

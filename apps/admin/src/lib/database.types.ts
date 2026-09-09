@@ -44,6 +44,7 @@ export type Database = {
           body: string;
           created_at: string;
           id: string;
+          is_protected: boolean;
           topic_id: string;
           updated_at: string;
         };
@@ -52,6 +53,7 @@ export type Database = {
           body: string;
           created_at?: string;
           id?: string;
+          is_protected?: boolean;
           topic_id: string;
           updated_at?: string;
         };
@@ -60,6 +62,7 @@ export type Database = {
           body?: string;
           created_at?: string;
           id?: string;
+          is_protected?: boolean;
           topic_id?: string;
           updated_at?: string;
         };
@@ -88,6 +91,7 @@ export type Database = {
           id: string;
           is_locked: boolean;
           is_pinned: boolean;
+          is_protected: boolean;
           slug: string;
           title: string;
           updated_at: string;
@@ -99,6 +103,7 @@ export type Database = {
           id?: string;
           is_locked?: boolean;
           is_pinned?: boolean;
+          is_protected?: boolean;
           slug: string;
           title: string;
           updated_at?: string;
@@ -110,6 +115,7 @@ export type Database = {
           id?: string;
           is_locked?: boolean;
           is_pinned?: boolean;
+          is_protected?: boolean;
           slug?: string;
           title?: string;
           updated_at?: string;
@@ -191,6 +197,13 @@ export type Database = {
             foreignKeyName: "marketplace_listing_images_listing_id_fkey";
             columns: ["listing_id"];
             isOneToOne: false;
+            referencedRelation: "marketplace_feed";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "marketplace_listing_images_listing_id_fkey";
+            columns: ["listing_id"];
+            isOneToOne: false;
             referencedRelation: "marketplace_listings";
             referencedColumns: ["id"];
           },
@@ -204,6 +217,7 @@ export type Database = {
           currency_code: string;
           description: string;
           id: string;
+          listing_source: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version: string | null;
           platform: string | null;
           price_amount: number | null;
@@ -211,6 +225,7 @@ export type Database = {
           seller_id: string;
           short_description: string;
           slug: string;
+          sort_order: number | null;
           status: Database["public"]["Enums"]["marketplace_listing_status"];
           submitted_at: string | null;
           title: string;
@@ -223,6 +238,7 @@ export type Database = {
           currency_code?: string;
           description: string;
           id?: string;
+          listing_source?: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version?: string | null;
           platform?: string | null;
           price_amount?: number | null;
@@ -230,6 +246,7 @@ export type Database = {
           seller_id: string;
           short_description: string;
           slug: string;
+          sort_order?: number | null;
           status?: Database["public"]["Enums"]["marketplace_listing_status"];
           submitted_at?: string | null;
           title: string;
@@ -242,6 +259,7 @@ export type Database = {
           currency_code?: string;
           description?: string;
           id?: string;
+          listing_source?: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version?: string | null;
           platform?: string | null;
           price_amount?: number | null;
@@ -249,6 +267,7 @@ export type Database = {
           seller_id?: string;
           short_description?: string;
           slug?: string;
+          sort_order?: number | null;
           status?: Database["public"]["Enums"]["marketplace_listing_status"];
           submitted_at?: string | null;
           title?: string;
@@ -301,6 +320,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_activity_streaks: {
+        Row: {
+          current_streak: number;
+          last_active_date: string;
+          last_bumped_at: string;
+          streak_started_on: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          current_streak: number;
+          last_active_date: string;
+          last_bumped_at: string;
+          streak_started_on: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          current_streak?: number;
+          last_active_date?: string;
+          last_bumped_at?: string;
+          streak_started_on?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_streaks_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_roles: {
         Row: {
           created_at: string;
@@ -321,13 +375,115 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      marketplace_feed: {
+        Row: {
+          agency_created_at: string | null;
+          agency_sort_order: number | null;
+          category_id: number | null;
+          category_name: string | null;
+          category_slug: string | null;
+          created_at: string | null;
+          currency_code: string | null;
+          description: string | null;
+          effective_streak: number | null;
+          feed_group: number | null;
+          id: string | null;
+          last_bumped_at: string | null;
+          listing_source: Database["public"]["Enums"]["marketplace_listing_source"] | null;
+          minecraft_version: string | null;
+          platform: string | null;
+          price_amount: number | null;
+          promotion_eligible: boolean | null;
+          seller_avatar_url: string | null;
+          seller_id: string | null;
+          seller_username: string | null;
+          short_description: string | null;
+          slug: string | null;
+          sort_order: number | null;
+          status: Database["public"]["Enums"]["marketplace_listing_status"] | null;
+          title: string | null;
+          updated_at: string | null;
+          user_created_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_listings_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "marketplace_categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "marketplace_listings_seller_id_fkey";
+            columns: ["seller_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      consume_registration_attempt: {
+        Args: { _key_hash: string; _limit: number };
+        Returns: boolean;
+      };
+      create_forum_reply: {
+        Args: { _body: string; _topic_id: string };
+        Returns: string;
+      };
+      create_forum_topic: {
+        Args: {
+          _body: string;
+          _category_id: number;
+          _slug: string;
+          _title: string;
+        };
+        Returns: string;
+      };
+      create_marketplace_listing: {
+        Args: {
+          _category_id: number;
+          _currency_code: string;
+          _description: string;
+          _minecraft_version: string;
+          _platform: string;
+          _price_amount: number;
+          _short_description: string;
+          _slug: string;
+          _submit?: boolean;
+          _title: string;
+        };
+        Returns: string;
+      };
+      record_daily_activity: {
+        Args: never;
+        Returns: {
+          current_streak: number;
+          last_active_date: string;
+          last_bumped_at: string;
+          streak_started_on: string;
+        }[];
+      };
+      update_marketplace_listing: {
+        Args: {
+          _category_id: number;
+          _currency_code: string;
+          _description: string;
+          _listing_id: string;
+          _minecraft_version: string;
+          _platform: string;
+          _price_amount: number;
+          _short_description: string;
+          _submit?: boolean;
+          _title: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       app_role: "user" | "moderator" | "admin";
+      marketplace_listing_source: "agency" | "user";
       marketplace_listing_status: "draft" | "pending_review" | "published" | "archived";
     };
     CompositeTypes: {
@@ -455,6 +611,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
+      marketplace_listing_source: ["agency", "user"],
       marketplace_listing_status: ["draft", "pending_review", "published", "archived"],
     },
   },

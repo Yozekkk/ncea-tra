@@ -4,10 +4,11 @@ import {
   deleteListing,
   getListings,
   getMarketplaceCategories,
+  saveAgencyListing,
   saveMarketplaceCategory,
   setListingStatus,
 } from "../lib/data";
-import type { ListingStatus, MarketplaceCategory } from "../lib/types";
+import type { ListingStatus, ListingView, MarketplaceCategory } from "../lib/types";
 import { formatDate, formatPrice } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 import {
@@ -21,14 +22,18 @@ import {
   Modal,
   PageHeader,
 } from "../components/ui";
+import { useAdminAccess } from "../components/AdminAccess";
 
 type Tab = "categories" | "listings";
 
 export function MarketplacePage() {
-  const [tab, setTab] = useState<Tab>("categories");
+  const { role } = useAdminAccess();
+  const isAdmin = role === "admin";
+  const [tab, setTab] = useState<Tab>(isAdmin ? "categories" : "listings");
   const categories = useAsync(getMarketplaceCategories);
   const listings = useAsync(getListings);
   const [editing, setEditing] = useState<MarketplaceCategory | "new" | null>(null);
+  const [editingListing, setEditingListing] = useState<ListingView | "new" | null>(null);
   const [actionError, setActionError] = useState("");
 
   const perform = async (action: () => Promise<void>, reload: () => Promise<void>) => {
@@ -59,6 +64,29 @@ export function MarketplacePage() {
     setEditing(null);
   };
 
+  const submitAgencyListing = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const current = editingListing === "new" ? null : editingListing;
+    await perform(
+      () =>
+        saveAgencyListing(current?.id ?? null, {
+          category_id: Number(form.get("category_id")),
+          title: String(form.get("title")),
+          slug: String(form.get("slug")),
+          short_description: String(form.get("short_description")),
+          description: String(form.get("description")),
+          price_amount: form.get("price_amount") ? Number(form.get("price_amount")) : null,
+          currency_code: String(form.get("currency_code") || "RUB"),
+          minecraft_version: String(form.get("minecraft_version")) || null,
+          platform: String(form.get("platform")) || null,
+          sort_order: Number(form.get("sort_order")),
+        }),
+      listings.reload,
+    );
+    setEditingListing(null);
+  };
+
   const current = tab === "categories" ? categories : listings;
   return (
     <>
@@ -66,15 +94,19 @@ export function MarketplacePage() {
         title="Marketplace"
         description="Moderate categories and listing publication state."
         action={
-          tab === "categories" ? (
+          tab === "categories" && isAdmin ? (
             <Button onClick={() => setEditing("new")}>
               <Plus size={17} /> New category
+            </Button>
+          ) : tab === "listings" && isAdmin ? (
+            <Button onClick={() => setEditingListing("new")}>
+              <Plus size={17} /> New official listing
             </Button>
           ) : undefined
         }
       />
       <div className="tabs" role="tablist">
-        {(["categories", "listings"] as Tab[]).map((item) => (
+        {(isAdmin ? (["categories", "listings"] as Tab[]) : (["listings"] as Tab[])).map((item) => (
           <button
             role="tab"
             aria-selected={tab === item}
@@ -143,6 +175,7 @@ export function MarketplacePage() {
                   <th>Listing</th>
                   <th>Seller</th>
                   <th>Category</th>
+                  <th>Source</th>
                   <th>Price</th>
                   <th>Status</th>
                   <th>Created</th>
@@ -157,6 +190,11 @@ export function MarketplacePage() {
                     </td>
                     <td>@{item.seller}</td>
                     <td>{item.category}</td>
+                    <td>
+                      <Badge tone={item.listing_source === "agency" ? "live" : "muted"}>
+                        {item.listing_source}
+                      </Badge>
+                    </td>
                     <td>{formatPrice(item.price_amount, item.currency_code)}</td>
                     <td>
                       <Badge
@@ -173,29 +211,41 @@ export function MarketplacePage() {
                     </td>
                     <td>{formatDate(item.created_at)}</td>
                     <td>
-                      <div className="action-row">
-                        <select
-                          aria-label={`Status for ${item.title}`}
-                          value={item.status}
-                          onChange={(e) =>
-                            void perform(
-                              () => setListingStatus(item.id, e.target.value as ListingStatus),
-                              listings.reload,
-                            )
-                          }
-                        >
-                          <option value="draft">Draft</option>
-                          <option value="pending_review">Pending review</option>
-                          <option value="published">Published</option>
-                          <option value="archived">Archived</option>
-                        </select>
-                        <ConfirmButton
-                          confirmLabel={`Delete listing “${item.title}”?`}
-                          onConfirm={() => perform(() => deleteListing(item.id), listings.reload)}
-                        >
-                          Delete
-                        </ConfirmButton>
-                      </div>
+                      {item.listing_source === "agency" && !isAdmin ? (
+                        <Badge tone="muted">protected</Badge>
+                      ) : (
+                        <div className="action-row">
+                          {item.listing_source === "agency" ? (
+                            <IconButton
+                              aria-label={`Edit ${item.title}`}
+                              onClick={() => setEditingListing(item)}
+                            >
+                              <Edit3 size={17} />
+                            </IconButton>
+                          ) : null}
+                          <select
+                            aria-label={`Status for ${item.title}`}
+                            value={item.status}
+                            onChange={(e) =>
+                              void perform(
+                                () => setListingStatus(item.id, e.target.value as ListingStatus),
+                                listings.reload,
+                              )
+                            }
+                          >
+                            <option value="draft">Draft</option>
+                            <option value="pending_review">Pending review</option>
+                            <option value="published">Published</option>
+                            <option value="archived">Archived</option>
+                          </select>
+                          <ConfirmButton
+                            confirmLabel={`Delete listing “${item.title}”?`}
+                            onConfirm={() => perform(() => deleteListing(item.id), listings.reload)}
+                          >
+                            Delete
+                          </ConfirmButton>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -216,7 +266,122 @@ export function MarketplacePage() {
           <CategoryForm item={editing === "new" ? null : editing} onSubmit={submitCategory} />
         </Modal>
       )}
+      {editingListing && (
+        <Modal
+          title={editingListing === "new" ? "New official listing" : "Edit official listing"}
+          onClose={() => setEditingListing(null)}
+        >
+          <AgencyListingForm
+            item={editingListing === "new" ? null : editingListing}
+            categories={categories.data ?? []}
+            onSubmit={submitAgencyListing}
+          />
+        </Modal>
+      )}
     </>
+  );
+}
+
+function AgencyListingForm({
+  item,
+  categories,
+  onSubmit,
+}: {
+  item: ListingView | null;
+  categories: MarketplaceCategory[];
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <form className="dialog-form" onSubmit={onSubmit}>
+      <label>
+        Category
+        <select name="category_id" defaultValue={item?.category_id ?? categories[0]?.id} required>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Title
+        <input name="title" defaultValue={item?.title} required minLength={3} maxLength={180} />
+      </label>
+      <label>
+        Slug
+        <input
+          name="slug"
+          defaultValue={item?.slug}
+          required
+          pattern="[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}"
+        />
+      </label>
+      <label>
+        Short description
+        <textarea
+          name="short_description"
+          defaultValue={item?.short_description}
+          required
+          minLength={10}
+          maxLength={280}
+          rows={2}
+        />
+      </label>
+      <label>
+        Description
+        <textarea
+          name="description"
+          defaultValue={item?.description}
+          required
+          minLength={20}
+          maxLength={20000}
+          rows={5}
+        />
+      </label>
+      <div className="dialog-grid">
+        <label>
+          Sort order
+          <input
+            name="sort_order"
+            type="number"
+            min={0}
+            defaultValue={item?.sort_order ?? 100}
+            required
+          />
+        </label>
+        <label>
+          Price (optional)
+          <input
+            name="price_amount"
+            type="number"
+            min={0}
+            step="0.01"
+            defaultValue={item?.price_amount ?? ""}
+          />
+        </label>
+        <label>
+          Currency
+          <select name="currency_code" defaultValue={item?.currency_code ?? "RUB"}>
+            <option value="RUB">RUB</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+          </select>
+        </label>
+        <label>
+          Minecraft version
+          <input
+            name="minecraft_version"
+            defaultValue={item?.minecraft_version ?? ""}
+            maxLength={40}
+          />
+        </label>
+        <label>
+          Platform
+          <input name="platform" defaultValue={item?.platform ?? ""} maxLength={40} />
+        </label>
+      </div>
+      <Button type="submit">Save official listing</Button>
+    </form>
   );
 }
 

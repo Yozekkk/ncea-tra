@@ -43,6 +43,9 @@ export type Database = {
           author_id: string;
           body: string;
           created_at: string;
+          deleted_at: string | null;
+          deleted_by: string | null;
+          deletion_reason: string | null;
           id: string;
           is_protected: boolean;
           topic_id: string;
@@ -52,6 +55,9 @@ export type Database = {
           author_id: string;
           body: string;
           created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           id?: string;
           is_protected?: boolean;
           topic_id: string;
@@ -61,6 +67,9 @@ export type Database = {
           author_id?: string;
           body?: string;
           created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           id?: string;
           is_protected?: boolean;
           topic_id?: string;
@@ -70,6 +79,13 @@ export type Database = {
           {
             foreignKeyName: "forum_posts_author_id_fkey";
             columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "forum_posts_deleted_by_fkey";
+            columns: ["deleted_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -88,6 +104,9 @@ export type Database = {
           author_id: string;
           category_id: number;
           created_at: string;
+          deleted_at: string | null;
+          deleted_by: string | null;
+          deletion_reason: string | null;
           id: string;
           is_locked: boolean;
           is_pinned: boolean;
@@ -100,6 +119,9 @@ export type Database = {
           author_id: string;
           category_id: number;
           created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           id?: string;
           is_locked?: boolean;
           is_pinned?: boolean;
@@ -112,6 +134,9 @@ export type Database = {
           author_id?: string;
           category_id?: number;
           created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           id?: string;
           is_locked?: boolean;
           is_pinned?: boolean;
@@ -133,6 +158,13 @@ export type Database = {
             columns: ["category_id"];
             isOneToOne: false;
             referencedRelation: "forum_categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "forum_topics_deleted_by_fkey";
+            columns: ["deleted_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -215,12 +247,17 @@ export type Database = {
           category_id: number;
           created_at: string;
           currency_code: string;
+          deleted_at: string | null;
+          deleted_by: string | null;
+          deletion_reason: string | null;
           description: string;
           id: string;
+          image_url: string | null;
           listing_source: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version: string | null;
           platform: string | null;
           price_amount: number | null;
+          price_text: string | null;
           published_at: string | null;
           seller_id: string;
           short_description: string;
@@ -236,12 +273,17 @@ export type Database = {
           category_id: number;
           created_at?: string;
           currency_code?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           description: string;
           id?: string;
+          image_url?: string | null;
           listing_source?: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version?: string | null;
           platform?: string | null;
           price_amount?: number | null;
+          price_text?: string | null;
           published_at?: string | null;
           seller_id: string;
           short_description: string;
@@ -257,12 +299,17 @@ export type Database = {
           category_id?: number;
           created_at?: string;
           currency_code?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          deletion_reason?: string | null;
           description?: string;
           id?: string;
+          image_url?: string | null;
           listing_source?: Database["public"]["Enums"]["marketplace_listing_source"];
           minecraft_version?: string | null;
           platform?: string | null;
           price_amount?: number | null;
+          price_text?: string | null;
           published_at?: string | null;
           seller_id?: string;
           short_description?: string;
@@ -279,6 +326,13 @@ export type Database = {
             columns: ["category_id"];
             isOneToOne: false;
             referencedRelation: "marketplace_categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "marketplace_listings_deleted_by_fkey";
+            columns: ["deleted_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
@@ -391,12 +445,14 @@ export type Database = {
           effective_streak: number | null;
           feed_group: number | null;
           id: string | null;
+          image_url: string | null;
           last_bumped_at: string | null;
           last_streak_renewed_at: string | null;
           listing_source: Database["public"]["Enums"]["marketplace_listing_source"] | null;
           minecraft_version: string | null;
           platform: string | null;
           price_amount: number | null;
+          price_text: string | null;
           promoted_published_at: string | null;
           promotion_eligible: boolean | null;
           published_at: string | null;
@@ -430,6 +486,25 @@ export type Database = {
       };
     };
     Functions: {
+      admin_save_marketplace_listing: {
+        Args: {
+          _category_id: number;
+          _currency_code: string;
+          _description: string;
+          _image_url: string;
+          _listing_id: string;
+          _listing_source: Database["public"]["Enums"]["marketplace_listing_source"];
+          _minecraft_version: string;
+          _platform: string;
+          _price_amount: number;
+          _price_text: string;
+          _short_description: string;
+          _sort_order: number;
+          _status: Database["public"]["Enums"]["marketplace_listing_status"];
+          _title: string;
+        };
+        Returns: string;
+      };
       consume_registration_attempt: {
         Args: { _key_hash: string; _limit: number };
         Returns: boolean;
@@ -462,6 +537,19 @@ export type Database = {
         };
         Returns: string;
       };
+      get_deleted_content: {
+        Args: { _kind?: string };
+        Returns: {
+          author_username: string;
+          content_type: string;
+          deleted_at: string;
+          deleted_by_username: string;
+          deletion_reason: string;
+          id: string;
+          storage_paths: string[];
+          title: string;
+        }[];
+      };
       record_daily_activity: {
         Args: never;
         Returns: {
@@ -492,6 +580,46 @@ export type Database = {
           streak_started_on: string;
         }[];
       };
+      owner_save_forum_topic: {
+        Args: {
+          _category_id: number;
+          _content: string;
+          _is_locked: boolean;
+          _is_pinned: boolean;
+          _is_protected: boolean;
+          _title: string;
+          _topic_id: string;
+        };
+        Returns: string;
+      };
+      owner_update_forum_post: {
+        Args: { _body: string; _post_id: string };
+        Returns: undefined;
+      };
+      permanently_delete_content: {
+        Args: { _id: string; _kind: string };
+        Returns: undefined;
+      };
+      restore_deleted_content: {
+        Args: { _id: string; _kind: string };
+        Returns: undefined;
+      };
+      set_user_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string };
+        Returns: undefined;
+      };
+      soft_delete_forum_post: {
+        Args: { _post_id: string; _reason?: string };
+        Returns: undefined;
+      };
+      soft_delete_forum_topic: {
+        Args: { _reason?: string; _topic_id: string };
+        Returns: undefined;
+      };
+      soft_delete_marketplace_listing: {
+        Args: { _listing_id: string; _reason?: string };
+        Returns: undefined;
+      };
       update_marketplace_listing: {
         Args: {
           _category_id: number;
@@ -509,7 +637,7 @@ export type Database = {
       };
     };
     Enums: {
-      app_role: "user" | "moderator" | "admin";
+      app_role: "user" | "moderator" | "admin" | "owner";
       marketplace_listing_source: "agency" | "user";
       marketplace_listing_status: "draft" | "pending_review" | "published" | "archived";
     };
@@ -637,7 +765,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "moderator", "admin"],
+      app_role: ["user", "moderator", "admin", "owner"],
       marketplace_listing_source: ["agency", "user"],
       marketplace_listing_status: ["draft", "pending_review", "published", "archived"],
     },

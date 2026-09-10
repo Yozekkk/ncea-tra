@@ -25,6 +25,7 @@ async function getAdminListings() {
   const { data, error } = await getSupabaseClient()
     .from("marketplace_listings")
     .select("*, profiles(username), marketplace_categories(name,slug)")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) throw error;
@@ -45,6 +46,7 @@ async function getAdminPosts() {
   const { data, error } = await getSupabaseClient()
     .from("forum_posts")
     .select("*, profiles(username), forum_topics(title,slug)")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) throw error;

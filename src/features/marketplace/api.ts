@@ -159,6 +159,7 @@ export async function getMyListings(userId: string) {
     .from("marketplace_listings")
     .select(listingSelect)
     .eq("seller_id", userId)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) fail(error, "Не удалось загрузить ваши объявления");
@@ -170,6 +171,7 @@ export async function getListing(slug: string) {
     .from("marketplace_listings")
     .select(listingSelect)
     .eq("slug", slug)
+    .is("deleted_at", null)
     .single();
   if (error) fail(error, "Объявление не найдено");
   return (await signImages([data as unknown as MarketplaceListing]))[0];
@@ -180,6 +182,7 @@ async function getListingById(id: string) {
     .from("marketplace_listings")
     .select("*")
     .eq("id", id)
+    .is("deleted_at", null)
     .single();
   if (error) fail(error, "Не удалось получить сохранённое объявление");
   return data as MarketplaceListing;
@@ -215,13 +218,10 @@ export async function archiveListing(id: string) {
 }
 
 export async function deleteListing(listing: MarketplaceListing) {
-  const supabase = getSupabaseClient();
-  const paths = (listing.marketplace_listing_images ?? []).map((image) => image.storage_path);
-  if (paths.length) {
-    const { error: storageError } = await supabase.storage.from(bucket).remove(paths);
-    if (storageError) fail(storageError, "Не удалось удалить изображения");
-  }
-  const { error } = await supabase.from("marketplace_listings").delete().eq("id", listing.id);
+  const { error } = await getSupabaseClient().rpc("soft_delete_marketplace_listing", {
+    _listing_id: listing.id,
+    _reason: null,
+  });
   if (error) fail(error, "Не удалось удалить объявление");
 }
 

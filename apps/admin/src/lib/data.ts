@@ -10,6 +10,10 @@ import type {
   PostView,
   TopicView,
   ListingView,
+  DeletedItem,
+  DeletedContentType,
+  ForumTopicEditorValues,
+  MarketplaceEditorValues,
 } from "./types";
 
 function fail(message: string, error: { message: string } | null): never {
@@ -43,14 +47,16 @@ export async function getUsers(limit = 200): Promise<AdminUser[]> {
 }
 
 export async function setUserRole(userId: string, role: AppRole): Promise<void> {
-  const { error } = await getSupabase().from("user_roles").update({ role }).eq("user_id", userId);
+  if (role === "owner") throw new Error("Owner role is managed only through backend migrations.");
+  const { error } = await getSupabase().rpc("set_user_role", { _user_id: userId, _role: role });
   if (error) fail("Could not update role", error);
 }
 
 export async function getTopics(limit = 200): Promise<TopicView[]> {
   const { data, error } = await getSupabase()
     .from("forum_topics")
-    .select("*, profiles(username), forum_categories(name)")
+    .select("*, profiles!forum_topics_author_id_fkey(username), forum_categories(name)")
+    .is("deleted_at", null)
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -65,7 +71,8 @@ export async function getTopics(limit = 200): Promise<TopicView[]> {
 export async function getPosts(limit = 200): Promise<PostView[]> {
   const { data, error } = await getSupabase()
     .from("forum_posts")
-    .select("*, profiles(username), forum_topics(title)")
+    .select("*, profiles!forum_posts_author_id_fkey(username), forum_topics(title)")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) fail("Could not load forum posts", error);
@@ -108,22 +115,18 @@ export async function updateTopic(id: string, values: TablesUpdate<"forum_topics
 }
 
 export async function deleteTopic(id: string): Promise<void> {
-  const { error } = await getSupabase()
-    .from("forum_topics")
-    .delete()
-    .eq("id", id)
-    .select("id")
-    .single();
+  const { error } = await getSupabase().rpc("soft_delete_forum_topic", {
+    _topic_id: id,
+    _reason: "Moderated in NCEA Admin",
+  });
   if (error) fail("Could not delete topic", error);
 }
 
 export async function deletePost(id: string): Promise<void> {
-  const { error } = await getSupabase()
-    .from("forum_posts")
-    .delete()
-    .eq("id", id)
-    .select("id")
-    .single();
+  const { error } = await getSupabase().rpc("soft_delete_forum_post", {
+    _post_id: id,
+    _reason: "Moderated in NCEA Admin",
+  });
   if (error) fail("Could not moderate post", error);
 }
 
@@ -151,7 +154,10 @@ export async function saveMarketplaceCategory(
 export async function getListings(limit = 200): Promise<ListingView[]> {
   const { data, error } = await getSupabase()
     .from("marketplace_listings")
-    .select("*, profiles(username), marketplace_categories(name)")
+    .select(
+      "*, profiles!marketplace_listings_seller_id_fkey(username), marketplace_categories(name)",
+    )
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) fail("Could not load listings", error);
@@ -172,61 +178,101 @@ export async function setListingStatus(id: string, status: ListingStatus): Promi
   if (error) fail("Could not update listing status", error);
 }
 
-export async function saveAgencyListing(
+export async function saveMarketplaceListing(
   id: string | null,
-  values: Pick<
-    TablesInsert<"marketplace_listings">,
-    | "category_id"
-    | "title"
-    | "slug"
-    | "short_description"
-    | "description"
-    | "price_amount"
-    | "currency_code"
-    | "minecraft_version"
-    | "platform"
-    | "sort_order"
-  >,
+  values: MarketplaceEditorValues,
 ): Promise<void> {
-  const payload = { ...values, listing_source: "agency" as const };
-  const { data: authData, error: authError } = await getSupabase().auth.getUser();
-  if (authError || !authData.user) fail("Could not identify the official listing owner", authError);
-  const query = id
-    ? getSupabase()
-        .from("marketplace_listings")
-        .update(payload)
-        .eq("id", id)
-        .eq("listing_source", "agency")
-    : getSupabase()
-        .from("marketplace_listings")
-        .insert({ ...payload, seller_id: authData.user.id, status: "draft" });
-  const { error } = await query.select("id").single();
-  if (error) fail("Could not save official listing", error);
+  const { error } = await getSupabase().rpc("admin_save_marketplace_listing", {
+    _listing_id: id,
+    _category_id: values.category_id,
+    _title: values.title,
+    _short_description: values.short_description,
+    _description: values.description,
+    _listing_source: values.listing_source,
+    _image_url: values.image_url,
+    _price_amount: values.price_amount,
+    _price_text: values.price_text,
+    _currency_code: values.currency_code,
+    _minecraft_version: values.minecraft_version,
+    _platform: values.platform,
+    _sort_order: values.sort_order,
+    _status: values.status,
+  } as never);
+  if (error) fail("Could not save Marketplace listing", error);
 }
 
 export async function deleteListing(id: string): Promise<void> {
-  const supabase = getSupabase();
-  const { data: images, error: imageError } = await supabase
-    .from("marketplace_listing_images")
-    .select("storage_path")
-    .eq("listing_id", id);
-  if (imageError) fail("Could not load listing images before deletion", imageError);
+  const { error } = await getSupabase().rpc("soft_delete_marketplace_listing", {
+    _listing_id: id,
+    _reason: "Removed in NCEA Admin",
+  });
+  if (error) fail("Could not delete listing", error);
+}
 
-  const storagePaths = (images ?? []).map((image) => image.storage_path);
-  if (storagePaths.length > 0) {
+export async function getForumTopicContent(topicId: string): Promise<string> {
+  const { data, error } = await getSupabase()
+    .from("forum_posts")
+    .select("body")
+    .eq("topic_id", topicId)
+    .is("deleted_at", null)
+    .order("created_at")
+    .limit(1)
+    .maybeSingle();
+  if (error) fail("Could not load topic content", error);
+  return data?.body ?? "";
+}
+
+export async function saveOwnerForumTopic(
+  id: string | null,
+  values: ForumTopicEditorValues,
+): Promise<void> {
+  const { error } = await getSupabase().rpc("owner_save_forum_topic", {
+    _topic_id: id,
+    _category_id: values.category_id,
+    _title: values.title,
+    _content: values.content,
+    _is_pinned: values.is_pinned,
+    _is_locked: values.is_locked,
+    _is_protected: values.is_protected,
+  } as never);
+  if (error) fail("Could not save Forum topic", error);
+}
+
+export async function updateOwnerForumPost(id: string, body: string): Promise<void> {
+  const { error } = await getSupabase().rpc("owner_update_forum_post", {
+    _post_id: id,
+    _body: body,
+  });
+  if (error) fail("Could not update Forum post", error);
+}
+
+export async function getDeletedContent(kind: "all" | DeletedContentType = "all") {
+  const { data, error } = await getSupabase().rpc("get_deleted_content", { _kind: kind });
+  if (error) fail("Could not load deleted content", error);
+  return (data ?? []) as DeletedItem[];
+}
+
+export async function restoreDeletedContent(item: DeletedItem): Promise<void> {
+  const { error } = await getSupabase().rpc("restore_deleted_content", {
+    _kind: item.content_type,
+    _id: item.id,
+  });
+  if (error) fail("Could not restore content", error);
+}
+
+export async function permanentlyDeleteContent(item: DeletedItem): Promise<void> {
+  const supabase = getSupabase();
+  if (item.content_type === "marketplace" && item.storage_paths.length > 0) {
     const { error: storageError } = await supabase.storage
       .from("marketplace-listings")
-      .remove(storagePaths);
-    if (storageError) fail("Could not delete listing images", storageError);
+      .remove(item.storage_paths);
+    if (storageError) fail("Could not permanently delete related files", storageError);
   }
-
-  const { error } = await supabase
-    .from("marketplace_listings")
-    .delete()
-    .eq("id", id)
-    .select("id")
-    .single();
-  if (error) fail("Could not delete listing", error);
+  const { error } = await supabase.rpc("permanently_delete_content", {
+    _kind: item.content_type,
+    _id: item.id,
+  });
+  if (error) fail("Could not permanently delete content", error);
 }
 
 async function count(table: "profiles" | "forum_topics" | "forum_posts" | "marketplace_listings") {

@@ -58,6 +58,7 @@ export function UsersPage() {
           <option value="user">User</option>
           <option value="moderator">Moderator</option>
           <option value="admin">Admin</option>
+          <option value="owner">Owner</option>
         </select>
       </div>
       {actionError && <ErrorState message={actionError} />}
@@ -92,8 +93,10 @@ export function UsersPage() {
                       <select
                         aria-label={`Role for ${user.username}`}
                         value={user.role}
+                        disabled={user.role === "owner"}
                         onChange={(e) => void changeRole(user.id, e.target.value as AppRole)}
                       >
+                        {user.role === "owner" ? <option value="owner">Owner</option> : null}
                         <option value="user">User</option>
                         <option value="moderator">Moderator</option>
                         <option value="admin">Admin</option>

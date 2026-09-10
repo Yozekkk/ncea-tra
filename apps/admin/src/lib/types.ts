@@ -1,6 +1,7 @@
 import type { Tables } from "./database.types";
 
-export type AppRole = "user" | "moderator" | "admin";
+export type AppRole = "user" | "moderator" | "admin" | "owner";
+export type StaffRole = "moderator" | "admin" | "owner";
 export type ListingStatus = "draft" | "pending_review" | "published" | "archived";
 export type Profile = Tables<"profiles">;
 export type UserRole = Tables<"user_roles">;
@@ -14,6 +15,42 @@ export type AdminUser = Profile & { role: AppRole };
 export type TopicView = ForumTopic & { author: string; category: string };
 export type PostView = ForumPost & { author: string; topic: string };
 export type ListingView = MarketplaceListing & { seller: string; category: string };
+export type DeletedContentType = "marketplace" | "topics" | "posts";
+export interface DeletedItem {
+  content_type: DeletedContentType;
+  id: string;
+  title: string;
+  author_username: string;
+  deleted_by_username: string | null;
+  deleted_at: string;
+  deletion_reason: string | null;
+  storage_paths: string[];
+}
+
+export interface MarketplaceEditorValues {
+  category_id: number;
+  title: string;
+  short_description: string;
+  description: string;
+  listing_source: "agency" | "user";
+  image_url: string | null;
+  price_amount: number | null;
+  price_text: string | null;
+  currency_code: string;
+  minecraft_version: string | null;
+  platform: string | null;
+  sort_order: number | null;
+  status: ListingStatus;
+}
+
+export interface ForumTopicEditorValues {
+  category_id: number;
+  title: string;
+  content: string;
+  is_pinned: boolean;
+  is_locked: boolean;
+  is_protected: boolean;
+}
 
 export interface DashboardData {
   counts: {

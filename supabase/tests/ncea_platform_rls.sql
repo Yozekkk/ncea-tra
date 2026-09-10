@@ -95,13 +95,12 @@ $$;
 do $$
 declare affected integer;
 begin
-  update public.user_roles
-  set role = 'admin'
-  where user_id = '10000000-0000-4000-8000-000000000001';
-  get diagnostics affected = row_count;
-  if affected <> 0 then
+  begin
+    update public.user_roles
+    set role = 'admin'
+    where user_id = '10000000-0000-4000-8000-000000000001';
     raise exception 'A user changed their own role';
-  end if;
+  exception when insufficient_privilege then null; end;
 
   begin
     update public.marketplace_listings
@@ -181,8 +180,10 @@ select set_config(
 update public.forum_topics
 set is_locked = true, is_pinned = true
 where id = '20000000-0000-4000-8000-000000000001';
-delete from public.forum_posts
-where id = '30000000-0000-4000-8000-000000000001';
+select public.soft_delete_forum_post(
+  '30000000-0000-4000-8000-000000000001',
+  'legacy permission suite moderation check'
+);
 update public.marketplace_listings
 set status = 'published'
 where id = '40000000-0000-4000-8000-000000000001';
@@ -231,7 +232,7 @@ begin
     select 1 from public.forum_posts
     where id = '30000000-0000-4000-8000-000000000001'
   ) then
-    raise exception 'Admin could not delete post';
+    raise exception 'Admin could not soft-delete user post';
   end if;
   if not exists (
     select 1 from public.marketplace_listings

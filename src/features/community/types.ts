@@ -1,4 +1,4 @@
-export type AppRole = "user" | "moderator" | "admin";
+export type AppRole = "user" | "moderator" | "admin" | "owner";
 export type ListingStatus = "draft" | "pending_review" | "published" | "archived";
 export type ListingSource = "agency" | "user";
 
@@ -43,6 +43,9 @@ export interface ForumTopic {
   is_pinned: boolean;
   is_locked: boolean;
   is_protected: boolean;
+  deleted_at: string | null;
+  deleted_by: string | null;
+  deletion_reason: string | null;
   created_at: string;
   updated_at: string;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
@@ -56,6 +59,9 @@ export interface ForumPost {
   author_id: string;
   body: string;
   is_protected: boolean;
+  deleted_at: string | null;
+  deleted_by: string | null;
+  deletion_reason: string | null;
   created_at: string;
   updated_at: string;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
@@ -82,6 +88,8 @@ export interface MarketplaceListing {
   short_description: string;
   description: string;
   price_amount: number | null;
+  price_text: string | null;
+  image_url: string | null;
   currency_code: string;
   minecraft_version: string | null;
   platform: string | null;
@@ -91,6 +99,9 @@ export interface MarketplaceListing {
   submitted_at: string | null;
   published_at: string | null;
   archived_at: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
+  deletion_reason: string | null;
   created_at: string;
   updated_at: string;
   effective_streak?: number;

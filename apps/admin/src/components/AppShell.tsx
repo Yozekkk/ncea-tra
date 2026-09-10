@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Users,
   X,
+  Trash2,
 } from "lucide-react";
 import { getSupabase } from "../lib/supabase";
 import { IconButton } from "./ui";
@@ -20,6 +21,7 @@ const navigation = [
   { path: "/marketplace", label: "Marketplace", icon: ShoppingBag },
   { path: "/moderation", label: "Moderation", icon: ShieldCheck },
   { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/deleted", label: "Удалённые", icon: Trash2 },
 ];
 
 export function AppShell({
@@ -30,7 +32,7 @@ export function AppShell({
 }: PropsWithChildren<{
   path: string;
   navigate: (path: string) => void;
-  role: "moderator" | "admin";
+  role: "moderator" | "admin" | "owner";
 }>) {
   const [menuOpen, setMenuOpen] = useState(false);
   const move = (next: string) => {
@@ -63,9 +65,12 @@ export function AppShell({
         </div>
         <nav aria-label="Admin navigation">
           {navigation
-            .filter(
-              ({ path: itemPath }) =>
-                role === "admin" || !["/users", "/settings"].includes(itemPath),
+            .filter(({ path: itemPath }) =>
+              role === "owner"
+                ? true
+                : role === "admin"
+                  ? itemPath !== "/deleted"
+                  : !["/users", "/settings", "/deleted"].includes(itemPath),
             )
             .map(({ path: itemPath, label, icon: Icon }) => (
               <button

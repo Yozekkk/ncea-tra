@@ -30,7 +30,7 @@ export function AuthGate({ children }: PropsWithChildren) {
       try {
         const role = await getCurrentRole(nextUser.id);
         setRole(role);
-        if (role === "admin" || role === "moderator") setStatus("staff");
+        if (role === "owner" || role === "admin" || role === "moderator") setStatus("staff");
         else setStatus("denied");
       } catch (reason) {
         setError(reason instanceof Error ? reason.message : "Authorization failed.");
@@ -79,7 +79,7 @@ export function AuthGate({ children }: PropsWithChildren) {
           </div>
           <p className="eyebrow">PRIVATE SYSTEM</p>
           <h1>NCEA Admin</h1>
-          <p>Sign in with an account assigned the admin or moderator role.</p>
+          <p>Sign in with an account assigned the owner, admin or moderator role.</p>
           {error && <ErrorState message={error} />}
           <form onSubmit={login}>
             <label>

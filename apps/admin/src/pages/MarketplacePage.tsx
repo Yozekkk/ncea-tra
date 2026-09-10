@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from "react";
-import { Edit3, Plus } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Edit3, ImageOff, Plus } from "lucide-react";
 import {
   deleteListing,
   getListings,
   getMarketplaceCategories,
-  saveAgencyListing,
+  saveMarketplaceListing,
   saveMarketplaceCategory,
   setListingStatus,
 } from "../lib/data";
@@ -28,7 +28,8 @@ type Tab = "categories" | "listings";
 
 export function MarketplacePage() {
   const { role } = useAdminAccess();
-  const isAdmin = role === "admin";
+  const isAdmin = role === "admin" || role === "owner";
+  const isOwner = role === "owner";
   const [tab, setTab] = useState<Tab>(isAdmin ? "categories" : "listings");
   const categories = useAsync(getMarketplaceCategories);
   const listings = useAsync(getListings);
@@ -41,8 +42,10 @@ export function MarketplacePage() {
     try {
       await action();
       await reload();
+      return true;
     } catch (reason) {
       setActionError(reason instanceof Error ? reason.message : "Action failed.");
+      return false;
     }
   };
 
@@ -50,7 +53,7 @@ export function MarketplacePage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const current = editing === "new" ? null : editing;
-    await perform(
+    const saved = await perform(
       () =>
         saveMarketplaceCategory(current?.id ?? null, {
           name: String(form.get("name")),
@@ -61,30 +64,44 @@ export function MarketplacePage() {
         }),
       categories.reload,
     );
-    setEditing(null);
+    if (saved) setEditing(null);
   };
 
-  const submitAgencyListing = async (event: FormEvent<HTMLFormElement>) => {
+  const submitListing = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const current = editingListing === "new" ? null : editingListing;
-    await perform(
+    const intent = String(form.get("intent") || "save");
+    const imageUrl = String(form.get("image_url") || "").trim();
+    if (imageUrl && !isSafeImageUrl(imageUrl)) {
+      setActionError("Image URL must be a valid http/https URL without markup or credentials.");
+      return;
+    }
+    const saved = await perform(
       () =>
-        saveAgencyListing(current?.id ?? null, {
+        saveMarketplaceListing(current?.id ?? null, {
           category_id: Number(form.get("category_id")),
           title: String(form.get("title")),
-          slug: String(form.get("slug")),
           short_description: String(form.get("short_description")),
           description: String(form.get("description")),
+          listing_source: String(form.get("listing_source")) as "agency" | "user",
+          image_url: imageUrl || null,
           price_amount: form.get("price_amount") ? Number(form.get("price_amount")) : null,
+          price_text: String(form.get("price_text") || "").trim() || null,
           currency_code: String(form.get("currency_code") || "RUB"),
           minecraft_version: String(form.get("minecraft_version")) || null,
           platform: String(form.get("platform")) || null,
-          sort_order: Number(form.get("sort_order")),
+          sort_order:
+            String(form.get("listing_source")) === "agency"
+              ? Number(form.get("sort_order") || 0)
+              : null,
+          status: (intent === "publish"
+            ? "published"
+            : String(form.get("status"))) as ListingStatus,
         }),
       listings.reload,
     );
-    setEditingListing(null);
+    if (saved) setEditingListing(null);
   };
 
   const current = tab === "categories" ? categories : listings;
@@ -215,7 +232,7 @@ export function MarketplacePage() {
                         <Badge tone="muted">protected</Badge>
                       ) : (
                         <div className="action-row">
-                          {item.listing_source === "agency" ? (
+                          {isAdmin ? (
                             <IconButton
                               aria-label={`Edit ${item.title}`}
                               onClick={() => setEditingListing(item)}
@@ -238,12 +255,18 @@ export function MarketplacePage() {
                             <option value="published">Published</option>
                             <option value="archived">Archived</option>
                           </select>
-                          <ConfirmButton
-                            confirmLabel={`Delete listing “${item.title}”?`}
-                            onConfirm={() => perform(() => deleteListing(item.id), listings.reload)}
-                          >
-                            Delete
-                          </ConfirmButton>
+                          {item.listing_source === "user" || isOwner ? (
+                            <ConfirmButton
+                              confirmLabel={`Move listing “${item.title}” to trash?`}
+                              onConfirm={() =>
+                                perform(() => deleteListing(item.id), listings.reload)
+                              }
+                            >
+                              Delete
+                            </ConfirmButton>
+                          ) : (
+                            <Badge tone="muted">owner delete only</Badge>
+                          )}
                         </div>
                       )}
                     </td>
@@ -268,13 +291,14 @@ export function MarketplacePage() {
       )}
       {editingListing && (
         <Modal
-          title={editingListing === "new" ? "New official listing" : "Edit official listing"}
+          title={editingListing === "new" ? "New Marketplace listing" : "Edit Marketplace listing"}
           onClose={() => setEditingListing(null)}
+          wide
         >
-          <AgencyListingForm
+          <ListingEditorForm
             item={editingListing === "new" ? null : editingListing}
             categories={categories.data ?? []}
-            onSubmit={submitAgencyListing}
+            onSubmit={submitListing}
           />
         </Modal>
       )}
@@ -282,7 +306,7 @@ export function MarketplacePage() {
   );
 }
 
-function AgencyListingForm({
+function ListingEditorForm({
   item,
   categories,
   onSubmit,
@@ -291,33 +315,19 @@ function AgencyListingForm({
   categories: MarketplaceCategory[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const [source, setSource] = useState<"agency" | "user">(item?.listing_source ?? "agency");
+  const [imageUrl, setImageUrl] = useState(item?.image_url ?? "");
+  const [imageFailed, setImageFailed] = useState(false);
+  useEffect(() => setImageFailed(false), [imageUrl]);
+  const showPreview = isSafeImageUrl(imageUrl) && !imageFailed;
   return (
-    <form className="dialog-form" onSubmit={onSubmit}>
+    <form className="dialog-form" onSubmit={onSubmit} autoComplete="off">
       <label>
-        Category
-        <select name="category_id" defaultValue={item?.category_id ?? categories[0]?.id} required>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Title
+        Название
         <input name="title" defaultValue={item?.title} required minLength={3} maxLength={180} />
       </label>
       <label>
-        Slug
-        <input
-          name="slug"
-          defaultValue={item?.slug}
-          required
-          pattern="[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}"
-        />
-      </label>
-      <label>
-        Short description
+        Короткий подзаголовок
         <textarea
           name="short_description"
           defaultValue={item?.short_description}
@@ -328,7 +338,7 @@ function AgencyListingForm({
         />
       </label>
       <label>
-        Description
+        Полное описание
         <textarea
           name="description"
           defaultValue={item?.description}
@@ -340,17 +350,48 @@ function AgencyListingForm({
       </label>
       <div className="dialog-grid">
         <label>
-          Sort order
+          Категория
+          <select name="category_id" defaultValue={item?.category_id ?? categories[0]?.id} required>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Источник
+          <select
+            name="listing_source"
+            value={source}
+            onChange={(event) => setSource(event.target.value as typeof source)}
+          >
+            <option value="agency">От агентства</option>
+            <option value="user">От пользователя</option>
+          </select>
+        </label>
+        <label>
+          Статус
+          <select name="status" defaultValue={item?.status ?? "draft"}>
+            <option value="draft">Черновик</option>
+            <option value="pending_review">На проверке</option>
+            <option value="published">Опубликовано</option>
+            <option value="archived">В архиве</option>
+          </select>
+        </label>
+        <label>
+          Порядок официальных карточек
           <input
             name="sort_order"
             type="number"
             min={0}
             defaultValue={item?.sort_order ?? 100}
-            required
+            required={source === "agency"}
+            disabled={source !== "agency"}
           />
         </label>
         <label>
-          Price (optional)
+          Цена (необязательно)
           <input
             name="price_amount"
             type="number"
@@ -360,7 +401,7 @@ function AgencyListingForm({
           />
         </label>
         <label>
-          Currency
+          Валюта
           <select name="currency_code" defaultValue={item?.currency_code ?? "RUB"}>
             <option value="RUB">RUB</option>
             <option value="EUR">EUR</option>
@@ -376,13 +417,85 @@ function AgencyListingForm({
           />
         </label>
         <label>
-          Platform
+          Platform / Core
           <input name="platform" defaultValue={item?.platform ?? ""} maxLength={40} />
         </label>
       </div>
-      <Button type="submit">Save official listing</Button>
+      <label>
+        Текст вместо цены
+        <input
+          name="price_text"
+          defaultValue={item?.price_text ?? "Цена скоро будет добавлена"}
+          maxLength={120}
+        />
+      </label>
+      <label>
+        URL изображения
+        <input
+          name="image_url"
+          type="url"
+          inputMode="url"
+          placeholder="https://example.com/image.webp…"
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+          maxLength={2048}
+        />
+        {imageUrl && !isSafeImageUrl(imageUrl) ? (
+          <span className="field-error" role="alert">
+            Допустим только безопасный прямой http/https URL.
+          </span>
+        ) : null}
+      </label>
+      <div className="image-url-preview" aria-live="polite">
+        {showPreview ? (
+          <img
+            src={imageUrl}
+            alt="Предпросмотр изображения товара"
+            width={960}
+            height={540}
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <span>
+            <ImageOff size={22} />
+            Скоро будет добавлена картинка
+          </span>
+        )}
+      </div>
+      <div className="dialog-actions">
+        <Button
+          type="submit"
+          name="intent"
+          value="save"
+          disabled={Boolean(imageUrl && !isSafeImageUrl(imageUrl))}
+        >
+          Сохранить
+        </Button>
+        <Button
+          type="submit"
+          name="intent"
+          value="publish"
+          className="button-secondary"
+          disabled={Boolean(imageUrl && !isSafeImageUrl(imageUrl))}
+        >
+          Опубликовать
+        </Button>
+      </div>
     </form>
   );
+}
+
+function isSafeImageUrl(value: string) {
+  if (!value) return false;
+  if (value.length > 2048 || /[\s<>"'`]/.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") && !url.username && !url.password
+    );
+  } catch {
+    return false;
+  }
 }
 
 function CategoryForm({

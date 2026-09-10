@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
+import type { StaffRole } from "../lib/types";
 
-export type StaffRole = "moderator" | "admin";
+export type { StaffRole } from "../lib/types";
 
 export const AdminAccessContext = createContext<{ role: StaffRole } | null>(null);
 

@@ -1,4 +1,11 @@
-import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  type ButtonHTMLAttributes,
+  type PropsWithChildren,
+  type ReactNode,
+} from "react";
 import { AlertTriangle, LoaderCircle, X } from "lucide-react";
 
 export function Button({ className = "", ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -66,18 +73,39 @@ export function Modal({
   title,
   children,
   onClose,
-}: PropsWithChildren<{ title: string; onClose: () => void }>) {
+  wide = false,
+}: PropsWithChildren<{ title: string; onClose: () => void; wide?: boolean }>) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseRef.current();
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      previous?.focus();
+    };
+  }, []);
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
-        className="modal"
+        ref={dialogRef}
+        className={wide ? "modal modal-wide" : "modal"}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleId}
+        tabIndex={-1}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="modal-header">
-          <h2>{title}</h2>
+          <h2 id={titleId}>{title}</h2>
           <IconButton aria-label="Close dialog" onClick={onClose}>
             <X size={18} />
           </IconButton>
@@ -92,7 +120,7 @@ export function ConfirmButton({
   children,
   confirmLabel,
   onConfirm,
-}: PropsWithChildren<{ confirmLabel: string; onConfirm: () => void | Promise<void> }>) {
+}: PropsWithChildren<{ confirmLabel: string; onConfirm: () => unknown | Promise<unknown> }>) {
   const handleClick = () => {
     if (window.confirm(confirmLabel)) void onConfirm();
   };

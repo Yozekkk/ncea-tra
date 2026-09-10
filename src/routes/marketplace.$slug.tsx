@@ -5,6 +5,7 @@ import { CommunityShell, ErrorPanel, LoadingPanel } from "@/features/community/C
 import { getListing } from "@/features/marketplace/api";
 import {
   formatListingPrice,
+  ListingArtwork,
   ListingOwnerActions,
   marketplaceKeys,
   StatusBadge,
@@ -44,7 +45,9 @@ function ListingPage() {
         </Link>
         <article className="listing-detail">
           <div className="listing-gallery">
-            {item.marketplace_listing_images?.length ? (
+            {item.image_url ? (
+              <ListingArtwork listing={item} className="listing-placeholder" />
+            ) : item.marketplace_listing_images?.length ? (
               item.marketplace_listing_images.map((image) =>
                 image.signed_url ? (
                   <img
@@ -70,7 +73,7 @@ function ListingPage() {
             </div>
             <h1>{item.title}</h1>
             <strong className="listing-price">
-              {formatListingPrice(item.price_amount, item.currency_code)}
+              {formatListingPrice(item.price_amount, item.currency_code, item.price_text)}
             </strong>
             <p className="listing-lead">{item.short_description}</p>
             <p className="user-content">{item.description}</p>

@@ -42,13 +42,50 @@ export const marketplaceKeys = {
   listing: (slug: string) => ["marketplace", "listing", slug] as const,
 };
 
-export function formatListingPrice(amount: number | null, currency: string) {
-  if (amount === null) return "Цена скоро будет добавлена";
+export function formatListingPrice(
+  amount: number | null,
+  currency: string,
+  fallback?: string | null,
+) {
+  if (amount === null) return fallback || "Цена скоро будет добавлена";
   return new Intl.NumberFormat("ru-RU", {
     style: "currency",
     currency,
     maximumFractionDigits: 2,
   }).format(amount);
+}
+
+export function ListingArtwork({
+  listing,
+  className,
+}: {
+  listing: MarketplaceListing;
+  className?: string;
+}) {
+  const cover = listing.marketplace_listing_images?.[0];
+  const source = listing.image_url || cover?.signed_url;
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [source]);
+  return (
+    <div className={className}>
+      {source && !failed ? (
+        <img
+          src={source}
+          alt={cover?.alt_text ?? listing.title}
+          width={640}
+          height={480}
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span className="listing-placeholder-copy">
+          <ImagePlus aria-hidden="true" />
+          Скоро будет добавлена картинка
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function StatusBadge({ status }: { status: MarketplaceListing["status"] }) {
@@ -68,7 +105,6 @@ export function ListingCard({
   listing: MarketplaceListing;
   ownerView?: boolean;
 }) {
-  const cover = listing.marketplace_listing_images?.[0];
   const isAgency = listing.listing_source === "agency";
   return (
     <Link
@@ -87,24 +123,15 @@ export function ListingCard({
             </div>
             <h2>{listing.title}</h2>
             <p>{listing.short_description}</p>
-            <div className="listing-agency-media">
-              {cover?.signed_url ? (
-                <img
-                  src={cover.signed_url}
-                  alt={cover.alt_text ?? listing.title}
-                  width={640}
-                  height={480}
-                  loading="lazy"
-                />
-              ) : (
-                <span className="listing-placeholder-copy">
-                  <ImagePlus aria-hidden="true" />
-                  Скоро будет добавлена картинка
-                </span>
-              )}
-            </div>
+            <ListingArtwork listing={listing} className="listing-agency-media" />
             <div className="listing-card-footer">
-              <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
+              <strong>
+                {formatListingPrice(
+                  listing.price_amount,
+                  listing.currency_code,
+                  listing.price_text,
+                )}
+              </strong>
               <span className="listing-card-action">Подробнее →</span>
             </div>
           </div>
@@ -113,20 +140,7 @@ export function ListingCard({
         <>
           <div className="listing-user-preview">
             <span className="listing-category-pill">{listing.marketplace_categories?.name}</span>
-            {cover?.signed_url ? (
-              <img
-                src={cover.signed_url}
-                alt={cover.alt_text ?? listing.title}
-                width={640}
-                height={480}
-                loading="lazy"
-              />
-            ) : (
-              <span className="listing-placeholder-copy">
-                <ImagePlus aria-hidden="true" />
-                Скоро будет добавлена картинка
-              </span>
-            )}
+            <ListingArtwork listing={listing} />
           </div>
           <div className="listing-card-body">
             <div className="listing-card-kicker">
@@ -142,7 +156,13 @@ export function ListingCard({
             <h2>{listing.title}</h2>
             <p>{listing.short_description}</p>
             <div className="listing-card-footer">
-              <strong>{formatListingPrice(listing.price_amount, listing.currency_code)}</strong>
+              <strong>
+                {formatListingPrice(
+                  listing.price_amount,
+                  listing.currency_code,
+                  listing.price_text,
+                )}
+              </strong>
               <span>
                 {listing.profiles?.username ?? "Участник NCEA"} ·{" "}
                 {formatCommunityDate(listing.created_at)}
@@ -528,7 +548,7 @@ export function ListingOwnerActions({ listing }: { listing: MarketplaceListing }
         {listing.status !== "published" ? (
           <Button
             variant="destructive"
-            onClick={() => window.confirm("Удалить объявление и изображения?") && remove.mutate()}
+            onClick={() => window.confirm("Переместить объявление в корзину?") && remove.mutate()}
           >
             <Trash2 />
             Удалить

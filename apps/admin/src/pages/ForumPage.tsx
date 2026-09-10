@@ -4,12 +4,15 @@ import {
   deletePost,
   deleteTopic,
   getForumCategories,
+  getForumTopicContent,
   getPosts,
   getTopics,
   saveForumCategory,
+  saveOwnerForumTopic,
+  updateOwnerForumPost,
   updateTopic,
 } from "../lib/data";
-import type { ForumCategory } from "../lib/types";
+import type { ForumCategory, PostView, TopicView } from "../lib/types";
 import { formatDate } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 import {
@@ -29,12 +32,18 @@ type Tab = "categories" | "topics" | "posts";
 
 export function ForumPage() {
   const { role } = useAdminAccess();
-  const isAdmin = role === "admin";
+  const isAdmin = role === "admin" || role === "owner";
+  const isOwner = role === "owner";
   const [tab, setTab] = useState<Tab>(isAdmin ? "categories" : "topics");
   const categories = useAsync(getForumCategories);
   const topics = useAsync(getTopics);
   const posts = useAsync(getPosts);
   const [editing, setEditing] = useState<ForumCategory | "new" | null>(null);
+  const [editingTopic, setEditingTopic] = useState<{
+    item: TopicView | null;
+    content: string;
+  } | null>(null);
+  const [editingPost, setEditingPost] = useState<PostView | null>(null);
   const [actionError, setActionError] = useState("");
 
   const perform = async (action: () => Promise<void>, reload: () => Promise<void>) => {
@@ -42,8 +51,10 @@ export function ForumPage() {
     try {
       await action();
       await reload();
+      return true;
     } catch (reason) {
       setActionError(reason instanceof Error ? reason.message : "Action failed.");
+      return false;
     }
   };
 
@@ -51,7 +62,7 @@ export function ForumPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const current = editing === "new" ? null : editing;
-    await perform(
+    const saved = await perform(
       () =>
         saveForumCategory(current?.id ?? null, {
           name: String(form.get("name")),
@@ -62,7 +73,49 @@ export function ForumPage() {
         }),
       categories.reload,
     );
-    setEditing(null);
+    if (saved) setEditing(null);
+  };
+
+  const openTopicEditor = async (item: TopicView | null) => {
+    setActionError("");
+    try {
+      setEditingTopic({ item, content: item ? await getForumTopicContent(item.id) : "" });
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "Could not open topic editor.");
+    }
+  };
+
+  const submitTopic = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const item = editingTopic?.item;
+    const saved = await perform(
+      () =>
+        saveOwnerForumTopic(item?.id ?? null, {
+          category_id: Number(form.get("category_id")),
+          title: String(form.get("title")),
+          content: String(form.get("content")),
+          is_pinned: form.get("is_pinned") === "on",
+          is_locked: form.get("is_locked") === "on",
+          is_protected: form.get("is_protected") === "on",
+        }),
+      topics.reload,
+    );
+    if (saved) {
+      setEditingTopic(null);
+      await posts.reload();
+    }
+  };
+
+  const submitPost = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingPost) return;
+    const form = new FormData(event.currentTarget);
+    const saved = await perform(
+      () => updateOwnerForumPost(editingPost.id, String(form.get("body"))),
+      posts.reload,
+    );
+    if (saved) setEditingPost(null);
   };
 
   const current = tab === "categories" ? categories : tab === "topics" ? topics : posts;
@@ -75,6 +128,10 @@ export function ForumPage() {
           tab === "categories" && isAdmin ? (
             <Button onClick={() => setEditing("new")}>
               <Plus size={17} /> New category
+            </Button>
+          ) : tab === "topics" && isOwner ? (
+            <Button onClick={() => void openTopicEditor(null)}>
+              <Plus size={17} /> Новая тема
             </Button>
           ) : undefined
         }
@@ -176,10 +233,18 @@ export function ForumPage() {
                       </div>
                     </td>
                     <td>
-                      {item.is_protected && !isAdmin ? (
+                      {item.is_protected && !isOwner ? (
                         <Badge tone="muted">protected</Badge>
                       ) : (
                         <div className="action-row">
+                          {isOwner ? (
+                            <IconButton
+                              aria-label={`Edit ${item.title}`}
+                              onClick={() => void openTopicEditor(item)}
+                            >
+                              <Edit3 size={17} />
+                            </IconButton>
+                          ) : null}
                           <IconButton
                             aria-label={item.is_pinned ? "Unpin topic" : "Pin topic"}
                             onClick={() =>
@@ -244,15 +309,22 @@ export function ForumPage() {
                     <td>{item.topic}</td>
                     <td>{formatDate(item.created_at)}</td>
                     <td>
-                      {item.is_protected && !isAdmin ? (
+                      {item.is_protected && !isOwner ? (
                         <Badge tone="muted">protected</Badge>
                       ) : (
-                        <ConfirmButton
-                          confirmLabel="Remove this post?"
-                          onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
-                        >
-                          Moderate
-                        </ConfirmButton>
+                        <div className="action-row">
+                          {isOwner ? (
+                            <IconButton aria-label="Edit post" onClick={() => setEditingPost(item)}>
+                              <Edit3 size={17} />
+                            </IconButton>
+                          ) : null}
+                          <ConfirmButton
+                            confirmLabel="Move this post to trash?"
+                            onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
+                          >
+                            Moderate
+                          </ConfirmButton>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -271,7 +343,102 @@ export function ForumPage() {
           <CategoryForm item={editing === "new" ? null : editing} onSubmit={submitCategory} />
         </Modal>
       )}
+      {editingTopic && (
+        <Modal
+          title={editingTopic.item ? "Редактировать тему" : "Новая тема"}
+          onClose={() => setEditingTopic(null)}
+          wide
+        >
+          <TopicForm
+            item={editingTopic.item}
+            content={editingTopic.content}
+            categories={categories.data ?? []}
+            onSubmit={submitTopic}
+          />
+        </Modal>
+      )}
+      {editingPost && (
+        <Modal title="Редактировать сообщение" onClose={() => setEditingPost(null)} wide>
+          <form className="dialog-form" onSubmit={submitPost}>
+            <label>
+              Содержимое
+              <textarea
+                name="body"
+                defaultValue={editingPost.body}
+                minLength={1}
+                maxLength={20000}
+                rows={10}
+                required
+              />
+            </label>
+            <Button type="submit">Сохранить сообщение</Button>
+          </form>
+        </Modal>
+      )}
     </>
+  );
+}
+
+function TopicForm({
+  item,
+  content,
+  categories,
+  onSubmit,
+}: {
+  item: TopicView | null;
+  content: string;
+  categories: ForumCategory[];
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <form className="dialog-form" onSubmit={onSubmit} autoComplete="off">
+      <label>
+        Название
+        <input
+          name="title"
+          defaultValue={item?.title ?? ""}
+          minLength={3}
+          maxLength={180}
+          required
+        />
+      </label>
+      <label>
+        Категория
+        <select name="category_id" defaultValue={item?.category_id ?? categories[0]?.id} required>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Содержимое
+        <textarea
+          name="content"
+          defaultValue={content}
+          minLength={1}
+          maxLength={20000}
+          rows={12}
+          required
+        />
+      </label>
+      <div className="dialog-checks">
+        <label className="check-label">
+          <input name="is_pinned" type="checkbox" defaultChecked={item?.is_pinned ?? false} />{" "}
+          Закреплена
+        </label>
+        <label className="check-label">
+          <input name="is_locked" type="checkbox" defaultChecked={item?.is_locked ?? false} />{" "}
+          Закрыта
+        </label>
+        <label className="check-label">
+          <input name="is_protected" type="checkbox" defaultChecked={item?.is_protected ?? true} />{" "}
+          Официальная NCEA
+        </label>
+      </div>
+      <Button type="submit">Сохранить тему</Button>
+    </form>
   );
 }
 

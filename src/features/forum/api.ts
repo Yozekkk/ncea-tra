@@ -23,6 +23,7 @@ export async function getLatestTopics(categoryId?: number) {
   let query = getSupabaseClient()
     .from("forum_topics")
     .select(topicSelect)
+    .is("deleted_at", null)
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(50);
@@ -47,6 +48,7 @@ export async function getForumTopic(slug: string) {
     .from("forum_topics")
     .select(topicSelect)
     .eq("slug", slug)
+    .is("deleted_at", null)
     .limit(1)
     .single();
   if (error) fail(error, "Тема не найдена");
@@ -58,6 +60,7 @@ export async function getTopicPosts(topicId: string) {
     .from("forum_posts")
     .select("*, profiles(username, avatar_url)")
     .eq("topic_id", topicId)
+    .is("deleted_at", null)
     .order("created_at");
   if (error) fail(error, "Не удалось загрузить сообщения");
   return data as unknown as ForumPost[];
@@ -92,7 +95,10 @@ export async function updateTopic(
 }
 
 export async function deleteTopic(id: string) {
-  const { error } = await getSupabaseClient().from("forum_topics").delete().eq("id", id);
+  const { error } = await getSupabaseClient().rpc("soft_delete_forum_topic", {
+    _topic_id: id,
+    _reason: null,
+  });
   if (error) fail(error, "Не удалось удалить тему");
 }
 
@@ -105,6 +111,9 @@ export async function updatePost(id: string, body: string) {
 }
 
 export async function deletePost(id: string) {
-  const { error } = await getSupabaseClient().from("forum_posts").delete().eq("id", id);
+  const { error } = await getSupabaseClient().rpc("soft_delete_forum_post", {
+    _post_id: id,
+    _reason: null,
+  });
   if (error) fail(error, "Не удалось удалить сообщение");
 }

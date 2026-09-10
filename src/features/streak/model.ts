@@ -17,7 +17,7 @@ export function getStreakPresentation(value: number): StreakPresentation {
     eligible,
     message:
       days === 0
-        ? "Зайдите сегодня, чтобы начать серию"
+        ? "Продлите ударный режим, чтобы начать серию"
         : eligible
           ? "Ваши опубликованные товары участвуют в продвижении"
           : `До продвижения: ${PROMOTION_STREAK_DAYS - days} дн.`,
@@ -29,7 +29,8 @@ export interface PromotableListing {
   listing_source?: "agency" | "user";
   sort_order?: number | null;
   effective_streak: number;
-  last_bumped_at: string | null;
+  last_streak_renewed_at: string | null;
+  published_at: string | null;
   created_at: string;
 }
 
@@ -55,10 +56,14 @@ export function rankMarketplaceListings<T extends PromotableListing>(listings: T
     if (leftEligible && rightEligible) {
       if (left.effective_streak !== right.effective_streak)
         return right.effective_streak - left.effective_streak;
-      const bumpDifference =
-        Date.parse(right.last_bumped_at ?? "1970-01-01T00:00:00Z") -
-        Date.parse(left.last_bumped_at ?? "1970-01-01T00:00:00Z");
-      if (bumpDifference) return bumpDifference;
+      const renewalDifference =
+        Date.parse(right.last_streak_renewed_at ?? "1970-01-01T00:00:00Z") -
+        Date.parse(left.last_streak_renewed_at ?? "1970-01-01T00:00:00Z");
+      if (renewalDifference) return renewalDifference;
+      const publicationDifference =
+        Date.parse(right.published_at ?? "1970-01-01T00:00:00Z") -
+        Date.parse(left.published_at ?? "1970-01-01T00:00:00Z");
+      if (publicationDifference) return publicationDifference;
     }
     const createdDifference = Date.parse(right.created_at) - Date.parse(left.created_at);
     if (createdDifference) return createdDifference;

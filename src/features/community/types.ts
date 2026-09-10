@@ -4,9 +4,14 @@ export type ListingSource = "agency" | "user";
 
 export interface ActivityStreak {
   current_streak: number;
-  last_active_date: string;
-  streak_started_on: string;
-  last_bumped_at: string;
+  last_active_date: string | null;
+  streak_started_on: string | null;
+  last_streak_renewed_at: string | null;
+  renewed_today: boolean;
+}
+
+export interface StreakRenewalResult extends ActivityStreak {
+  renewed: boolean;
 }
 
 export interface Profile {
@@ -91,6 +96,7 @@ export interface MarketplaceListing {
   effective_streak?: number;
   promotion_eligible?: boolean;
   last_bumped_at?: string | null;
+  last_streak_renewed_at?: string | null;
   profiles?: Pick<Profile, "username" | "avatar_url"> | null;
   marketplace_categories?: Pick<MarketplaceCategory, "name" | "slug"> | null;
   marketplace_listing_images?: ListingImage[];

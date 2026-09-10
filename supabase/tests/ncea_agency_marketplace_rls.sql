@@ -194,11 +194,13 @@ $$;
 
 reset role;
 insert into public.user_activity_streaks (
-  user_id, current_streak, last_active_date, streak_started_on, last_bumped_at
+  user_id, current_streak, last_active_date, streak_started_on,
+  last_bumped_at, last_streak_renewed_at
 ) values (
   '12000000-0000-4000-8000-000000000001', 30,
   (statement_timestamp() at time zone 'UTC')::date,
   (statement_timestamp() at time zone 'UTC')::date - 29,
+  statement_timestamp(),
   statement_timestamp()
 );
 
@@ -219,7 +221,8 @@ begin
     agency_sort_order asc nulls last,
     agency_created_at asc nulls last,
     effective_streak desc,
-    last_bumped_at desc nulls last,
+    last_streak_renewed_at desc nulls last,
+    promoted_published_at desc nulls last,
     user_created_at desc nulls last,
     id
   limit 1;

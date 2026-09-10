@@ -53,10 +53,12 @@ const requiredFiles = [
   "supabase/migrations/20260908122000_ncea_marketplace_rpc_enum_cast.sql",
   "supabase/migrations/20260908123000_ncea_storage_policy_upload_compatibility.sql",
   "supabase/migrations/20260908124000_ncea_registration_rate_limit_saturation.sql",
+  "supabase/migrations/20260910051040_ncea_strike_mode_and_plugin_bundles.sql",
   "supabase/functions/register-account/index.ts",
   "supabase/tests/ncea_api_verification.mjs",
   "supabase/tests/ncea_platform_rls.sql",
   "supabase/tests/ncea_streak_marketplace_rls.sql",
+  "supabase/tests/ncea_strike_mode_rls.sql",
   "tests/validation.test.ts",
   "docs/ncea-platform.md",
   ".env.example",
@@ -260,6 +262,56 @@ if (
   fail("Ссылка официального партнёра открывается небезопасно");
 if (!process.exitCode)
   ok("Официальный партнёр и защищённый agency Marketplace зафиксированы в UI и миграции");
+
+const strikeMigration = read(
+  "supabase/migrations/20260910051040_ncea_strike_mode_and_plugin_bundles.sql",
+);
+const authProvider = read("src/features/auth/AuthProvider.tsx");
+const strikeCard = read("src/features/streak/components.tsx");
+const marketplaceApi = read("src/features/marketplace/api.ts");
+for (const invariant of [
+  "create or replace function public.get_strike_mode_status()",
+  "create or replace function public.renew_strike_mode()",
+  "pg_advisory_xact_lock",
+  "statement_timestamp() at time zone 'UTC'",
+  "revoke all on function public.record_daily_activity() from public, anon, authenticated",
+  "last_streak_renewed_at",
+  "listing.published_at",
+]) {
+  if (!strikeMigration.includes(invariant))
+    fail(`В strike-mode migration отсутствует invariant: ${invariant}`);
+}
+for (const title of [
+  "Сборка Funtime",
+  "Сборка ReallyWorld",
+  "Сборка HolyWorld",
+  "Сборка Bedwars",
+  "Сборка мини-игр",
+]) {
+  if (!strikeMigration.includes(title)) fail(`Не добавлена официальная сборка: ${title}`);
+}
+if (authProvider.includes('rpc("record_daily_activity")'))
+  fail("AuthProvider всё ещё автоматически продлевает streak при открытии сайта");
+if (!authProvider.includes("getStrikeModeStatus"))
+  fail("AuthProvider не использует read-only статус ударного режима");
+for (const copy of [
+  "🔥 Ударный режим",
+  "Продлить ударный режим",
+  "Сегодня ударный режим уже продлён. Возвращайтесь завтра.",
+]) {
+  if (!strikeCard.includes(copy)) fail(`В strike-mode UI отсутствует текст: ${copy}`);
+}
+for (const ordering of [
+  '.order("feed_group", { ascending: true })',
+  '.order("effective_streak", { ascending: false })',
+  '.order("last_streak_renewed_at", { ascending: false, nullsFirst: false })',
+  '.order("promoted_published_at", { ascending: false, nullsFirst: false })',
+  '.order("id", { ascending: true })',
+]) {
+  if (!marketplaceApi.includes(ordering)) fail(`Marketplace API не фиксирует порядок: ${ordering}`);
+}
+if (!process.exitCode)
+  ok("Ударный режим, UTC-идемпотентность, сборки NCEA и порядок выдачи зафиксированы");
 
 if (process.exitCode) {
   console.error("\nПроверка NCEA завершилась с ошибками. Деплой остановлен.\n");

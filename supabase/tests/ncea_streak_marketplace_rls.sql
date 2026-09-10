@@ -93,7 +93,7 @@ declare
   activity record;
   listing_id uuid;
 begin
-  select * into activity from public.record_daily_activity();
+  select * into activity from public.renew_strike_mode();
   if activity.current_streak <> 6 then
     raise exception 'Repeated authenticated activity changed today streak';
   end if;
@@ -235,8 +235,8 @@ begin
   order by
     promotion_eligible desc,
     effective_streak desc,
-    last_bumped_at desc nulls last,
-    created_at desc,
+    last_streak_renewed_at desc nulls last,
+    published_at desc nulls last,
     id
   limit 1;
 

@@ -90,7 +90,7 @@ describe("activity streak presentation and promotion order", () => {
       days: 0,
       progress: 0,
       eligible: false,
-      message: "Зайдите сегодня, чтобы начать серию",
+      message: "Продлите ударный режим, чтобы начать серию",
     });
     assert.equal(getStreakPresentation(2).progress, 2);
     assert.equal(getStreakPresentation(2).eligible, false);
@@ -103,26 +103,61 @@ describe("activity streak presentation and promotion order", () => {
       {
         id: "b",
         effective_streak: 4,
-        last_bumped_at: "2026-09-07T10:00:00Z",
+        last_streak_renewed_at: "2026-09-07T10:00:00Z",
+        published_at: "2026-09-03T10:00:00Z",
         created_at: "2026-09-01T10:00:00Z",
       },
-      { id: "c", effective_streak: 0, last_bumped_at: null, created_at: "2026-09-08T10:00:00Z" },
+      {
+        id: "c",
+        effective_streak: 0,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-08T10:00:00Z",
+        created_at: "2026-09-08T10:00:00Z",
+      },
       {
         id: "a",
         effective_streak: 6,
-        last_bumped_at: "2026-09-08T10:00:00Z",
+        last_streak_renewed_at: "2026-09-08T10:00:00Z",
+        published_at: "2026-08-02T10:00:00Z",
         created_at: "2026-08-01T10:00:00Z",
       },
       {
         id: "d",
         effective_streak: 4,
-        last_bumped_at: "2026-09-08T10:00:00Z",
+        last_streak_renewed_at: "2026-09-08T10:00:00Z",
+        published_at: "2026-09-04T10:00:00Z",
         created_at: "2026-09-02T10:00:00Z",
       },
     ]);
     assert.deepEqual(
       ranked.map((item) => item.id),
       ["a", "d", "b", "c"],
+    );
+  });
+
+  it("uses publication time before id for equally promoted sellers", () => {
+    const ranked = rankMarketplaceListings([
+      {
+        id: "published-earlier",
+        listing_source: "user" as const,
+        effective_streak: 5,
+        last_streak_renewed_at: "2026-09-10T09:00:00Z",
+        published_at: "2026-09-08T10:00:00Z",
+        created_at: "2026-09-10T10:00:00Z",
+      },
+      {
+        id: "published-later",
+        listing_source: "user" as const,
+        effective_streak: 5,
+        last_streak_renewed_at: "2026-09-10T09:00:00Z",
+        published_at: "2026-09-09T10:00:00Z",
+        created_at: "2026-09-01T10:00:00Z",
+      },
+    ]);
+
+    assert.deepEqual(
+      ranked.map((item) => item.id),
+      ["published-later", "published-earlier"],
     );
   });
 
@@ -133,7 +168,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "user" as const,
         sort_order: null,
         effective_streak: 30,
-        last_bumped_at: "2026-09-09T10:00:00Z",
+        last_streak_renewed_at: "2026-09-09T10:00:00Z",
+        published_at: "2026-09-09T10:00:00Z",
         created_at: "2026-09-09T10:00:00Z",
       },
       {
@@ -141,7 +177,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "agency" as const,
         sort_order: 20,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-08-01T10:00:00Z",
         created_at: "2026-08-01T10:00:00Z",
       },
       {
@@ -149,7 +186,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "user" as const,
         sort_order: null,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-09T12:00:00Z",
         created_at: "2026-09-09T12:00:00Z",
       },
       {
@@ -157,7 +195,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "agency" as const,
         sort_order: 10,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-01T10:00:00Z",
         created_at: "2026-09-01T10:00:00Z",
       },
     ]);
@@ -175,7 +214,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "agency" as const,
         sort_order: 10,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-02T10:00:00Z",
         created_at: "2026-09-02T10:00:00Z",
       },
       {
@@ -183,7 +223,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "agency" as const,
         sort_order: 10,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-01T10:00:00Z",
         created_at: "2026-09-01T10:00:00Z",
       },
       {
@@ -191,7 +232,8 @@ describe("activity streak presentation and promotion order", () => {
         listing_source: "agency" as const,
         sort_order: 10,
         effective_streak: 0,
-        last_bumped_at: null,
+        last_streak_renewed_at: null,
+        published_at: "2026-09-01T10:00:00Z",
         created_at: "2026-09-01T10:00:00Z",
       },
     ]);

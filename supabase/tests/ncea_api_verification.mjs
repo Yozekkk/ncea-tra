@@ -143,19 +143,25 @@ const [userA, userB, admin] = clients;
 const [accountA, accountB, accountAdmin] = accounts;
 const anonymous = client();
 
-const { data: firstActivity, error: firstActivityError } = await userA.rpc("record_daily_activity");
+const { data: initialStrikeStatus, error: initialStrikeStatusError } =
+  await userA.rpc("get_strike_mode_status");
+if (initialStrikeStatusError) throw initialStrikeStatusError;
+check(initialStrikeStatus?.[0]?.current_streak === 0, "Reading strike status mutated the streak");
+const { data: firstActivity, error: firstActivityError } = await userA.rpc("renew_strike_mode");
 if (firstActivityError) throw firstActivityError;
 const { data: repeatedActivity, error: repeatedActivityError } =
-  await userA.rpc("record_daily_activity");
+  await userA.rpc("renew_strike_mode");
 if (repeatedActivityError) throw repeatedActivityError;
 check(firstActivity?.[0]?.current_streak >= 1, "User A activity streak was not created");
+check(firstActivity?.[0]?.renewed === true, "First strike renewal was not acknowledged");
 check(
-  repeatedActivity?.[0]?.current_streak === firstActivity?.[0]?.current_streak,
+  repeatedActivity?.[0]?.current_streak === firstActivity?.[0]?.current_streak &&
+    repeatedActivity?.[0]?.renewed === false,
   "Repeated same-day activity incremented User A streak",
 );
 const { error: forgedStreakError } = await userA
   .from("user_activity_streaks")
-  .update({ current_streak: 999 })
+  .update({ current_streak: 999, last_streak_renewed_at: "2099-01-01T00:00:00Z" })
   .eq("user_id", accountA.id);
 check(Boolean(forgedStreakError), "User A changed their streak through the client");
 

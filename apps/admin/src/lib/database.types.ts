@@ -325,6 +325,7 @@ export type Database = {
           current_streak: number;
           last_active_date: string;
           last_bumped_at: string;
+          last_streak_renewed_at: string;
           streak_started_on: string;
           updated_at: string;
           user_id: string;
@@ -333,6 +334,7 @@ export type Database = {
           current_streak: number;
           last_active_date: string;
           last_bumped_at: string;
+          last_streak_renewed_at: string;
           streak_started_on: string;
           updated_at?: string;
           user_id: string;
@@ -341,6 +343,7 @@ export type Database = {
           current_streak?: number;
           last_active_date?: string;
           last_bumped_at?: string;
+          last_streak_renewed_at?: string;
           streak_started_on?: string;
           updated_at?: string;
           user_id?: string;
@@ -389,11 +392,14 @@ export type Database = {
           feed_group: number | null;
           id: string | null;
           last_bumped_at: string | null;
+          last_streak_renewed_at: string | null;
           listing_source: Database["public"]["Enums"]["marketplace_listing_source"] | null;
           minecraft_version: string | null;
           platform: string | null;
           price_amount: number | null;
+          promoted_published_at: string | null;
           promotion_eligible: boolean | null;
+          published_at: string | null;
           seller_avatar_url: string | null;
           seller_id: string | null;
           seller_username: string | null;
@@ -462,6 +468,27 @@ export type Database = {
           current_streak: number;
           last_active_date: string;
           last_bumped_at: string;
+          streak_started_on: string;
+        }[];
+      };
+      get_strike_mode_status: {
+        Args: never;
+        Returns: {
+          current_streak: number;
+          last_active_date: string;
+          last_streak_renewed_at: string;
+          renewed_today: boolean;
+          streak_started_on: string;
+        }[];
+      };
+      renew_strike_mode: {
+        Args: never;
+        Returns: {
+          current_streak: number;
+          last_active_date: string;
+          last_streak_renewed_at: string;
+          renewed: boolean;
+          renewed_today: boolean;
           streak_started_on: string;
         }[];
       };

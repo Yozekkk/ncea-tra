@@ -9,7 +9,12 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import type { ActivityStreak, AppRole, Profile } from "@/features/community/types";
+import type {
+  ActivityStreak,
+  AppRole,
+  Profile,
+  StreakRenewalResult,
+} from "@/features/community/types";
 
 type AuthState = {
   ready: boolean;
@@ -20,6 +25,7 @@ type AuthState = {
   streak: ActivityStreak | null;
   isStaff: boolean;
   isAdmin: boolean;
+  renewStreak: () => Promise<StreakRenewalResult>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -44,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setReady(true);
       return;
     }
-    const [{ getSupabaseClient }, { recordDailyActivity }] = await Promise.all([
+    const [{ getSupabaseClient }, { getStrikeModeStatus }] = await Promise.all([
       import("@/lib/supabase"),
       import("@/features/streak/api"),
     ]);
@@ -52,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [{ data: nextProfile }, { data: nextRole }, nextStreak] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", nextSession.user.id).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", nextSession.user.id).maybeSingle(),
-      recordDailyActivity().catch(() => null),
+      getStrikeModeStatus().catch(() => null),
     ]);
     if (sessionRef.current?.user.id === nextSession.user.id) {
       setProfile((nextProfile as Profile | null) ?? null);
@@ -91,6 +97,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [hydrate]);
 
   const refreshProfile = useCallback(async () => hydrate(sessionRef.current), [hydrate]);
+  const renewStreak = useCallback(async () => {
+    const { renewStrikeMode } = await import("@/features/streak/api");
+    const nextStreak = await renewStrikeMode();
+    setStreak(nextStreak);
+    return nextStreak;
+  }, []);
   const logout = useCallback(async () => {
     const { getSupabaseClient, isSupabaseConfigured } = await import("@/lib/supabase");
     if (isSupabaseConfigured()) await getSupabaseClient().auth.signOut();
@@ -107,10 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       streak,
       isStaff: role === "moderator" || role === "admin",
       isAdmin: role === "admin",
+      renewStreak,
       refreshProfile,
       logout,
     }),
-    [ready, session, profile, role, streak, refreshProfile, logout],
+    [ready, session, profile, role, streak, renewStreak, refreshProfile, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

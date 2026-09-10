@@ -27,9 +27,11 @@ type FeedRow = Omit<
   effective_streak: number;
   promotion_eligible: boolean;
   last_bumped_at: string | null;
+  last_streak_renewed_at: string | null;
   feed_group: number;
   agency_sort_order: number | null;
   agency_created_at: string | null;
+  promoted_published_at: string | null;
   user_created_at: string | null;
 };
 
@@ -120,7 +122,8 @@ export async function getPublishedListings(
     .order("agency_sort_order", { ascending: true, nullsFirst: false })
     .order("agency_created_at", { ascending: true, nullsFirst: false })
     .order("effective_streak", { ascending: false })
-    .order("last_bumped_at", { ascending: false, nullsFirst: false })
+    .order("last_streak_renewed_at", { ascending: false, nullsFirst: false })
+    .order("promoted_published_at", { ascending: false, nullsFirst: false })
     .order("user_created_at", { ascending: false, nullsFirst: false })
     .order("id", { ascending: true })
     .limit(60);
@@ -138,6 +141,7 @@ export async function getPublishedListings(
       feed_group: _feedGroup,
       agency_sort_order: _agencySortOrder,
       agency_created_at: _agencyCreatedAt,
+      promoted_published_at: _promotedPublishedAt,
       user_created_at: _userCreatedAt,
       ...listing
     }) => ({

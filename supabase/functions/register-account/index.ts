@@ -7,11 +7,14 @@ const allowedOrigins = new Set([
   "https://ncea-tra.vercel.app",
   "https://ncea-tra-rose.vercel.app",
   "https://ncea-tra-admin-panel-hunmaster.vercel.app",
+  "https://ncreate-site.vercel.app",
 ]);
 
 function isAllowedOrigin(origin: string) {
   if (allowedOrigins.has(origin)) return true;
   if (/^https:\/\/(?:ncea|ncea-tra)-[a-z0-9-]+-admin-panel-hunmaster\.vercel\.app$/.test(origin))
+    return true;
+  if (/^https:\/\/ncreate-site-[a-z0-9-]+-admin-panel-hunmaster\.vercel\.app$/.test(origin))
     return true;
   return /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 }

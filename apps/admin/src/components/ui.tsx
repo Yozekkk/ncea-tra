@@ -20,15 +20,17 @@ export function PageHeader({
   title,
   description,
   action,
+  controlLabel = "NCEA CONTROL",
 }: {
   title: string;
   description: string;
   action?: ReactNode;
+  controlLabel?: string;
 }) {
   return (
     <div className="page-header">
       <div>
-        <p className="eyebrow">NCEA CONTROL</p>
+        <p className="eyebrow">{controlLabel}</p>
         <h1>{title}</h1>
         <p>{description}</p>
       </div>

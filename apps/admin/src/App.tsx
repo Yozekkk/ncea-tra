@@ -3,6 +3,7 @@ import { AppShell } from "./components/AppShell";
 import { AuthGate } from "./components/AuthGate";
 import { useAdminAccess } from "./components/AdminAccess";
 import { LoadingState } from "./components/ui";
+import type { AdminWorkspace } from "./lib/types";
 
 const Dashboard = lazy(() =>
   import("./pages/Dashboard").then((module) => ({ default: module.Dashboard })),
@@ -25,6 +26,15 @@ const UsersPage = lazy(() =>
 const DeletedPage = lazy(() =>
   import("./pages/DeletedPage").then((module) => ({ default: module.DeletedPage })),
 );
+const NCreateDashboard = lazy(() =>
+  import("./pages/NCreateDashboard").then((module) => ({ default: module.NCreateDashboard })),
+);
+const NCreateSettingsPage = lazy(() =>
+  import("./pages/NCreateSettingsPage").then((module) => ({ default: module.NCreateSettingsPage })),
+);
+const NCreateForumPage = lazy(() =>
+  import("./pages/NCreateForumPage").then((module) => ({ default: module.NCreateForumPage })),
+);
 
 const routes: Record<string, React.ComponentType> = {
   "/": Dashboard,
@@ -34,6 +44,12 @@ const routes: Record<string, React.ComponentType> = {
   "/moderation": ModerationPage,
   "/settings": SettingsPage,
   "/deleted": DeletedPage,
+};
+
+const ncreateRoutes: Record<string, React.ComponentType> = {
+  "/": NCreateDashboard,
+  "/site": NCreateSettingsPage,
+  "/forum": NCreateForumPage,
 };
 
 export function App() {
@@ -46,6 +62,9 @@ export function App() {
 
 function AuthorizedApp() {
   const { role } = useAdminAccess();
+  const [workspace, setWorkspaceState] = useState<AdminWorkspace>(() =>
+    window.localStorage.getItem("ncea-admin-workspace") === "ncreate" ? "ncreate" : "ncea",
+  );
   const [path, setPath] = useState(normalizePath(window.location.pathname));
   useEffect(() => {
     const onPopState = () => setPath(normalizePath(window.location.pathname));
@@ -58,12 +77,21 @@ function AuthorizedApp() {
     setPath(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const forbidden =
-    role === "owner" ? [] : role === "admin" ? ["/deleted"] : ["/users", "/settings", "/deleted"];
+  const setWorkspace = (next: AdminWorkspace) => {
+    window.localStorage.setItem("ncea-admin-workspace", next);
+    setWorkspaceState(next);
+    window.history.pushState({}, "", "/");
+    setPath("/");
+  };
+  const forbidden = workspace === "ncreate"
+    ? role === "moderator" ? ["/site"] : []
+    : role === "owner" ? [] : role === "admin" ? ["/deleted"] : ["/users", "/settings", "/deleted"];
   const allowedPath = forbidden.includes(path) ? "/moderation" : path;
-  const Page = routes[allowedPath] ?? (role === "moderator" ? ModerationPage : Dashboard);
+  const activeRoutes = workspace === "ncreate" ? ncreateRoutes : routes;
+  const safePath = activeRoutes[allowedPath] ? allowedPath : "/";
+  const Page = activeRoutes[safePath] ?? Dashboard;
   return (
-    <AppShell path={allowedPath} navigate={navigate} role={role}>
+    <AppShell path={safePath} navigate={navigate} role={role} workspace={workspace} setWorkspace={setWorkspace}>
       <Suspense fallback={<LoadingState />}>
         <Page />
       </Suspense>
@@ -73,5 +101,5 @@ function AuthorizedApp() {
 
 function normalizePath(path: string) {
   const normalized = path.replace(/\/+$/, "") || "/";
-  return routes[normalized] ? normalized : "/";
+  return normalized;
 }

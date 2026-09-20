@@ -1,7 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Clock, Lock, MessageCircle, Pencil, Pin, Plus, Send, Trash2 } from "lucide-react";
+import {
+  Clock,
+  ImageOff,
+  Lock,
+  MessageCircle,
+  Pencil,
+  Pin,
+  Plus,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -77,6 +87,7 @@ export function TopicList({ topics }: { topics: ForumTopic[] }) {
           className="topic-row"
         >
           <span className="activity-rail" aria-hidden="true" />
+          {topic.image_url ? <TopicCover src={topic.image_url} title={topic.title} /> : null}
           <div className="topic-row-main">
             <div className="topic-flags">
               {topic.is_pinned ? (
@@ -109,6 +120,26 @@ export function TopicList({ topics }: { topics: ForumTopic[] }) {
           </div>
         </Link>
       ))}
+    </div>
+  );
+}
+
+function TopicCover({ src, title }: { src: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="topic-row-cover">
+      {failed ? (
+        <ImageOff aria-label="Обложка недоступна" />
+      ) : (
+        <img
+          src={src}
+          alt={`Обложка темы «${title}»`}
+          loading="lazy"
+          width={320}
+          height={180}
+          onError={() => setFailed(true)}
+        />
+      )}
     </div>
   );
 }

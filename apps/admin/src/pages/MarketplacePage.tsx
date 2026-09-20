@@ -1,5 +1,5 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Edit3, ImageOff, Plus } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { Edit3, Plus } from "lucide-react";
 import {
   deleteListing,
   getListings,
@@ -23,6 +23,8 @@ import {
   PageHeader,
 } from "../components/ui";
 import { useAdminAccess } from "../components/AdminAccess";
+import { UrlImagePreview } from "../components/UrlImagePreview";
+import { isSafeHttpUrl, normalizeOptionalText } from "../lib/validation";
 
 type Tab = "categories" | "listings";
 
@@ -73,7 +75,7 @@ export function MarketplacePage() {
     const current = editingListing === "new" ? null : editingListing;
     const intent = String(form.get("intent") || "save");
     const imageUrl = String(form.get("image_url") || "").trim();
-    if (imageUrl && !isSafeImageUrl(imageUrl)) {
+    if (imageUrl && !isSafeHttpUrl(imageUrl)) {
       setActionError("Image URL must be a valid http/https URL without markup or credentials.");
       return;
     }
@@ -87,7 +89,7 @@ export function MarketplacePage() {
           listing_source: String(form.get("listing_source")) as "agency" | "user",
           image_url: imageUrl || null,
           price_amount: form.get("price_amount") ? Number(form.get("price_amount")) : null,
-          price_text: String(form.get("price_text") || "").trim() || null,
+          price_text: normalizeOptionalText(form.get("price_text")),
           currency_code: String(form.get("currency_code") || "RUB"),
           minecraft_version: String(form.get("minecraft_version")) || null,
           platform: String(form.get("platform")) || null,
@@ -97,7 +99,11 @@ export function MarketplacePage() {
               : null,
           status: (intent === "publish"
             ? "published"
-            : String(form.get("status"))) as ListingStatus,
+            : intent === "draft"
+              ? "draft"
+              : intent === "archive"
+                ? "archived"
+                : String(form.get("status"))) as ListingStatus,
         }),
       listings.reload,
     );
@@ -317,9 +323,7 @@ function ListingEditorForm({
 }) {
   const [source, setSource] = useState<"agency" | "user">(item?.listing_source ?? "agency");
   const [imageUrl, setImageUrl] = useState(item?.image_url ?? "");
-  const [imageFailed, setImageFailed] = useState(false);
-  useEffect(() => setImageFailed(false), [imageUrl]);
-  const showPreview = isSafeImageUrl(imageUrl) && !imageFailed;
+  const invalidImage = Boolean(imageUrl && !isSafeHttpUrl(imageUrl));
   return (
     <form className="dialog-form" onSubmit={onSubmit} autoComplete="off">
       <label>
@@ -440,35 +444,18 @@ function ListingEditorForm({
           onChange={(event) => setImageUrl(event.target.value)}
           maxLength={2048}
         />
-        {imageUrl && !isSafeImageUrl(imageUrl) ? (
+        {invalidImage ? (
           <span className="field-error" role="alert">
             Допустим только безопасный прямой http/https URL.
           </span>
         ) : null}
       </label>
-      <div className="image-url-preview" aria-live="polite">
-        {showPreview ? (
-          <img
-            src={imageUrl}
-            alt="Предпросмотр изображения товара"
-            width={960}
-            height={540}
-            onError={() => setImageFailed(true)}
-          />
-        ) : (
-          <span>
-            <ImageOff size={22} />
-            Скоро будет добавлена картинка
-          </span>
-        )}
-      </div>
+      <UrlImagePreview url={imageUrl} alt="Предпросмотр изображения товара" />
       <div className="dialog-actions">
-        <Button
-          type="submit"
-          name="intent"
-          value="save"
-          disabled={Boolean(imageUrl && !isSafeImageUrl(imageUrl))}
-        >
+        <Button type="submit" name="intent" value="draft" disabled={invalidImage}>
+          Сохранить черновик
+        </Button>
+        <Button type="submit" name="intent" value="save" disabled={invalidImage}>
           Сохранить
         </Button>
         <Button
@@ -476,26 +463,24 @@ function ListingEditorForm({
           name="intent"
           value="publish"
           className="button-secondary"
-          disabled={Boolean(imageUrl && !isSafeImageUrl(imageUrl))}
+          disabled={invalidImage}
         >
           Опубликовать
         </Button>
+        {item ? (
+          <Button
+            type="submit"
+            name="intent"
+            value="archive"
+            className="button-secondary"
+            disabled={invalidImage}
+          >
+            Архивировать
+          </Button>
+        ) : null}
       </div>
     </form>
   );
-}
-
-function isSafeImageUrl(value: string) {
-  if (!value) return false;
-  if (value.length > 2048 || /[\s<>"'`]/.test(value)) return false;
-  try {
-    const url = new URL(value);
-    return (
-      (url.protocol === "http:" || url.protocol === "https:") && !url.username && !url.password
-    );
-  } catch {
-    return false;
-  }
 }
 
 function CategoryForm({

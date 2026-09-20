@@ -1,68 +1,28 @@
 export type EmployeeLevel = "Стажёр" | "Junior" | "Middle" | "Lead";
 
 export type Employee = {
+  id: string;
   name: string;
-  timezone: string;
-  telegram: string;
-  discord: string;
+  timezone: string | null;
+  telegram: string | null;
+  discord: string | null;
   role: string;
   level: EmployeeLevel;
-  github: string | null;
+  github_url: string | null;
+  image_url: string | null;
+  bio: string | null;
+  sort_order: number;
 };
 
-export const employees: Employee[] = [
-  {
-    name: "Степан",
-    timezone: "МСК",
-    telegram: "@bblsmile",
-    discord: "joykin0065",
-    role: "Контент-мейкер",
-    level: "Middle",
-    github: null,
-  },
-  {
-    name: "Максим",
-    timezone: "EEST",
-    telegram: "@circusoff",
-    discord: "qw3nn",
-    role: "Веб-разработчик",
-    level: "Стажёр",
-    github: null,
-  },
-  {
-    name: "Егор",
-    timezone: "GMT +2",
-    telegram: "@m1ndyp",
-    discord: ".163.",
-    role: "Веб-разработка / разработка модов",
-    level: "Junior",
-    github: null,
-  },
-  {
-    name: "Антон",
-    timezone: "CET (-1 от МСК)",
-    telegram: "@YOURDEPRESSEDVAMPIRE",
-    discord: "@nevskydev",
-    role: "Fullstack-разработка",
-    level: "Lead",
-    github: null,
-  },
-  {
-    name: "Стас",
-    timezone: "МСК",
-    telegram: "@Stacyhomk",
-    discord: "stacygomk",
-    role: "Менеджер",
-    level: "Стажёр",
-    github: null,
-  },
-  {
-    name: "Максим",
-    timezone: "UTC+3 / Киев",
-    telegram: "@LOGICSPARK",
-    discord: "_STALKER_2",
-    role: "Веб-программист",
-    level: "Стажёр",
-    github: null,
-  },
-];
+export async function getActiveEmployees(): Promise<Employee[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("ncea_employees")
+    .select("id,name,role,level,timezone,telegram,discord,github_url,image_url,bio,sort_order")
+    .eq("is_active", true)
+    .order("sort_order")
+    .order("name")
+    .order("id");
+  if (error) throw new Error(error.message || "Не удалось загрузить сотрудников NCEA.");
+  return (data ?? []) as Employee[];
+}
+import { getSupabaseClient } from "@/lib/supabase";

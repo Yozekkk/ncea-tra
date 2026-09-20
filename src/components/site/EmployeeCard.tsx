@@ -37,8 +37,13 @@ async function copyToClipboard(value: string) {
 
 export function EmployeeCard({ employee, index }: EmployeeCardProps) {
   const [copied, setCopied] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const resetTimer = useRef<number | undefined>(undefined);
-  const telegramUsername = employee.telegram.replace(/^@/, "");
+  const telegramHref = employee.telegram
+    ? employee.telegram.startsWith("https://t.me/")
+      ? employee.telegram
+      : `https://t.me/${employee.telegram.replace(/^@/, "")}`
+    : null;
 
   useEffect(
     () => () => {
@@ -47,8 +52,11 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
     [],
   );
 
+  useEffect(() => setImageFailed(false), [employee.image_url]);
+
   const handleDiscordCopy = async () => {
     try {
+      if (!employee.discord) return;
       await copyToClipboard(employee.discord);
       setCopied(true);
       if (resetTimer.current) window.clearTimeout(resetTimer.current);
@@ -67,34 +75,63 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
         </span>
       </div>
 
+      {employee.image_url ? (
+        <div className={`employee-card__media${imageFailed ? " is-failed" : ""}`}>
+          {imageFailed ? (
+            <span>Фото недоступно</span>
+          ) : (
+            <img
+              src={employee.image_url}
+              alt={`Фото сотрудника ${employee.name}`}
+              loading="lazy"
+              onError={() => setImageFailed(true)}
+            />
+          )}
+        </div>
+      ) : null}
+
       <div className="employee-card__identity">
         <h2>{employee.name}</h2>
         <p>{employee.role}</p>
       </div>
 
+      {employee.bio ? <p className="employee-card__bio">{employee.bio}</p> : null}
+
       <div className="employee-timezone">
         <Clock aria-hidden="true" />
-        <span>{employee.timezone}</span>
+        <span>{employee.timezone ?? "Часовой пояс не указан"}</span>
       </div>
 
       <div className="employee-actions" aria-label={`Контакты: ${employee.name}`}>
-        <a
-          className="employee-action"
-          href={`https://t.me/${telegramUsername}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span className="employee-action__icon">
-            <Send aria-hidden="true" />
-          </span>
-          <span className="employee-action__copy">
-            <strong>Telegram</strong>
-            <small>Перейти</small>
-          </span>
-          <ArrowUpRight className="employee-action__arrow" aria-hidden="true" />
-        </a>
+        {telegramHref ? (
+          <a className="employee-action" href={telegramHref} target="_blank" rel="noreferrer">
+            <span className="employee-action__icon">
+              <Send aria-hidden="true" />
+            </span>
+            <span className="employee-action__copy">
+              <strong>Telegram</strong>
+              <small>Перейти</small>
+            </span>
+            <ArrowUpRight className="employee-action__arrow" aria-hidden="true" />
+          </a>
+        ) : (
+          <button className="employee-action is-disabled" type="button" disabled>
+            <span className="employee-action__icon">
+              <Send aria-hidden="true" />
+            </span>
+            <span className="employee-action__copy">
+              <strong>Telegram</strong>
+              <small>Не указан</small>
+            </span>
+          </button>
+        )}
 
-        <button className="employee-action" type="button" onClick={handleDiscordCopy}>
+        <button
+          className={`employee-action${employee.discord ? "" : " is-disabled"}`}
+          type="button"
+          onClick={handleDiscordCopy}
+          disabled={!employee.discord}
+        >
           <span className="employee-action__icon">
             <MessageCircle aria-hidden="true" />
           </span>
@@ -109,8 +146,13 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
           )}
         </button>
 
-        {employee.github ? (
-          <a className="employee-action" href={employee.github} target="_blank" rel="noreferrer">
+        {employee.github_url ? (
+          <a
+            className="employee-action"
+            href={employee.github_url}
+            target="_blank"
+            rel="noreferrer"
+          >
             <span className="employee-action__icon">
               <Github aria-hidden="true" />
             </span>

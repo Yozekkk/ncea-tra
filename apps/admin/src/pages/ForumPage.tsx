@@ -27,6 +27,8 @@ import {
   PageHeader,
 } from "../components/ui";
 import { useAdminAccess } from "../components/AdminAccess";
+import { UrlImagePreview } from "../components/UrlImagePreview";
+import { isSafeHttpUrl, normalizeOptionalText } from "../lib/validation";
 
 type Tab = "categories" | "topics" | "posts";
 
@@ -89,6 +91,11 @@ export function ForumPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const item = editingTopic?.item;
+    const imageUrl = normalizeOptionalText(form.get("image_url"));
+    if (imageUrl && !isSafeHttpUrl(imageUrl)) {
+      setActionError("Cover URL must be a valid http/https URL without markup or credentials.");
+      return;
+    }
     const saved = await perform(
       () =>
         saveOwnerForumTopic(item?.id ?? null, {
@@ -98,6 +105,7 @@ export function ForumPage() {
           is_pinned: form.get("is_pinned") === "on",
           is_locked: form.get("is_locked") === "on",
           is_protected: form.get("is_protected") === "on",
+          image_url: imageUrl,
         }),
       topics.reload,
     );
@@ -129,7 +137,7 @@ export function ForumPage() {
             <Button onClick={() => setEditing("new")}>
               <Plus size={17} /> New category
             </Button>
-          ) : tab === "topics" && isOwner ? (
+          ) : tab === "topics" && isAdmin ? (
             <Button onClick={() => void openTopicEditor(null)}>
               <Plus size={17} /> Новая тема
             </Button>
@@ -233,11 +241,11 @@ export function ForumPage() {
                       </div>
                     </td>
                     <td>
-                      {item.is_protected && !isOwner ? (
+                      {item.is_protected && !isAdmin ? (
                         <Badge tone="muted">protected</Badge>
                       ) : (
                         <div className="action-row">
-                          {isOwner ? (
+                          {isAdmin ? (
                             <IconButton
                               aria-label={`Edit ${item.title}`}
                               onClick={() => void openTopicEditor(item)}
@@ -390,6 +398,8 @@ function TopicForm({
   categories: ForumCategory[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const [imageUrl, setImageUrl] = useState(item?.image_url ?? "");
+  const invalidImage = Boolean(imageUrl && !isSafeHttpUrl(imageUrl));
   return (
     <form className="dialog-form" onSubmit={onSubmit} autoComplete="off">
       <label>
@@ -423,6 +433,24 @@ function TopicForm({
           required
         />
       </label>
+      <label>
+        URL обложки
+        <input
+          name="image_url"
+          type="url"
+          inputMode="url"
+          placeholder="https://example.com/forum-cover.webp"
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+          maxLength={2048}
+        />
+        {invalidImage ? (
+          <span className="field-error" role="alert">
+            Допустим только безопасный прямой http/https URL.
+          </span>
+        ) : null}
+      </label>
+      <UrlImagePreview url={imageUrl} alt="Предпросмотр обложки темы" />
       <div className="dialog-checks">
         <label className="check-label">
           <input name="is_pinned" type="checkbox" defaultChecked={item?.is_pinned ?? false} />{" "}
@@ -437,7 +465,9 @@ function TopicForm({
           Официальная NCEA
         </label>
       </div>
-      <Button type="submit">Сохранить тему</Button>
+      <Button type="submit" disabled={invalidImage}>
+        Сохранить тему
+      </Button>
     </form>
   );
 }

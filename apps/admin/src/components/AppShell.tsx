@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Users,
+  UserRoundCog,
   X,
   Trash2,
   Boxes,
@@ -23,6 +24,7 @@ const navigation = [
   { path: "/users", label: "Users", icon: Users },
   { path: "/forum", label: "Forum", icon: MessageSquareText },
   { path: "/marketplace", label: "Marketplace", icon: ShoppingBag },
+  { path: "/employees", label: "Сотрудники", icon: UserRoundCog },
   { path: "/moderation", label: "Moderation", icon: ShieldCheck },
   { path: "/settings", label: "Settings", icon: Settings },
   { path: "/deleted", label: "Удалённые", icon: Trash2 },
@@ -58,7 +60,8 @@ export function AppShell({
     <div className="app-shell">
       <header className="mobile-header">
         <button className="wordmark" onClick={() => move("/")}>
-          {workspace === "ncea" ? "NCEA" : "NCreate"}<span>/admin</span>
+          {workspace === "ncea" ? "NCEA" : "NCreate"}
+          <span>/admin</span>
         </button>
         <IconButton aria-label="Open navigation" onClick={() => setMenuOpen(true)}>
           <Menu />
@@ -67,7 +70,8 @@ export function AppShell({
       <aside className={menuOpen ? "sidebar sidebar-open" : "sidebar"}>
         <div className="sidebar-top">
           <button className="wordmark" onClick={() => move("/")}>
-            {workspace === "ncea" ? "NCEA" : "NCreate"}<span>/admin</span>
+            {workspace === "ncea" ? "NCEA" : "NCreate"}
+            <span>/admin</span>
           </button>
           <IconButton
             className="mobile-close"
@@ -78,11 +82,25 @@ export function AppShell({
           </IconButton>
         </div>
         <div className="project-switcher" aria-label="Project switcher">
-          <button className={workspace === "ncea" ? "active" : ""} onClick={() => setWorkspace("ncea")}>
-            <Globe2 size={16} /><span><strong>NCEA</strong><small>Основной проект</small></span>
+          <button
+            className={workspace === "ncea" ? "active" : ""}
+            onClick={() => setWorkspace("ncea")}
+          >
+            <Globe2 size={16} />
+            <span>
+              <strong>NCEA</strong>
+              <small>Основной проект</small>
+            </span>
           </button>
-          <button className={workspace === "ncreate" ? "active ncreate" : ""} onClick={() => setWorkspace("ncreate")}>
-            <Boxes size={16} /><span><strong>NCreate</strong><small>Minecraft server</small></span>
+          <button
+            className={workspace === "ncreate" ? "active ncreate" : ""}
+            onClick={() => setWorkspace("ncreate")}
+          >
+            <Boxes size={16} />
+            <span>
+              <strong>NCreate</strong>
+              <small>Minecraft server</small>
+            </span>
           </button>
           <ChevronsUpDown size={14} aria-hidden />
         </div>
@@ -92,10 +110,10 @@ export function AppShell({
               workspace === "ncreate"
                 ? role !== "moderator" || itemPath !== "/site"
                 : role === "owner"
-                ? true
-                : role === "admin"
-                  ? itemPath !== "/deleted"
-                  : !["/users", "/settings", "/deleted"].includes(itemPath),
+                  ? true
+                  : role === "admin"
+                    ? itemPath !== "/deleted"
+                    : !["/users", "/employees", "/settings", "/deleted"].includes(itemPath),
             )
             .map(({ path: itemPath, label, icon: Icon }) => (
               <button

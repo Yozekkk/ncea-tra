@@ -14,6 +14,8 @@ import type {
   DeletedContentType,
   ForumTopicEditorValues,
   MarketplaceEditorValues,
+  EmployeeEditorValues,
+  NceaEmployee,
 } from "./types";
 
 function fail(message: string, error: { message: string } | null): never {
@@ -234,8 +236,38 @@ export async function saveOwnerForumTopic(
     _is_pinned: values.is_pinned,
     _is_locked: values.is_locked,
     _is_protected: values.is_protected,
+    _image_url: values.image_url,
   } as never);
   if (error) fail("Could not save Forum topic", error);
+}
+
+export async function getEmployees(): Promise<NceaEmployee[]> {
+  const { data, error } = await getSupabase()
+    .from("ncea_employees")
+    .select("*")
+    .order("sort_order")
+    .order("name")
+    .order("id");
+  if (error) fail("Could not load employees", error);
+  return data ?? [];
+}
+
+export async function saveEmployee(id: string | null, values: EmployeeEditorValues): Promise<void> {
+  const query = id
+    ? getSupabase().from("ncea_employees").update(values).eq("id", id).select("id").single()
+    : getSupabase().from("ncea_employees").insert(values).select("id").single();
+  const { error } = await query;
+  if (error) fail("Could not save employee", error);
+}
+
+export async function setEmployeeActive(id: string, isActive: boolean): Promise<void> {
+  const { error } = await getSupabase()
+    .from("ncea_employees")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .select("id")
+    .single();
+  if (error) fail("Could not update employee visibility", error);
 }
 
 export async function updateOwnerForumPost(id: string, body: string): Promise<void> {

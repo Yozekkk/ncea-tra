@@ -40,6 +40,7 @@ export interface ForumTopic {
   author_id: string;
   title: string;
   slug: string;
+  image_url: string | null;
   is_pinned: boolean;
   is_locked: boolean;
   is_protected: boolean;

@@ -26,6 +26,9 @@ const UsersPage = lazy(() =>
 const DeletedPage = lazy(() =>
   import("./pages/DeletedPage").then((module) => ({ default: module.DeletedPage })),
 );
+const EmployeesPage = lazy(() =>
+  import("./pages/EmployeesPage").then((module) => ({ default: module.EmployeesPage })),
+);
 const NCreateDashboard = lazy(() =>
   import("./pages/NCreateDashboard").then((module) => ({ default: module.NCreateDashboard })),
 );
@@ -41,6 +44,7 @@ const routes: Record<string, React.ComponentType> = {
   "/users": UsersPage,
   "/forum": ForumPage,
   "/marketplace": MarketplacePage,
+  "/employees": EmployeesPage,
   "/moderation": ModerationPage,
   "/settings": SettingsPage,
   "/deleted": DeletedPage,
@@ -83,15 +87,28 @@ function AuthorizedApp() {
     window.history.pushState({}, "", "/");
     setPath("/");
   };
-  const forbidden = workspace === "ncreate"
-    ? role === "moderator" ? ["/site"] : []
-    : role === "owner" ? [] : role === "admin" ? ["/deleted"] : ["/users", "/settings", "/deleted"];
+  const forbidden =
+    workspace === "ncreate"
+      ? role === "moderator"
+        ? ["/site"]
+        : []
+      : role === "owner"
+        ? []
+        : role === "admin"
+          ? ["/deleted"]
+          : ["/users", "/employees", "/settings", "/deleted"];
   const allowedPath = forbidden.includes(path) ? "/moderation" : path;
   const activeRoutes = workspace === "ncreate" ? ncreateRoutes : routes;
   const safePath = activeRoutes[allowedPath] ? allowedPath : "/";
   const Page = activeRoutes[safePath] ?? Dashboard;
   return (
-    <AppShell path={safePath} navigate={navigate} role={role} workspace={workspace} setWorkspace={setWorkspace}>
+    <AppShell
+      path={safePath}
+      navigate={navigate}
+      role={role}
+      workspace={workspace}
+      setWorkspace={setWorkspace}
+    >
       <Suspense fallback={<LoadingState />}>
         <Page />
       </Suspense>

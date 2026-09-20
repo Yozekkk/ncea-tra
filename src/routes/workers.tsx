@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { EmployeeCard } from "@/components/site/EmployeeCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { employees } from "@/lib/employees";
+import { getActiveEmployees } from "@/lib/employees";
 import {
   WORKERS_MOTION_VIEWPORT,
   workersCardReveal,
@@ -26,6 +27,11 @@ export const Route = createFileRoute("/workers")({
 });
 
 function WorkersPage() {
+  const employees = useQuery({
+    queryKey: ["ncea", "employees", "active"],
+    queryFn: getActiveEmployees,
+    staleTime: 30_000,
+  });
   return (
     <div className="ref-site workers-page">
       <SiteHeader />
@@ -42,18 +48,37 @@ function WorkersPage() {
             <p>Разработка, дизайн, контент и управление проектами — люди, которые стоят за NCEA.</p>
           </motion.header>
 
-          <motion.div className="employees-deck" variants={workersStaggerContainer}>
-            {employees.map((employee, index) => (
-              <motion.div
-                className={`employee-card-motion employee-card-motion--${index + 1}`}
-                key={`${employee.name}-${employee.telegram}`}
-                custom={index}
-                variants={workersCardReveal}
-              >
-                <EmployeeCard employee={employee} index={index} />
-              </motion.div>
-            ))}
-          </motion.div>
+          {employees.isLoading ? (
+            <div className="workers-state" role="status">
+              Загружаем команду NCEA…
+            </div>
+          ) : employees.error ? (
+            <div className="workers-state workers-state--error" role="alert">
+              <strong>Не удалось загрузить сотрудников</strong>
+              <span>{employees.error.message}</span>
+              <button type="button" onClick={() => void employees.refetch()}>
+                Повторить
+              </button>
+            </div>
+          ) : !employees.data?.length ? (
+            <div className="workers-state">
+              <strong>Команда скоро появится здесь</strong>
+              <span>Активных карточек сотрудников пока нет.</span>
+            </div>
+          ) : (
+            <motion.div className="employees-deck" variants={workersStaggerContainer}>
+              {employees.data.map((employee, index) => (
+                <motion.div
+                  className={`employee-card-motion employee-card-motion--${Math.min(index + 1, 6)}`}
+                  key={employee.id}
+                  custom={index}
+                  variants={workersCardReveal}
+                >
+                  <EmployeeCard employee={employee} index={index} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </motion.section>
       </main>
       <SiteFooter />

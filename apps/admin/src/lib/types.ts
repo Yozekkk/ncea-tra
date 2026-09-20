@@ -10,6 +10,7 @@ export type ForumTopic = Tables<"forum_topics">;
 export type ForumPost = Tables<"forum_posts">;
 export type MarketplaceCategory = Tables<"marketplace_categories">;
 export type MarketplaceListing = Tables<"marketplace_listings">;
+export type NceaEmployee = Tables<"ncea_employees">;
 export type NCreateSettings = Tables<"ncreate_site_settings">;
 export type NCreateSection = Tables<"ncreate_home_sections">;
 export type NCreateCard = Tables<"ncreate_home_cards">;
@@ -59,6 +60,21 @@ export interface ForumTopicEditorValues {
   is_pinned: boolean;
   is_locked: boolean;
   is_protected: boolean;
+  image_url: string | null;
+}
+
+export interface EmployeeEditorValues {
+  name: string;
+  role: string;
+  level: "Стажёр" | "Junior" | "Middle" | "Lead";
+  timezone: string | null;
+  telegram: string | null;
+  discord: string | null;
+  github_url: string | null;
+  image_url: string | null;
+  bio: string | null;
+  sort_order: number;
+  is_active: boolean;
 }
 
 export interface DashboardData {

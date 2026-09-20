@@ -56,6 +56,11 @@ const ncreateRoutes: Record<string, React.ComponentType> = {
   "/forum": NCreateForumPage,
 };
 
+const deploymentBase =
+  window.location.pathname === "/ncea-admin" || window.location.pathname.startsWith("/ncea-admin/")
+    ? "/ncea-admin"
+    : "";
+
 export function App() {
   return (
     <AuthGate>
@@ -69,22 +74,22 @@ function AuthorizedApp() {
   const [workspace, setWorkspaceState] = useState<AdminWorkspace>(() =>
     window.localStorage.getItem("ncea-admin-workspace") === "ncreate" ? "ncreate" : "ncea",
   );
-  const [path, setPath] = useState(normalizePath(window.location.pathname));
+  const [path, setPath] = useState(getCurrentPath);
   useEffect(() => {
-    const onPopState = () => setPath(normalizePath(window.location.pathname));
+    const onPopState = () => setPath(getCurrentPath());
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
   const navigate = (next: string) => {
     if (next === path) return;
-    window.history.pushState({}, "", next);
+    window.history.pushState({}, "", `${deploymentBase}${next === "/" ? "" : next}` || "/");
     setPath(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const setWorkspace = (next: AdminWorkspace) => {
     window.localStorage.setItem("ncea-admin-workspace", next);
     setWorkspaceState(next);
-    window.history.pushState({}, "", "/");
+    window.history.pushState({}, "", deploymentBase || "/");
     setPath("/");
   };
   const forbidden =
@@ -119,4 +124,12 @@ function AuthorizedApp() {
 function normalizePath(path: string) {
   const normalized = path.replace(/\/+$/, "") || "/";
   return normalized;
+}
+
+function getCurrentPath() {
+  const pathname =
+    deploymentBase && window.location.pathname.startsWith(deploymentBase)
+      ? window.location.pathname.slice(deploymentBase.length)
+      : window.location.pathname;
+  return normalizePath(pathname);
 }

@@ -1,8 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    { "source": "/ncea-admin", "destination": "/ncea-admin/index.html" },
-    { "source": "/ncea-admin/(.*)", "destination": "/ncea-admin/index.html" }
+  "redirects": [
+    { "source": "/ncea-admin", "destination": "https://ncea-admin.vercel.app", "permanent": false },
+    {
+      "source": "/ncea-admin/:path*",
+      "destination": "https://ncea-admin.vercel.app/:path*",
+      "permanent": false
+    }
   ],
   "headers": [
     {
@@ -18,14 +22,6 @@
         { "key": "X-DNS-Prefetch-Control", "value": "off" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
-      ]
-    },
-    {
-      "source": "/ncea-admin/(.*)",
-      "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
       ]
     },
     {

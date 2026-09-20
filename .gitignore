@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 .output
+public/ncea-admin/
 .vinxi
 .tanstack/**
 .nitro

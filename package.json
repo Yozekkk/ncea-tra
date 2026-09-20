@@ -9,7 +9,7 @@
     "polish-home": "node scripts/polish-home.mjs",
     "verify": "node scripts/verify-site.mjs",
     "prebuild": "npm run verify",
-    "build": "vite build && vite build apps/admin --config apps/admin/vite.config.ts --base=/ncea-admin/ --outDir ../../.output/public/ncea-admin --emptyOutDir",
+    "build": "vite build apps/admin --config apps/admin/vite.config.ts --base=/ncea-admin/ --outDir ../../public/ncea-admin --emptyOutDir && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

@@ -3,7 +3,7 @@ import type { ForumCategory, ForumPost, ForumTopic } from "@/features/community/
 import { makeSlug, type TopicValues } from "./schemas";
 
 const topicSelect =
-  "*, profiles(username, avatar_url), forum_categories(name, slug), forum_posts(count)";
+  "*, profiles!forum_topics_author_id_fkey(username, avatar_url), forum_categories(name, slug), forum_posts(count)";
 
 function fail(error: { message: string } | null, fallback: string): never {
   throw new Error(error?.message ?? fallback);
@@ -58,7 +58,7 @@ export async function getForumTopic(slug: string) {
 export async function getTopicPosts(topicId: string) {
   const { data, error } = await getSupabaseClient()
     .from("forum_posts")
-    .select("*, profiles(username, avatar_url)")
+    .select("*, profiles!forum_posts_author_id_fkey(username, avatar_url)")
     .eq("topic_id", topicId)
     .is("deleted_at", null)
     .order("created_at");

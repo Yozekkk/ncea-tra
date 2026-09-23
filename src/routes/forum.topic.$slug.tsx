@@ -30,6 +30,7 @@ function ForumTopicPage() {
         <ErrorPanel message={topic.error?.message ?? "Тема не найдена"} />
       </CommunityShell>
     );
+  const currentTopic = topic.data;
   return (
     <CommunityShell>
       <section className="community-section topic-page">
@@ -66,11 +67,11 @@ function ForumTopicPage() {
         ) : (
           <div className="post-list">
             {posts.data?.map((post, index) => (
-              <PostCard key={post.id} post={post} index={index} topic={topic.data} />
+              <PostCard key={post.id} post={post} index={index} topic={currentTopic} />
             ))}
           </div>
         )}
-        <ReplyComposer topic={topic.data} />
+        <ReplyComposer topic={currentTopic} />
       </section>
     </CommunityShell>
   );

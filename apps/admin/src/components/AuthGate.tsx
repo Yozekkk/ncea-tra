@@ -21,27 +21,50 @@ export function AuthGate({ children }: PropsWithChildren) {
       return;
     }
     const supabase = getSupabase();
+    let active = true;
+    let version = 0;
+    let receivedEvent = false;
+    let currentUserId: string | null = null;
     const verify = async (nextUser: User | null) => {
+      const current = ++version;
       setUser(nextUser);
       if (!nextUser) {
+        currentUserId = null;
+        setRole(null);
         setStatus("login");
         return;
       }
+      if (currentUserId !== nextUser.id) {
+        currentUserId = nextUser.id;
+        setRole(null);
+        setStatus("loading");
+      }
       try {
-        const role = await getCurrentRole(nextUser.id);
-        setRole(role);
-        if (role === "owner" || role === "admin" || role === "moderator") setStatus("staff");
+        const nextRole = await getCurrentRole(nextUser.id);
+        if (!active || current !== version) return;
+        setRole(nextRole);
+        setError("");
+        if (nextRole === "owner" || nextRole === "admin" || nextRole === "moderator") setStatus("staff");
         else setStatus("denied");
       } catch (reason) {
+        if (!active || current !== version) return;
+        setRole(null);
         setError(reason instanceof Error ? reason.message : "Authorization failed.");
         setStatus("denied");
       }
     };
-    void supabase.auth.getSession().then(({ data }) => verify(data.session?.user ?? null));
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      void verify(session?.user ?? null);
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active && !receivedEvent) return verify(data.session?.user ?? null);
+    }).catch((reason) => {
+      if (!active || receivedEvent) return;
+      setError(reason instanceof Error ? reason.message : "Session restore failed.");
+      setStatus("login");
     });
-    return () => data.subscription.unsubscribe();
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      receivedEvent = true;
+      queueMicrotask(() => { if (active) void verify(session?.user ?? null); });
+    });
+    return () => { active = false; version++; data.subscription.unsubscribe(); };
   }, []);
 
   const login = async (event: FormEvent<HTMLFormElement>) => {
@@ -49,12 +72,17 @@ export function AuthGate({ children }: PropsWithChildren) {
     const form = new FormData(event.currentTarget);
     setBusy(true);
     setError("");
-    const { error: authError } = await getSupabase().auth.signInWithPassword({
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-    });
-    if (authError) setError(authError.message);
-    setBusy(false);
+    try {
+      const { error: authError } = await getSupabase().auth.signInWithPassword({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      });
+      if (authError) setError(authError.message);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Sign in failed.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const logout = async () => {

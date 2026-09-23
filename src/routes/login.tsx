@@ -2,13 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CommunityShell, LoadingPanel } from "@/features/community/CommunityShell";
 import { AuthForm } from "@/features/auth/AuthForm";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { safeAuthRedirect } from "@/features/auth/redirect";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
-    redirect:
-      typeof search.redirect === "string" && search.redirect.startsWith("/")
-        ? search.redirect
-        : "/profile",
+    redirect: safeAuthRedirect(search.redirect),
   }),
   head: () => ({
     meta: [{ title: "Вход — NCEA" }, { name: "description", content: "Вход в аккаунт NCEA." }],

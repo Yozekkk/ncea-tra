@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login, registerAccount } from "./api";
+import { safeAuthRedirect } from "./redirect";
 import { loginSchema, registerSchema, type LoginValues, type RegisterValues } from "./schemas";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -39,7 +40,7 @@ export function AuthForm({
     try {
       if (isRegister) await registerAccount(values);
       else await login(values as LoginValues);
-      await navigate({ to: redirect.startsWith("/") ? redirect : "/profile" });
+      await navigate({ to: safeAuthRedirect(redirect) });
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "Не удалось выполнить вход");
     }

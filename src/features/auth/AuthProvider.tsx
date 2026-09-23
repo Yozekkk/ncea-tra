@@ -39,8 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<AppRole | null>(null);
   const [streak, setStreak] = useState<ActivityStreak | null>(null);
   const sessionRef = useRef<Session | null>(null);
+  const hydrateVersion = useRef(0);
 
   const hydrate = useCallback(async (nextSession: Session | null) => {
+    const currentVersion = ++hydrateVersion.current;
+    const previousUserId = sessionRef.current?.user.id;
     sessionRef.current = nextSession;
     setSession(nextSession);
     if (!nextSession) {
@@ -49,6 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStreak(null);
       setReady(true);
       return;
+    }
+    if (previousUserId !== nextSession.user.id) {
+      setReady(false);
+      setProfile(null);
+      setRole(null);
+      setStreak(null);
     }
     const [{ getSupabaseClient }, { getStrikeModeStatus }] = await Promise.all([
       import("@/lib/supabase"),
@@ -60,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.from("user_roles").select("role").eq("user_id", nextSession.user.id).maybeSingle(),
       getStrikeModeStatus().catch(() => null),
     ]);
-    if (sessionRef.current?.user.id === nextSession.user.id) {
+    if (hydrateVersion.current === currentVersion) {
       setProfile((nextProfile as Profile | null) ?? null);
       setRole((nextRole?.role as AppRole | undefined) ?? "user");
       setStreak(nextStreak);
@@ -71,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
     let active = true;
+    let receivedEvent = false;
     void import("@/lib/supabase")
       .then(({ getSupabaseClient, isSupabaseConfigured }) => {
         if (!active) return;
@@ -79,10 +89,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         const supabase = getSupabaseClient();
-        void supabase.auth.getSession().then(({ data }) => {
-          if (active) return hydrate(data.session);
-        });
+        void supabase.auth
+          .getSession()
+          .then(({ data }) => {
+            if (active && !receivedEvent) return hydrate(data.session);
+          })
+          .catch(() => {
+            if (active && !receivedEvent) setReady(true);
+          });
         const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+          receivedEvent = true;
           queueMicrotask(() => active && void hydrate(nextSession));
         });
         unsubscribe = () => data.subscription.unsubscribe();

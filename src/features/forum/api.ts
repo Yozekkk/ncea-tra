@@ -38,9 +38,9 @@ export async function getForumCategory(slug: string) {
     .from("forum_categories")
     .select("*")
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
   if (error) fail(error, "Категория не найдена");
-  return data as ForumCategory;
+  return data as ForumCategory | null;
 }
 
 export async function getForumTopic(slug: string) {
@@ -50,9 +50,9 @@ export async function getForumTopic(slug: string) {
     .eq("slug", slug)
     .is("deleted_at", null)
     .limit(1)
-    .single();
+    .maybeSingle();
   if (error) fail(error, "Тема не найдена");
-  return data as unknown as ForumTopic;
+  return data as unknown as ForumTopic | null;
 }
 
 export async function getTopicPosts(topicId: string) {
@@ -90,7 +90,12 @@ export async function updateTopic(
   id: string,
   values: { title?: string; is_pinned?: boolean; is_locked?: boolean },
 ) {
-  const { error } = await getSupabaseClient().from("forum_topics").update(values).eq("id", id);
+  const { error } = await getSupabaseClient()
+    .from("forum_topics")
+    .update(values)
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail(error, "Не удалось обновить тему");
 }
 
@@ -106,7 +111,9 @@ export async function updatePost(id: string, body: string) {
   const { error } = await getSupabaseClient()
     .from("forum_posts")
     .update({ body: body.trim() })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail(error, "Не удалось обновить сообщение");
 }
 

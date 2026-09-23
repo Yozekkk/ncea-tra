@@ -16,7 +16,10 @@ export const loginSchema = z.object({
 
 export const registerSchema = loginSchema.extend({
   username: usernameSchema,
-  password: z.string().min(8, "Пароль должен содержать минимум 8 символов"),
+  password: z
+    .string()
+    .min(8, "Пароль должен содержать минимум 8 символов")
+    .max(72, "Пароль должен содержать не более 72 символов"),
 });
 
 export const profileSchema = z.object({

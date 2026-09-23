@@ -26,6 +26,14 @@ insert into public.marketplace_listings(
 ('43000000-0000-4000-8000-000000000002',930001,'13000000-0000-4000-8000-000000000003','Agency listing','owner-test-agency-listing-a1000002','Agency listing subtitle','Agency listing description','published','agency',1),
 ('43000000-0000-4000-8000-000000000003',930001,'13000000-0000-4000-8000-000000000001','Permanent listing','owner-test-permanent-listing-a1000003','Permanent listing subtitle','Permanent listing description','draft','user',null);
 
+insert into storage.objects (bucket_id, name, metadata)
+values ('marketplace-listings',
+  '13000000-0000-4000-8000-000000000001/43000000-0000-4000-8000-000000000001/soft-delete.webp',
+  '{"mimetype":"image/webp","size":128}'::jsonb);
+insert into public.marketplace_listing_images (listing_id, storage_path)
+values ('43000000-0000-4000-8000-000000000001',
+  '13000000-0000-4000-8000-000000000001/43000000-0000-4000-8000-000000000001/soft-delete.webp');
+
 insert into public.forum_topics(id,category_id,author_id,title,slug,is_protected)
 values
 ('23000000-0000-4000-8000-000000000001',930001,'13000000-0000-4000-8000-000000000001','User topic','owner-test-user-topic',false),
@@ -89,6 +97,17 @@ begin
 end;
 $$;
 
+set local role anon;
+select set_config('request.jwt.claims','{"role":"anon"}',true);
+do $$ begin
+  if exists (
+    select 1 from storage.objects
+    where bucket_id = 'marketplace-listings'
+      and name = '13000000-0000-4000-8000-000000000001/43000000-0000-4000-8000-000000000001/soft-delete.webp'
+  ) then raise exception 'soft-deleted listing image remains publicly readable'; end if;
+end $$;
+
+set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
 
 do $$

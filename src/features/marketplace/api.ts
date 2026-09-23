@@ -13,7 +13,7 @@ import {
 } from "./schemas";
 
 const listingSelect =
-  "*, profiles(username, avatar_url), marketplace_categories(name, slug), marketplace_listing_images(*)";
+  "*, profiles!marketplace_listings_seller_id_fkey(username, avatar_url), marketplace_categories(name, slug), marketplace_listing_images(*)";
 const bucket = "marketplace-listings";
 
 type FeedRow = Omit<
@@ -172,8 +172,9 @@ export async function getListing(slug: string) {
     .select(listingSelect)
     .eq("slug", slug)
     .is("deleted_at", null)
-    .single();
+    .maybeSingle();
   if (error) fail(error, "Объявление не найдено");
+  if (!data) return null;
   return (await signImages([data as unknown as MarketplaceListing]))[0];
 }
 
@@ -213,7 +214,9 @@ export async function archiveListing(id: string) {
   const { error } = await getSupabaseClient()
     .from("marketplace_listings")
     .update({ status: "archived" })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) fail(error, "Не удалось архивировать объявление");
 }
 

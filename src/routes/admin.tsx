@@ -12,6 +12,7 @@ import {
 import type { ForumPost, MarketplaceListing } from "@/features/community/types";
 import { deletePost, getLatestTopics, updateTopic } from "@/features/forum/api";
 import { formatCommunityDate, forumKeys } from "@/features/forum/components";
+import { marketplaceKeys } from "@/features/marketplace/components";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin")({
@@ -24,7 +25,9 @@ export const Route = createFileRoute("/admin")({
 async function getAdminListings() {
   const { data, error } = await getSupabaseClient()
     .from("marketplace_listings")
-    .select("*, profiles(username), marketplace_categories(name,slug)")
+    .select(
+      "*, profiles!marketplace_listings_seller_id_fkey(username), marketplace_categories(name,slug)",
+    )
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -36,7 +39,9 @@ async function setListingStatus(id: string, status: MarketplaceListing["status"]
   const { error } = await getSupabaseClient()
     .from("marketplace_listings")
     .update({ status })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
   if (error) throw error;
 }
 
@@ -45,7 +50,7 @@ type AdminPost = ForumPost & { forum_topics?: { title: string; slug: string } | 
 async function getAdminPosts() {
   const { data, error } = await getSupabaseClient()
     .from("forum_posts")
-    .select("*, profiles(username), forum_topics(title,slug)")
+    .select("*, profiles!forum_posts_author_id_fkey(username), forum_topics(title,slug)")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -76,12 +81,18 @@ function AdminWorkspace() {
   const listingMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: MarketplaceListing["status"] }) =>
       setListingStatus(id, status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "listings"] }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "listings"] }),
+        queryClient.invalidateQueries({ queryKey: marketplaceKeys.all }),
+      ]);
+    },
   });
   return (
     <>
       <div className="admin-section">
         <h2>Темы форума</h2>
+        {topicMutation.error ? <ErrorPanel message={topicMutation.error.message} /> : null}
         {topics.isLoading ? (
           <LoadingPanel />
         ) : topics.error ? (
@@ -133,6 +144,7 @@ function AdminWorkspace() {
       </div>
       <div className="admin-section">
         <h2>Сообщения форума</h2>
+        {postMutation.error ? <ErrorPanel message={postMutation.error.message} /> : null}
         {posts.isLoading ? (
           <LoadingPanel />
         ) : posts.error ? (
@@ -167,6 +179,7 @@ function AdminWorkspace() {
       </div>
       <div className="admin-section">
         <h2>Объявления</h2>
+        {listingMutation.error ? <ErrorPanel message={listingMutation.error.message} /> : null}
         {listings.isLoading ? (
           <LoadingPanel />
         ) : listings.error ? (

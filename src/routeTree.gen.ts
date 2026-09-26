@@ -35,7 +35,7 @@ import { Route as MarketplaceMyRouteImport } from './routes/marketplace.my'
 import { Route as MarketplaceNewRouteImport } from './routes/marketplace.new'
 import { Route as ForumCategorySlugRouteImport } from './routes/forum.category.$slug'
 import { Route as ForumTopicSlugRouteImport } from './routes/forum.topic.$slug'
-import { Route as MarketplaceSlugEditRouteImport } from './routes/marketplace.$slug.edit'
+import { Route as MarketplaceSlugEditRouteImport } from './routes/marketplace_.$slug.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -168,9 +168,9 @@ const ForumTopicSlugRoute = ForumTopicSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceSlugEditRoute = MarketplaceSlugEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => MarketplaceSlugRoute,
+  id: '/marketplace_/$slug/edit',
+  path: '/marketplace/$slug/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -193,7 +193,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum/': typeof ForumIndexRoute
@@ -222,7 +222,7 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum': typeof ForumIndexRoute
@@ -252,14 +252,14 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
-  '/marketplace/$slug': typeof MarketplaceSlugRouteWithChildren
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum/': typeof ForumIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/forum/category/$slug': typeof ForumCategorySlugRoute
   '/forum/topic/$slug': typeof ForumTopicSlugRoute
-  '/marketplace/$slug/edit': typeof MarketplaceSlugEditRoute
+  '/marketplace_/$slug/edit': typeof MarketplaceSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -348,7 +348,7 @@ export interface FileRouteTypes {
     | '/marketplace/'
     | '/forum/category/$slug'
     | '/forum/topic/$slug'
-    | '/marketplace/$slug/edit'
+    | '/marketplace_/$slug/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -371,13 +371,14 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   WebsitesRoute: typeof WebsitesRoute
   WorkersRoute: typeof WorkersRoute
-  MarketplaceSlugRoute: typeof MarketplaceSlugRouteWithChildren
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceMyRoute: typeof MarketplaceMyRoute
   MarketplaceNewRoute: typeof MarketplaceNewRoute
   ForumIndexRoute: typeof ForumIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   ForumCategorySlugRoute: typeof ForumCategorySlugRoute
   ForumTopicSlugRoute: typeof ForumTopicSlugRoute
+  MarketplaceSlugEditRoute: typeof MarketplaceSlugEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -564,27 +565,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForumTopicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/marketplace/$slug/edit': {
-      id: '/marketplace/$slug/edit'
-      path: '/edit'
+    '/marketplace_/$slug/edit': {
+      id: '/marketplace_/$slug/edit'
+      path: '/marketplace/$slug/edit'
       fullPath: '/marketplace/$slug/edit'
       preLoaderRoute: typeof MarketplaceSlugEditRouteImport
-      parentRoute: typeof MarketplaceSlugRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface MarketplaceSlugRouteChildren {
-  MarketplaceSlugEditRoute: typeof MarketplaceSlugEditRoute
-}
-
-const MarketplaceSlugRouteChildren: MarketplaceSlugRouteChildren = {
-  MarketplaceSlugEditRoute: MarketplaceSlugEditRoute,
-}
-
-const MarketplaceSlugRouteWithChildren = MarketplaceSlugRoute._addFileChildren(
-  MarketplaceSlugRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -606,13 +595,14 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   WebsitesRoute: WebsitesRoute,
   WorkersRoute: WorkersRoute,
-  MarketplaceSlugRoute: MarketplaceSlugRouteWithChildren,
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceMyRoute: MarketplaceMyRoute,
   MarketplaceNewRoute: MarketplaceNewRoute,
   ForumIndexRoute: ForumIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   ForumCategorySlugRoute: ForumCategorySlugRoute,
   ForumTopicSlugRoute: ForumTopicSlugRoute,
+  MarketplaceSlugEditRoute: MarketplaceSlugEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,3 +1,4 @@
+import { readRows } from "./readRows";
 import type { TablesInsert, TablesUpdate } from "./database.types";
 import { getSupabase } from "./supabase";
 import type {
@@ -32,15 +33,23 @@ export async function getCurrentRole(userId: string): Promise<AppRole | null> {
   return data?.role ?? null;
 }
 
-export async function getUsers(limit = 200): Promise<AdminUser[]> {
+export async function getUsers(limit?: number): Promise<AdminUser[]> {
   const supabase = getSupabase();
-  const [{ data: profiles, error: profileError }, { data: roles, error: roleError }] =
-    await Promise.all([
-      supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(limit),
-      supabase.from("user_roles").select("user_id, role"),
-    ]);
-  if (profileError) fail("Could not load users", profileError);
-  if (roleError) fail("Could not load roles", roleError);
+  const [profiles, roles] = await Promise.all([
+    readRows(
+      (from, to) =>
+        supabase
+          .from("profiles")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .order("id")
+          .range(from, to),
+      limit,
+    ),
+    readRows((from, to) =>
+      supabase.from("user_roles").select("user_id, role").order("user_id").range(from, to),
+    ),
+  ]);
   const roleByUser = new Map((roles ?? []).map((item) => [item.user_id, item.role]));
   return (profiles ?? []).map((profile) => ({
     ...profile,
@@ -54,15 +63,19 @@ export async function setUserRole(userId: string, role: AppRole): Promise<void> 
   if (error) fail("Could not update role", error);
 }
 
-export async function getTopics(limit = 200): Promise<TopicView[]> {
-  const { data, error } = await getSupabase()
-    .from("forum_topics")
-    .select("*, profiles!forum_topics_author_id_fkey(username), forum_categories(name)")
-    .is("deleted_at", null)
-    .order("is_pinned", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error) fail("Could not load forum topics", error);
+export async function getTopics(limit?: number): Promise<TopicView[]> {
+  const data = await readRows(
+    (from, to) =>
+      getSupabase()
+        .from("forum_topics")
+        .select("*, profiles!forum_topics_author_id_fkey(username), forum_categories(name)")
+        .is("deleted_at", null)
+        .order("is_pinned", { ascending: false })
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(from, to),
+    limit,
+  );
   return (data ?? []).map(({ profiles, forum_categories, ...topic }) => ({
     ...topic,
     author: profiles?.username ?? "Unknown",
@@ -70,14 +83,18 @@ export async function getTopics(limit = 200): Promise<TopicView[]> {
   }));
 }
 
-export async function getPosts(limit = 200): Promise<PostView[]> {
-  const { data, error } = await getSupabase()
-    .from("forum_posts")
-    .select("*, profiles!forum_posts_author_id_fkey(username), forum_topics(title)")
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error) fail("Could not load forum posts", error);
+export async function getPosts(limit?: number): Promise<PostView[]> {
+  const data = await readRows(
+    (from, to) =>
+      getSupabase()
+        .from("forum_posts")
+        .select("*, profiles!forum_posts_author_id_fkey(username), forum_topics(title)")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(from, to),
+    limit,
+  );
   return (data ?? []).map(({ profiles, forum_topics, ...post }) => ({
     ...post,
     author: profiles?.username ?? "Unknown",
@@ -102,7 +119,7 @@ export async function saveForumCategory(
   const query = id
     ? getSupabase().from("forum_categories").update(values).eq("id", id)
     : getSupabase().from("forum_categories").insert(values);
-  const { error } = await query;
+  const { error } = await query.select("id").single();
   if (error) fail("Could not save forum category", error);
 }
 
@@ -149,20 +166,24 @@ export async function saveMarketplaceCategory(
   const query = id
     ? getSupabase().from("marketplace_categories").update(values).eq("id", id)
     : getSupabase().from("marketplace_categories").insert(values);
-  const { error } = await query;
+  const { error } = await query.select("id").single();
   if (error) fail("Could not save marketplace category", error);
 }
 
-export async function getListings(limit = 200): Promise<ListingView[]> {
-  const { data, error } = await getSupabase()
-    .from("marketplace_listings")
-    .select(
-      "*, profiles!marketplace_listings_seller_id_fkey(username), marketplace_categories(name)",
-    )
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error) fail("Could not load listings", error);
+export async function getListings(limit?: number): Promise<ListingView[]> {
+  const data = await readRows(
+    (from, to) =>
+      getSupabase()
+        .from("marketplace_listings")
+        .select(
+          "*, profiles!marketplace_listings_seller_id_fkey(username), marketplace_categories(name)",
+        )
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(from, to),
+    limit,
+  );
   return (data ?? []).map(({ profiles, marketplace_categories, ...listing }) => ({
     ...listing,
     seller: profiles?.username ?? "Unknown",
@@ -199,7 +220,7 @@ export async function saveMarketplaceListing(
     _platform: values.platform,
     _sort_order: values.sort_order,
     _status: values.status,
-  } as never);
+  });
   if (error) fail("Could not save Marketplace listing", error);
 }
 
@@ -237,19 +258,20 @@ export async function saveOwnerForumTopic(
     _is_locked: values.is_locked,
     _is_protected: values.is_protected,
     _image_url: values.image_url,
-  } as never);
+  });
   if (error) fail("Could not save Forum topic", error);
 }
 
 export async function getEmployees(): Promise<NceaEmployee[]> {
-  const { data, error } = await getSupabase()
-    .from("ncea_employees")
-    .select("*")
-    .order("sort_order")
-    .order("name")
-    .order("id");
-  if (error) fail("Could not load employees", error);
-  return data ?? [];
+  return readRows((from, to) =>
+    getSupabase()
+      .from("ncea_employees")
+      .select("*")
+      .order("sort_order")
+      .order("name")
+      .order("id")
+      .range(from, to),
+  );
 }
 
 export async function saveEmployee(id: string | null, values: EmployeeEditorValues): Promise<void> {
@@ -308,9 +330,10 @@ export async function permanentlyDeleteContent(item: DeletedItem): Promise<void>
 }
 
 async function count(table: "profiles" | "forum_topics" | "forum_posts" | "marketplace_listings") {
-  const { count: result, error } = await getSupabase()
-    .from(table)
-    .select("*", { count: "exact", head: true });
+  const query = getSupabase().from(table).select("*", { count: "exact", head: true });
+  const { count: result, error } = await (table === "profiles"
+    ? query
+    : query.is("deleted_at", null));
   if (error) fail(`Could not count ${table}`, error);
   return result ?? 0;
 }
@@ -328,9 +351,47 @@ export async function getDashboard(): Promise<DashboardData> {
       getSupabase()
         .from("marketplace_listings")
         .select("*", { count: "exact", head: true })
-        .eq("status", "published"),
+        .eq("status", "published")
+        .is("deleted_at", null),
     ]);
   if (published.error) fail("Could not count published listings", published.error);
+  const db = getSupabase();
+  const metrics = await Promise.all([
+    db
+      .from("marketplace_listings")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null)
+      .eq("status", "pending_review"),
+    db
+      .from("marketplace_listings")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null)
+      .eq("status", "archived"),
+    db.from("ncea_employees").select("*", { count: "exact", head: true }).is("deleted_at", null),
+    db
+      .from("ncea_employees")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null)
+      .eq("is_active", true),
+    db
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()),
+    db
+      .from("marketplace_listings")
+      .select("*", { count: "exact", head: true })
+      .not("deleted_at", "is", null),
+    db
+      .from("forum_topics")
+      .select("*", { count: "exact", head: true })
+      .not("deleted_at", "is", null),
+    db
+      .from("forum_posts")
+      .select("*", { count: "exact", head: true })
+      .not("deleted_at", "is", null),
+  ]);
+  for (const result of metrics)
+    if (result.error) fail("Could not load dashboard metric", result.error);
   return {
     counts: {
       users: userCount,
@@ -338,6 +399,12 @@ export async function getDashboard(): Promise<DashboardData> {
       posts: postCount,
       listings: listingCount,
       published: published.count ?? 0,
+      pending: metrics[0].count ?? 0,
+      archived: metrics[1].count ?? 0,
+      employees: metrics[2].count ?? 0,
+      activeEmployees: metrics[3].count ?? 0,
+      newUsers: metrics[4].count ?? 0,
+      deleted: metrics.slice(5).reduce((sum, result) => sum + (result.count ?? 0), 0),
     },
     users,
     topics,

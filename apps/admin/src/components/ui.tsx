@@ -84,13 +84,38 @@ export function Modal({
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     dialogRef.current?.focus();
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") onCloseRef.current();
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const controls = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
+        ),
+      ).filter(
+        (element) => element.getClientRects().length > 0 && !element.closest("fieldset:disabled"),
+      );
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) {
+        event.preventDefault();
+        return;
+      }
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || active === dialogRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !dialogRef.current.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", closeOnEscape);
     return () => {
       document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
       previous?.focus();
     };
   }, []);
@@ -122,12 +147,17 @@ export function ConfirmButton({
   children,
   confirmLabel,
   onConfirm,
-}: PropsWithChildren<{ confirmLabel: string; onConfirm: () => unknown | Promise<unknown> }>) {
+  disabled = false,
+}: PropsWithChildren<{
+  confirmLabel: string;
+  onConfirm: () => unknown | Promise<unknown>;
+  disabled?: boolean;
+}>) {
   const handleClick = () => {
     if (window.confirm(confirmLabel)) void onConfirm();
   };
   return (
-    <Button className="button-danger button-small" onClick={handleClick}>
+    <Button className="button-danger button-small" onClick={handleClick} disabled={disabled}>
       {children}
     </Button>
   );

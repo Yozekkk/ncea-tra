@@ -1,3 +1,4 @@
+// Generated from NCEA production schema; nullable RPC inputs annotated from SQL signatures.
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -347,10 +348,46 @@ export type Database = {
           },
         ];
       };
+      ncea_admin_audit: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          created_at: string;
+          entity: string;
+          entity_id: string;
+          id: number;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          created_at?: string;
+          entity: string;
+          entity_id: string;
+          id?: never;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          created_at?: string;
+          entity?: string;
+          entity_id?: string;
+          id?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ncea_admin_audit_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ncea_employees: {
         Row: {
           bio: string | null;
           created_at: string;
+          deleted_at: string | null;
           discord: string | null;
           github_url: string | null;
           id: string;
@@ -363,10 +400,12 @@ export type Database = {
           telegram: string | null;
           timezone: string | null;
           updated_at: string;
+          username: string | null;
         };
         Insert: {
           bio?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           discord?: string | null;
           github_url?: string | null;
           id?: string;
@@ -379,10 +418,12 @@ export type Database = {
           telegram?: string | null;
           timezone?: string | null;
           updated_at?: string;
+          username?: string | null;
         };
         Update: {
           bio?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           discord?: string | null;
           github_url?: string | null;
           id?: string;
@@ -394,6 +435,28 @@ export type Database = {
           sort_order?: number;
           telegram?: string | null;
           timezone?: string | null;
+          updated_at?: string;
+          username?: string | null;
+        };
+        Relationships: [];
+      };
+      ncea_site_settings: {
+        Row: {
+          announcement: string;
+          announcement_enabled: boolean;
+          site_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          announcement?: string;
+          announcement_enabled?: boolean;
+          site_id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          announcement?: string;
+          announcement_enabled?: boolean;
+          site_id?: string;
           updated_at?: string;
         };
         Relationships: [];
@@ -835,20 +898,21 @@ export type Database = {
       };
     };
     Functions: {
+      admin_reorder_employees: { Args: { _ids: string[] }; Returns: undefined };
       admin_save_marketplace_listing: {
         Args: {
           _category_id: number;
           _currency_code: string;
           _description: string;
-          _image_url: string;
-          _listing_id: string;
+          _image_url: string | null;
+          _listing_id: string | null;
           _listing_source: Database["public"]["Enums"]["marketplace_listing_source"];
-          _minecraft_version: string;
-          _platform: string;
-          _price_amount: number;
-          _price_text: string;
+          _minecraft_version: string | null;
+          _platform: string | null;
+          _price_amount: number | null;
+          _price_text: string | null;
           _short_description: string;
-          _sort_order: number;
+          _sort_order: number | null;
           _status: Database["public"]["Enums"]["marketplace_listing_status"];
           _title: string;
         };
@@ -876,9 +940,9 @@ export type Database = {
           _category_id: number;
           _currency_code: string;
           _description: string;
-          _minecraft_version: string;
-          _platform: string;
-          _price_amount: number;
+          _minecraft_version: string | null;
+          _platform: string | null;
+          _price_amount: number | null;
           _short_description: string;
           _slug: string;
           _submit?: boolean;
@@ -926,12 +990,12 @@ export type Database = {
         Args: {
           _category_id: number;
           _content: string;
-          _image_url: string;
+          _image_url: string | null;
           _is_locked: boolean;
           _is_pinned: boolean;
           _is_protected: boolean;
           _title: string;
-          _topic_id: string;
+          _topic_id: string | null;
         };
         Returns: string;
       };
@@ -991,10 +1055,10 @@ export type Database = {
           _category_id: number;
           _currency_code: string;
           _description: string;
-          _listing_id: string;
-          _minecraft_version: string;
-          _platform: string;
-          _price_amount: number;
+          _listing_id: string | null;
+          _minecraft_version: string | null;
+          _platform: string | null;
+          _price_amount: number | null;
           _short_description: string;
           _submit?: boolean;
           _title: string;

@@ -49,6 +49,7 @@ select set_config(
 );
 
 do $$
+declare affected integer;
 begin
   if (select count(*) from public.ncea_employees where id in (
     '64000000-0000-4000-8000-000000000001',

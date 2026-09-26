@@ -145,7 +145,7 @@ begin
   if not exists(select 1 from public.marketplace_listings where id=saved_listing and title='Owner edited listing') then
     raise exception 'owner did not manage marketplace listing'; end if;
 
-  saved_topic := public.owner_save_forum_topic(null,930001,'Owner topic','Owner topic content',true,true,true);
+  saved_topic := public.owner_save_forum_topic(null,930001,'Owner topic','Owner topic content',true,true,true,null);
   select id into saved_post from public.forum_posts where topic_id=saved_topic order by created_at,id limit 1;
   perform public.owner_update_forum_post(saved_post,'Owner edited topic content');
   if not exists(select 1 from public.forum_posts where id=saved_post and body='Owner edited topic content') then

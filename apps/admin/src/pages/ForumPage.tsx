@@ -1,3 +1,6 @@
+import { bulkTopics } from "../lib/operations";
+import { CollectionTools } from "../components/CollectionTools";
+import { useMutation } from "../lib/useMutation";
 import { useState, type FormEvent } from "react";
 import { Edit3, Lock, Pin, PinOff, Plus, Unlock } from "lucide-react";
 import {
@@ -47,18 +50,28 @@ export function ForumPage() {
   } | null>(null);
   const [editingPost, setEditingPost] = useState<PostView | null>(null);
   const [actionError, setActionError] = useState("");
-
-  const perform = async (action: () => Promise<void>, reload: () => Promise<void>) => {
-    setActionError("");
-    try {
-      await action();
-      await reload();
-      return true;
-    } catch (reason) {
-      setActionError(reason instanceof Error ? reason.message : "Action failed.");
-      return false;
-    }
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [stateFilter, setStateFilter] = useState("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const filteredTopics = (topics.data ?? []).filter(
+    (t) =>
+      (categoryFilter === "all" || String(t.category_id) === categoryFilter) &&
+      (stateFilter === "all" ||
+        (stateFilter === "pinned"
+          ? t.is_pinned
+          : stateFilter === "locked"
+            ? t.is_locked
+            : !t.is_locked)),
+  );
+  const bulk = async (locked: boolean) => {
+    const ids = filteredTopics
+      .filter((t) => selected.has(t.id) && (isAdmin || !t.is_protected))
+      .map((t) => t.id);
+    if (await perform(() => bulkTopics(ids, locked), topics.reload)) setSelected(new Set());
   };
+
+  const mutation = useMutation();
+  const perform = mutation.perform;
 
   const submitCategory = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -161,192 +174,290 @@ export function ForumPage() {
         ))}
       </div>
       {actionError && <ErrorState message={actionError} />}
-      {current.loading && <LoadingState />}
-      {current.error && <ErrorState message={current.error} retry={current.reload} />}
-      {tab === "categories" &&
-        categories.data &&
-        (categories.data.length ? (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Slug</th>
-                  <th>Order</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.data.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.name}</strong>
-                      <small>{item.description || "No description"}</small>
-                    </td>
-                    <td className="mono">{item.slug}</td>
-                    <td>{item.sort_order}</td>
-                    <td>
-                      <Badge tone={item.is_active ? "live" : "muted"}>
-                        {item.is_active ? "active" : "inactive"}
-                      </Badge>
-                    </td>
-                    <td>
-                      <IconButton aria-label={`Edit ${item.name}`} onClick={() => setEditing(item)}>
-                        <Edit3 size={17} />
-                      </IconButton>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <EmptyState
-            title="No forum categories"
-            detail="Create the first category to prepare the forum."
-          />
-        ))}
-      {tab === "topics" &&
-        topics.data &&
-        (topics.data.length ? (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Topic</th>
-                  <th>Author</th>
-                  <th>Created</th>
-                  <th>State</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topics.data.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.title}</strong>
-                      <small>{item.category}</small>
-                    </td>
-                    <td>@{item.author}</td>
-                    <td>{formatDate(item.created_at)}</td>
-                    <td>
-                      <div className="badge-row">
-                        {item.is_pinned && <Badge tone="live">pinned</Badge>}
-                        {item.is_locked && <Badge tone="warning">locked</Badge>}
-                        {item.is_protected && <Badge tone="muted">protected</Badge>}
-                        {!item.is_pinned && !item.is_locked && !item.is_protected && (
-                          <Badge>open</Badge>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      {item.is_protected && !isAdmin ? (
-                        <Badge tone="muted">protected</Badge>
-                      ) : (
-                        <div className="action-row">
-                          {isAdmin ? (
+      {mutation.error && <ErrorState message={mutation.error} />}
+      {mutation.message && (
+        <div className="success-state" role="status">
+          {mutation.message}
+        </div>
+      )}
+      {tab === "topics" && (
+        <div className="toolbar">
+          <select
+            aria-label="Категория тем"
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setSelected(new Set());
+            }}
+          >
+            <option value="all">Все категории</option>
+            {categories.data?.map((c) => (
+              <option value={c.id} key={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label="Состояние тем"
+            value={stateFilter}
+            onChange={(e) => {
+              setStateFilter(e.target.value);
+              setSelected(new Set());
+            }}
+          >
+            <option value="all">Все темы</option>
+            <option value="pinned">Закреплённые</option>
+            <option value="locked">Закрытые</option>
+            <option value="open">Открытые</option>
+          </select>
+          <ConfirmButton
+            disabled={mutation.busy || !selected.size}
+            confirmLabel="Закрыть выбранные темы для ответов?"
+            onConfirm={() => bulk(true)}
+          >
+            Закрыть выбранные
+          </ConfirmButton>
+          <Button disabled={mutation.busy || !selected.size} onClick={() => void bulk(false)}>
+            Открыть выбранные
+          </Button>
+        </div>
+      )}
+      <fieldset className="collection-actions" disabled={mutation.busy}>
+        {current.loading && <LoadingState />}
+        {current.error && <ErrorState message={current.error} retry={current.reload} />}
+        {tab === "categories" &&
+          categories.data &&
+          (categories.data.length ? (
+            <CollectionTools rows={categories.data} text={(item) => `${item.name} ${item.slug}`}>
+              {(visible) => (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Slug</th>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visible.map((item) => (
+                        <tr key={item.id}>
+                          <td>
+                            <strong>{item.name}</strong>
+                            <small>{item.description || "No description"}</small>
+                          </td>
+                          <td className="mono">{item.slug}</td>
+                          <td>{item.sort_order}</td>
+                          <td>
+                            <Badge tone={item.is_active ? "live" : "muted"}>
+                              {item.is_active ? "active" : "inactive"}
+                            </Badge>
+                          </td>
+                          <td>
                             <IconButton
-                              aria-label={`Edit ${item.title}`}
-                              onClick={() => void openTopicEditor(item)}
+                              aria-label={`Edit ${item.name}`}
+                              onClick={() => setEditing(item)}
                             >
                               <Edit3 size={17} />
                             </IconButton>
-                          ) : null}
-                          <IconButton
-                            aria-label={item.is_pinned ? "Unpin topic" : "Pin topic"}
-                            onClick={() =>
-                              void perform(
-                                () => updateTopic(item.id, { is_pinned: !item.is_pinned }),
-                                topics.reload,
-                              )
-                            }
-                          >
-                            {item.is_pinned ? <PinOff size={17} /> : <Pin size={17} />}
-                          </IconButton>
-                          <IconButton
-                            aria-label={item.is_locked ? "Unlock topic" : "Lock topic"}
-                            onClick={() =>
-                              void perform(
-                                () => updateTopic(item.id, { is_locked: !item.is_locked }),
-                                topics.reload,
-                              )
-                            }
-                          >
-                            {item.is_locked ? <Unlock size={17} /> : <Lock size={17} />}
-                          </IconButton>
-                          <ConfirmButton
-                            confirmLabel={`Delete topic “${item.title}” and all of its posts?`}
-                            onConfirm={() => perform(() => deleteTopic(item.id), topics.reload)}
-                          >
-                            Delete
-                          </ConfirmButton>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <EmptyState
-            title="No forum topics"
-            detail="Topics created by members will appear here."
-          />
-        ))}
-      {tab === "posts" &&
-        posts.data &&
-        (posts.data.length ? (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Post</th>
-                  <th>Author</th>
-                  <th>Topic</th>
-                  <th>Created</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.data.map((item) => (
-                  <tr key={item.id}>
-                    <td className="post-preview">{item.body}</td>
-                    <td>@{item.author}</td>
-                    <td>{item.topic}</td>
-                    <td>{formatDate(item.created_at)}</td>
-                    <td>
-                      {item.is_protected && !isOwner ? (
-                        <Badge tone="muted">protected</Badge>
-                      ) : (
-                        <div className="action-row">
-                          {isOwner ? (
-                            <IconButton aria-label="Edit post" onClick={() => setEditingPost(item)}>
-                              <Edit3 size={17} />
-                            </IconButton>
-                          ) : null}
-                          <ConfirmButton
-                            confirmLabel="Move this post to trash?"
-                            onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
-                          >
-                            Moderate
-                          </ConfirmButton>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <EmptyState title="No forum posts" detail="Member posts will appear here." />
-        ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CollectionTools>
+          ) : (
+            <EmptyState
+              title="No forum categories"
+              detail="Create the first category to prepare the forum."
+            />
+          ))}
+        {tab === "topics" &&
+          topics.data &&
+          (topics.data.length ? (
+            <CollectionTools
+              rows={filteredTopics}
+              text={(item) => `${item.title} ${item.author} ${item.category}`}
+            >
+              {(visible) => (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Topic</th>
+                        <th>Author</th>
+                        <th>Created</th>
+                        <th>State</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visible.map((item) => (
+                        <tr key={item.id}>
+                          <td>
+                            <strong>{item.title}</strong>
+                            <small>{item.category}</small>
+                            <a
+                              href={`https://ncea-studio.com/forum/topic/${encodeURIComponent(item.slug)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Публичная тема ↗
+                            </a>
+                          </td>
+                          <td>@{item.author}</td>
+                          <td>{formatDate(item.created_at)}</td>
+                          <td>
+                            <div className="badge-row">
+                              {item.is_pinned && <Badge tone="live">pinned</Badge>}
+                              {item.is_locked && <Badge tone="warning">locked</Badge>}
+                              {item.is_protected && <Badge tone="muted">protected</Badge>}
+                              {!item.is_pinned && !item.is_locked && !item.is_protected && (
+                                <Badge>open</Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            {item.is_protected && !isAdmin ? (
+                              <Badge tone="muted">protected</Badge>
+                            ) : (
+                              <div className="action-row">
+                                <input
+                                  type="checkbox"
+                                  aria-label={`Выбрать ${item.title}`}
+                                  checked={selected.has(item.id)}
+                                  onChange={(e) =>
+                                    setSelected((old) => {
+                                      const next = new Set(old);
+                                      if (e.target.checked) next.add(item.id);
+                                      else next.delete(item.id);
+                                      return next;
+                                    })
+                                  }
+                                />
+                                {isAdmin ? (
+                                  <IconButton
+                                    aria-label={`Edit ${item.title}`}
+                                    onClick={() => void openTopicEditor(item)}
+                                  >
+                                    <Edit3 size={17} />
+                                  </IconButton>
+                                ) : null}
+                                <IconButton
+                                  aria-label={item.is_pinned ? "Unpin topic" : "Pin topic"}
+                                  onClick={() =>
+                                    void perform(
+                                      () => updateTopic(item.id, { is_pinned: !item.is_pinned }),
+                                      topics.reload,
+                                    )
+                                  }
+                                >
+                                  {item.is_pinned ? <PinOff size={17} /> : <Pin size={17} />}
+                                </IconButton>
+                                <IconButton
+                                  aria-label={item.is_locked ? "Unlock topic" : "Lock topic"}
+                                  onClick={() =>
+                                    void perform(
+                                      () => updateTopic(item.id, { is_locked: !item.is_locked }),
+                                      topics.reload,
+                                    )
+                                  }
+                                >
+                                  {item.is_locked ? <Unlock size={17} /> : <Lock size={17} />}
+                                </IconButton>
+                                <ConfirmButton
+                                  disabled={mutation.busy}
+                                  confirmLabel={`Delete topic “${item.title}” and all of its posts?`}
+                                  onConfirm={() =>
+                                    perform(() => deleteTopic(item.id), topics.reload)
+                                  }
+                                >
+                                  Delete
+                                </ConfirmButton>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CollectionTools>
+          ) : (
+            <EmptyState
+              title="No forum topics"
+              detail="Topics created by members will appear here."
+            />
+          ))}
+        {tab === "posts" &&
+          posts.data &&
+          (posts.data.length ? (
+            <CollectionTools
+              rows={posts.data}
+              text={(item) => `${item.body} ${item.author} ${item.topic}`}
+            >
+              {(visible) => (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Post</th>
+                        <th>Author</th>
+                        <th>Topic</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visible.map((item) => (
+                        <tr key={item.id}>
+                          <td className="post-preview">{item.body}</td>
+                          <td>@{item.author}</td>
+                          <td>{item.topic}</td>
+                          <td>{formatDate(item.created_at)}</td>
+                          <td>
+                            {item.is_protected && !isOwner ? (
+                              <Badge tone="muted">protected</Badge>
+                            ) : (
+                              <div className="action-row">
+                                {isOwner ? (
+                                  <IconButton
+                                    aria-label="Edit post"
+                                    onClick={() => setEditingPost(item)}
+                                  >
+                                    <Edit3 size={17} />
+                                  </IconButton>
+                                ) : null}
+                                <ConfirmButton
+                                  disabled={mutation.busy}
+                                  confirmLabel="Move this post to trash?"
+                                  onConfirm={() => perform(() => deletePost(item.id), posts.reload)}
+                                >
+                                  Moderate
+                                </ConfirmButton>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CollectionTools>
+          ) : (
+            <EmptyState title="No forum posts" detail="Member posts will appear here." />
+          ))}
+      </fieldset>
       {editing && (
         <Modal
           title={editing === "new" ? "New forum category" : "Edit forum category"}
-          onClose={() => setEditing(null)}
+          onClose={() => !mutation.busy && setEditing(null)}
         >
           <CategoryForm item={editing === "new" ? null : editing} onSubmit={submitCategory} />
         </Modal>
@@ -354,19 +465,25 @@ export function ForumPage() {
       {editingTopic && (
         <Modal
           title={editingTopic.item ? "Редактировать тему" : "Новая тема"}
-          onClose={() => setEditingTopic(null)}
+          onClose={() => !mutation.busy && setEditingTopic(null)}
           wide
         >
-          <TopicForm
-            item={editingTopic.item}
-            content={editingTopic.content}
-            categories={categories.data ?? []}
-            onSubmit={submitTopic}
-          />
+          <fieldset disabled={mutation.busy}>
+            <TopicForm
+              item={editingTopic.item}
+              content={editingTopic.content}
+              categories={categories.data ?? []}
+              onSubmit={submitTopic}
+            />
+          </fieldset>
         </Modal>
       )}
       {editingPost && (
-        <Modal title="Редактировать сообщение" onClose={() => setEditingPost(null)} wide>
+        <Modal
+          title="Редактировать сообщение"
+          onClose={() => !mutation.busy && setEditingPost(null)}
+          wide
+        >
           <form className="dialog-form" onSubmit={submitPost}>
             <label>
               Содержимое

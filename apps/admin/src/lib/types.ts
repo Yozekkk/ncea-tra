@@ -64,6 +64,7 @@ export interface ForumTopicEditorValues {
 }
 
 export interface EmployeeEditorValues {
+  username: string | null;
   name: string;
   role: string;
   level: "Стажёр" | "Junior" | "Middle" | "Lead";
@@ -84,6 +85,12 @@ export interface DashboardData {
     posts: number;
     listings: number;
     published: number;
+    pending: number;
+    archived: number;
+    employees: number;
+    activeEmployees: number;
+    newUsers: number;
+    deleted: number;
   };
   users: AdminUser[];
   topics: TopicView[];

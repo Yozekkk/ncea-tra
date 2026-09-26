@@ -29,7 +29,7 @@ const WORKERS_CARD_START_X = [180, 120, 60, -60, -120, -180] as const;
 export const workersCardReveal: Variants = {
   hidden: (index: number) => ({
     opacity: 0,
-    x: WORKERS_CARD_START_X[index],
+    x: WORKERS_CARD_START_X[index] ?? 0,
     y: 40,
     scale: 0.95,
   }),

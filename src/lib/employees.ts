@@ -2,6 +2,7 @@ export type EmployeeLevel = "Стажёр" | "Junior" | "Middle" | "Lead";
 
 export type Employee = {
   id: string;
+  username?: string | null;
   name: string;
   timezone: string | null;
   telegram: string | null;
@@ -17,8 +18,11 @@ export type Employee = {
 export async function getActiveEmployees(): Promise<Employee[]> {
   const { data, error } = await getSupabaseClient()
     .from("ncea_employees")
-    .select("id,name,role,level,timezone,telegram,discord,github_url,image_url,bio,sort_order")
+    .select(
+      "id,name,username,role,level,timezone,telegram,discord,github_url,image_url,bio,sort_order",
+    )
     .eq("is_active", true)
+    .is("deleted_at", null)
     .order("sort_order")
     .order("name")
     .order("id");

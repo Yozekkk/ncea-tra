@@ -4209,6 +4209,7 @@ video {
 }
 
 .employee-card {
+  overflow-wrap: anywhere;
   position: relative;
   display: flex;
   min-height: 452px;
@@ -4227,6 +4228,18 @@ video {
     transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 220ms ease,
     box-shadow 260ms ease;
+}
+
+.employees-deck--expanded {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.employees-deck--expanded .employee-card-motion {
+  margin-left: 0;
+}
+.employees-deck--expanded .employee-card {
+  transform: none;
 }
 
 .employee-card::before {
@@ -4261,6 +4274,11 @@ video {
     0 38px 66px -38px rgba(136, 57, 17, 0.36),
     0 10px 24px rgba(25, 27, 33, 0.06);
   transform: translate3d(0, calc(var(--card-y) - 5px), 0) rotate(var(--card-rotation)) scale(1.01);
+}
+
+.employees-deck--expanded .employee-card-motion:hover .employee-card,
+.employees-deck--expanded .employee-card-motion:focus-within .employee-card {
+  transform: translateY(-5px) scale(1.01);
 }
 
 .employee-card__topline {
@@ -4517,7 +4535,7 @@ video {
   background: #e9e9ea;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1440px) {
   .workers-page .ref-workers {
     width: min(860px, calc(100% - 40px));
   }
@@ -4792,6 +4810,7 @@ video {
   font-size: 12px;
   font-weight: 800;
 }
+.ref-header .account-register,
 .account-register {
   color: #fff;
   background: #18181b;
@@ -6421,4 +6440,17 @@ video {
   .ref-community-tiktok-link {
     transition: none !important;
   }
+}
+
+.site-announcement {
+  position: relative;
+  margin: 90px auto -80px;
+  width: min(1280px, calc(100% - 40px));
+  padding: 14px 18px;
+  border: 1px solid #efc9b7;
+  border-radius: 16px;
+  background: #fff7f2;
+  color: #96401d;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }

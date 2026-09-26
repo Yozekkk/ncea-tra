@@ -31,18 +31,20 @@ function WorkersPage() {
     queryKey: ["ncea", "employees", "active"],
     queryFn: getActiveEmployees,
     staleTime: 30_000,
+    retry: 1,
   });
   return (
     <div className="ref-site workers-page">
       <SiteHeader />
       <main className="ref-workers">
-        <motion.section
-          className="workers-section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
-          <motion.header className="workers-heading" variants={workersHeadingReveal}>
+        <section className="workers-section">
+          <motion.header
+            className="workers-heading"
+            variants={workersHeadingReveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={WORKERS_MOTION_VIEWPORT}
+          >
             <p className="ref-eyebrow">КОМАНДА NCEA</p>
             <h1>Наша команда</h1>
             <p>Разработка, дизайн, контент и управление проектами — люди, которые стоят за NCEA.</p>
@@ -66,7 +68,12 @@ function WorkersPage() {
               <span>Активных карточек сотрудников пока нет.</span>
             </div>
           ) : (
-            <motion.div className="employees-deck" variants={workersStaggerContainer}>
+            <motion.div
+              className={`employees-deck${employees.data.length > 6 ? " employees-deck--expanded" : ""}`}
+              variants={workersStaggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
               {employees.data.map((employee, index) => (
                 <motion.div
                   className={`employee-card-motion employee-card-motion--${Math.min(index + 1, 6)}`}
@@ -79,7 +86,7 @@ function WorkersPage() {
               ))}
             </motion.div>
           )}
-        </motion.section>
+        </section>
       </main>
       <SiteFooter />
     </div>

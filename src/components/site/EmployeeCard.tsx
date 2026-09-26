@@ -37,6 +37,7 @@ async function copyToClipboard(value: string) {
 
 export function EmployeeCard({ employee, index }: EmployeeCardProps) {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const resetTimer = useRef<number | undefined>(undefined);
   const telegramHref = employee.telegram
@@ -55,6 +56,7 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
   useEffect(() => setImageFailed(false), [employee.image_url]);
 
   const handleDiscordCopy = async () => {
+    setCopyFailed(false);
     try {
       if (!employee.discord) return;
       await copyToClipboard(employee.discord);
@@ -63,6 +65,7 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
       resetTimer.current = window.setTimeout(() => setCopied(false), 1800);
     } catch {
       setCopied(false);
+      setCopyFailed(true);
     }
   };
 
@@ -92,6 +95,7 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
 
       <div className="employee-card__identity">
         <h2>{employee.name}</h2>
+        {employee.username ? <small>@{employee.username.replace(/^@/, "")}</small> : null}
         <p>{employee.role}</p>
       </div>
 
@@ -137,7 +141,9 @@ export function EmployeeCard({ employee, index }: EmployeeCardProps) {
           </span>
           <span className="employee-action__copy" aria-live="polite">
             <strong>Discord</strong>
-            <small>{copied ? "Скопировано ✓" : "Скопировать"}</small>
+            <small>
+              {copied ? "Скопировано ✓" : copyFailed ? "Не удалось скопировать" : "Скопировать"}
+            </small>
           </span>
           {copied ? (
             <Check className="employee-action__arrow is-copied" aria-hidden="true" />

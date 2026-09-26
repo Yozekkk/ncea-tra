@@ -16,7 +16,7 @@ import {
   marketplaceKeys,
 } from "@/features/marketplace/components";
 
-export const Route = createFileRoute("/marketplace/$slug/edit")({
+export const Route = createFileRoute("/marketplace_/$slug/edit")({
   head: () => ({
     meta: [{ title: "Редактировать объявление — NCEA" }, { name: "robots", content: "noindex" }],
   }),

@@ -10,9 +10,16 @@ import { getDashboard } from "../lib/data";
 import { formatDate } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 import { EmptyState, ErrorState, LoadingState, PageHeader } from "../components/ui";
+import { useAdminAccess } from "../components/AdminAccess";
+import { getAuditEntries } from "../lib/operations";
 
 export function Dashboard() {
   const state = useAsync(getDashboard);
+  const { role } = useAdminAccess();
+  const audit = useAsync(
+    () => (role === "moderator" ? Promise.resolve([]) : getAuditEntries()),
+    [role],
+  );
   const metrics: Array<[string, number, LucideIcon]> = state.data
     ? [
         ["Users", state.data.counts.users, Users],
@@ -20,6 +27,12 @@ export function Dashboard() {
         ["Forum posts", state.data.counts.posts, FileText],
         ["Listings", state.data.counts.listings, ShoppingBag],
         ["Published", state.data.counts.published, PackageCheck],
+        ["Pending review", state.data.counts.pending, ShoppingBag],
+        ["Archived listings", state.data.counts.archived, ShoppingBag],
+        ["Employees", state.data.counts.employees, Users],
+        ["Active employees", state.data.counts.activeEmployees, Users],
+        ["New users · 7 days", state.data.counts.newUsers, Users],
+        ["Deleted · accessible to your role", state.data.counts.deleted, FileText],
       ]
     : [];
   return (
@@ -39,6 +52,27 @@ export function Dashboard() {
             ))}
           </section>
           <section className="dashboard-grid">
+            {role !== "moderator" && (
+              <DashboardList title="Latest admin actions" empty="No recorded actions yet">
+                {audit.error ? (
+                  <ErrorState message={audit.error} retry={audit.reload} />
+                ) : (
+                  audit.data?.slice(0, 5).map((e) => (
+                    <div className="list-row" key={e.id}>
+                      <div>
+                        <strong>
+                          {e.action} · {e.entity}
+                        </strong>
+                        <span>
+                          @{e.actor} · {e.entity_id}
+                        </span>
+                      </div>
+                      <time>{formatDate(e.created_at)}</time>
+                    </div>
+                  ))
+                )}
+              </DashboardList>
+            )}
             <DashboardList title="Latest users" empty="No users yet">
               {state.data.users.map((user) => (
                 <div className="list-row" key={user.id}>

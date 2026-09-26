@@ -8,6 +8,9 @@ import type { AdminWorkspace } from "./lib/types";
 const Dashboard = lazy(() =>
   import("./pages/Dashboard").then((module) => ({ default: module.Dashboard })),
 );
+const AuditPage = lazy(() =>
+  import("./pages/AuditPage").then((module) => ({ default: module.AuditPage })),
+);
 const ForumPage = lazy(() =>
   import("./pages/ForumPage").then((module) => ({ default: module.ForumPage })),
 );
@@ -47,6 +50,7 @@ const routes: Record<string, React.ComponentType> = {
   "/employees": EmployeesPage,
   "/moderation": ModerationPage,
   "/settings": SettingsPage,
+  "/audit": AuditPage,
   "/deleted": DeletedPage,
 };
 
@@ -101,7 +105,7 @@ function AuthorizedApp() {
         ? []
         : role === "admin"
           ? ["/deleted"]
-          : ["/users", "/employees", "/settings", "/deleted"];
+          : ["/users", "/employees", "/settings", "/deleted", "/audit"];
   const allowedPath = forbidden.includes(path) ? "/moderation" : path;
   const activeRoutes = workspace === "ncreate" ? ncreateRoutes : routes;
   const safePath = activeRoutes[allowedPath] ? allowedPath : "/";

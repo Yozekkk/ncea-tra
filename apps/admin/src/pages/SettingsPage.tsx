@@ -2,9 +2,14 @@ import { useAsync } from "../lib/useAsync";
 import { checkDatabaseHealth } from "../lib/data";
 import { supabaseConfig } from "../lib/supabase";
 import { Badge, ErrorState, LoadingState, PageHeader } from "../components/ui";
+import { Button } from "../components/ui";
+import { getSiteSettings, saveSiteSettings } from "../lib/operations";
+import { useMutation } from "../lib/useMutation";
 
 export function SettingsPage() {
   const health = useAsync(checkDatabaseHealth);
+  const settings = useAsync(getSiteSettings);
+  const mutation = useMutation();
   const environment = import.meta.env.MODE === "production" ? "Production" : import.meta.env.MODE;
   return (
     <>
@@ -14,6 +19,56 @@ export function SettingsPage() {
       />
       {health.loading && <LoadingState />}
       {health.error && <ErrorState message={health.error} retry={health.reload} />}
+      {settings.loading && <LoadingState />}
+      {settings.error && <ErrorState message={settings.error} retry={settings.reload} />}
+      {mutation.error && <ErrorState message={mutation.error} />}
+      {mutation.message && (
+        <div className="success-state" role="status">
+          {mutation.message}
+        </div>
+      )}
+      {settings.data && (
+        <form
+          className="dialog-form panel"
+          key={settings.data.updated_at}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const form = new FormData(event.currentTarget);
+            void mutation.perform(
+              () =>
+                saveSiteSettings({
+                  announcement: String(form.get("announcement") ?? "").trim(),
+                  announcement_enabled: form.get("announcement_enabled") === "on",
+                }),
+              settings.reload,
+            );
+          }}
+        >
+          <fieldset disabled={mutation.busy}>
+            <legend>Публичное объявление NCEA</legend>
+            <label>
+              Текст объявления
+              <textarea
+                name="announcement"
+                maxLength={500}
+                rows={4}
+                defaultValue={settings.data.announcement}
+              />
+            </label>
+            <label className="check-label">
+              <input
+                name="announcement_enabled"
+                type="checkbox"
+                defaultChecked={settings.data.announcement_enabled}
+              />
+              Показывать на сайте
+            </label>
+            <Button type="submit" disabled={mutation.busy}>
+              {mutation.busy ? "Сохранение…" : "Сохранить объявление"}
+            </Button>
+          </fieldset>
+        </form>
+      )}
       <section className="settings-grid">
         <Info label="Environment" value={environment} />
         <Info label="Application version" value="1.0.0" mono />

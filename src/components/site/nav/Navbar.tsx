@@ -13,6 +13,7 @@ import {
 import { LOGO_MARK } from "@/components/site/ui";
 import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE, CHROME_MOTION_SPRING } from "@/lib/motion";
 import { AccountMenu } from "@/features/auth/AccountMenu";
+import { PublicAnnouncement } from "../PublicAnnouncement";
 
 const links = [
   { label: "Главная", href: "/", icon: Home },
@@ -44,6 +45,7 @@ export function Navbar() {
 
   return (
     <>
+      <PublicAnnouncement />
       <motion.header
         className="ref-header"
         initial={{

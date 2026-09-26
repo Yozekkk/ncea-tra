@@ -27,6 +27,7 @@ const navigation = [
   { path: "/employees", label: "Сотрудники", icon: UserRoundCog },
   { path: "/moderation", label: "Moderation", icon: ShieldCheck },
   { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/audit", label: "Audit log", icon: ShieldCheck },
   { path: "/deleted", label: "Удалённые", icon: Trash2 },
 ];
 
@@ -113,7 +114,9 @@ export function AppShell({
                   ? true
                   : role === "admin"
                     ? itemPath !== "/deleted"
-                    : !["/users", "/employees", "/settings", "/deleted"].includes(itemPath),
+                    : !["/users", "/employees", "/settings", "/deleted", "/audit"].includes(
+                        itemPath,
+                      ),
             )
             .map(({ path: itemPath, label, icon: Icon }) => (
               <button

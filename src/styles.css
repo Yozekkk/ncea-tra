@@ -2310,6 +2310,12 @@ video {
   .ref-hero-copy br {
     display: none;
   }
+  .ref-promo > span:nth-child(2) {
+    flex: 0 0 calc(100% - 54px);
+  }
+  .ref-promo > b {
+    margin-top: 8px;
+  }
   .ref-promo {
     min-height: 104px;
   }

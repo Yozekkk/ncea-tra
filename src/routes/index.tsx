@@ -131,11 +131,8 @@ function HomePage() {
           </motion.p>
           <motion.h1 variants={workersHeadingReveal}>NCEA</motion.h1>
           <motion.p className="ref-hero-copy" variants={workersItemReveal}>
-            Придаём Minecraft-проектам характер этой осенью.
-            <br />
-            Плагины, сборки, сайты, дизайн и мистические ивенты.
-            <br />
-            Для владельцев проектов, команд и сообществ.
+            Придаём Minecraft-проектам характер этой осенью. Плагины, сборки, сайты, дизайн и
+            мистические ивенты. Для владельцев проектов, команд и сообществ.
           </motion.p>
         </motion.section>
 

@@ -1950,6 +1950,57 @@ video {
 .ref-hero h1 {
   text-shadow: none;
 }
+.ref-hero-october {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(1292px, calc(100% - 36px));
+  min-height: 520px;
+  margin-top: 96px;
+  padding: 72px 32px;
+  overflow: hidden;
+  border: 1px solid #723c37;
+  border-radius: 28px;
+  color: #fff8f0;
+  background: linear-gradient(90deg, #170d1be8, #20101bd1 54%, #180c1388), url('/images/seasonal/october-hero.webp') center 46% / cover;
+  box-shadow: 0 24px 65px #20101b35;
+}
+.ref-hero-october::before {
+  display: block !important;
+  content: '' !important;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 76% 28%, #d7837840, transparent 38%);
+}
+.ref-hero-october h1 { color: #fff8f0; text-shadow: 0 8px 34px #120c17; }
+.ref-hero-october .ref-hero-copy { color: #f4e8df; }
+.ref-october-kicker {
+  width: fit-content;
+  margin: 0 0 18px;
+  padding: 9px 14px;
+  border: 1px solid #ffb2779c;
+  border-radius: 100px;
+  color: #ffcfaa;
+  background: #210e1aba;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+@media (max-width: 600px) {
+  .ref-hero-october {
+    width: calc(100% - 28px);
+    min-height: 480px;
+    margin-top: 76px;
+    padding: 72px 24px 52px;
+    border-radius: 22px;
+    background-position: 63% center;
+  }
+  .ref-october-kicker { font-size: 9px; letter-spacing: .08em; }
+}
 .ref-service-content {
   width: 100%;
   padding-right: 36%;

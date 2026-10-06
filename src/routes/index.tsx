@@ -120,17 +120,20 @@ function HomePage() {
       <SiteHeader />
       <main>
         <motion.section
-          className="ref-hero"
+          className="ref-hero ref-hero-october"
           id="home"
           variants={workersStaggerContainer}
           initial="hidden"
           animate="visible"
         >
+          <motion.p className="ref-october-kicker" variants={workersItemReveal}>
+            ОКТЯБРЬ · ВРЕМЯ НЕОБЫЧНЫХ ИДЕЙ
+          </motion.p>
           <motion.h1 variants={workersHeadingReveal}>NCEA</motion.h1>
           <motion.p className="ref-hero-copy" variants={workersItemReveal}>
-            Разработка, оформление и поддержка Minecraft-проектов.
+            Придаём Minecraft-проектам характер этой осенью.
             <br />
-            Плагины, сборки, сайты, дизайн и серверные решения.
+            Плагины, сборки, сайты, дизайн и мистические ивенты.
             <br />
             Для владельцев проектов, команд и сообществ.
           </motion.p>

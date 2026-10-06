@@ -588,6 +588,8 @@ td small {
 }
 .modal {
   width: min(520px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
   overscroll-behavior: contain;
   padding: 20px;
   background: #121214;

@@ -52,9 +52,8 @@ export function NCreateSettingsPage() {
           hero_subtitle: nullText(form.get("hero_subtitle")),
           server_ip: nullText(form.get("server_ip")),
           minecraft_version: nullText(form.get("minecraft_version")),
-          online_players: Number(form.get("online_players")),
-          record_players: Number(form.get("record_players")),
-          total_players: Number(form.get("total_players")),
+          average_online: form.get("average_online") === "" ? null : Number(form.get("average_online")),
+          uptime_percent: form.get("uptime_percent") === "" ? null : Number(form.get("uptime_percent")),
           discord_url: nullText(form.get("discord_url")),
           telegram_url: nullText(form.get("telegram_url")),
           youtube_url: nullText(form.get("youtube_url")),
@@ -148,6 +147,7 @@ export function NCreateSettingsPage() {
         ) : settings.data ? (
           <form
             className="admin-form ncreate-settings-form"
+            key={settings.data.updated_at}
             onSubmit={(event) => void submitSettings(event)}
           >
             <fieldset disabled={!canWrite || mutation.busy}>
@@ -178,22 +178,18 @@ export function NCreateSettingsPage() {
                   value={settings.data.minecraft_version}
                 />
                 <Field
-                  label="Онлайн"
-                  name="online_players"
-                  value={settings.data.online_players}
+                  label="Средний онлайн"
+                  name="average_online"
+                  value={settings.data.average_online}
                   type="number"
                 />
                 <Field
-                  label="Рекорд"
-                  name="record_players"
-                  value={settings.data.record_players}
+                  label="Аптайм сервера, %"
+                  name="uptime_percent"
+                  value={settings.data.uptime_percent == null ? null : Number(settings.data.uptime_percent.toFixed(2))}
                   type="number"
-                />
-                <Field
-                  label="Всего"
-                  name="total_players"
-                  value={settings.data.total_players}
-                  type="number"
+                  step="0.01"
+                  max={100}
                 />
                 <label>
                   <span>Статус</span>
@@ -436,6 +432,8 @@ function Field({
   type = "text",
   required = false,
   wide = false,
+  step,
+  max,
 }: {
   label: string;
   name: string;
@@ -443,6 +441,8 @@ function Field({
   type?: string;
   required?: boolean;
   wide?: boolean;
+  step?: string;
+  max?: number;
 }) {
   return (
     <label className={wide ? "wide" : ""}>
@@ -451,6 +451,8 @@ function Field({
         name={name}
         type={type}
         min={type === "number" ? 0 : undefined}
+        max={max}
+        step={step}
         defaultValue={value ?? ""}
         required={required}
       />

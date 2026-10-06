@@ -698,6 +698,7 @@ export type Database = {
       };
       ncreate_site_settings: {
         Row: {
+          average_online: number | null;
           discord_url: string | null;
           donate_url: string | null;
           hero_subtitle: string | null;
@@ -705,6 +706,7 @@ export type Database = {
           launcher_url: string | null;
           minecraft_version: string | null;
           online_players: number;
+          uptime_percent: number | null;
           record_players: number;
           server_ip: string | null;
           server_name: string;
@@ -717,6 +719,7 @@ export type Database = {
           youtube_url: string | null;
         };
         Insert: {
+          average_online?: number | null;
           discord_url?: string | null;
           donate_url?: string | null;
           hero_subtitle?: string | null;
@@ -724,6 +727,7 @@ export type Database = {
           launcher_url?: string | null;
           minecraft_version?: string | null;
           online_players?: number;
+          uptime_percent?: number | null;
           record_players?: number;
           server_ip?: string | null;
           server_name?: string;
@@ -736,6 +740,7 @@ export type Database = {
           youtube_url?: string | null;
         };
         Update: {
+          average_online?: number | null;
           discord_url?: string | null;
           donate_url?: string | null;
           hero_subtitle?: string | null;
@@ -743,6 +748,7 @@ export type Database = {
           launcher_url?: string | null;
           minecraft_version?: string | null;
           online_players?: number;
+          uptime_percent?: number | null;
           record_players?: number;
           server_ip?: string | null;
           server_name?: string;

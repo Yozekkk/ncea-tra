@@ -116,7 +116,7 @@ const STATS = [
 
 function HomePage() {
   return (
-    <div className="ref-site">
+    <div className="ref-site ref-site--october">
       <SiteHeader />
       <main>
         <motion.section
@@ -126,14 +126,48 @@ function HomePage() {
           initial="hidden"
           animate="visible"
         >
-          <motion.p className="ref-october-kicker" variants={workersItemReveal}>
-            ОКТЯБРЬ · ВРЕМЯ НЕОБЫЧНЫХ ИДЕЙ
-          </motion.p>
-          <motion.h1 variants={workersHeadingReveal}>NCEA</motion.h1>
-          <motion.p className="ref-hero-copy" variants={workersItemReveal}>
-            Придаём Minecraft-проектам характер этой осенью. Плагины, сборки, сайты, дизайн и
-            мистические ивенты. Для владельцев проектов, команд и сообществ.
-          </motion.p>
+          <div className="ref-hero-content">
+            <motion.p className="ref-october-kicker" variants={workersItemReveal}>
+              ОКТЯБРЬ · ВРЕМЯ НЕОБЫЧНЫХ ИДЕЙ
+            </motion.p>
+            <motion.h1 variants={workersHeadingReveal}>NCEA</motion.h1>
+            <motion.p className="ref-hero-copy" variants={workersItemReveal}>
+              Придаём Minecraft-проектам характер этой осенью. Плагины, сборки, сайты, дизайн и
+              мистические ивенты. Для владельцев проектов, команд и сообществ.
+            </motion.p>
+            <motion.a
+              className="ref-october-action"
+              href={ORDER}
+              target="_blank"
+              rel="noopener noreferrer"
+              variants={workersItemReveal}
+            >
+              Обсудить проект <ArrowUpRight aria-hidden="true" />
+            </motion.a>
+          </div>
+          <div className="ref-hero-scene" aria-hidden="true">
+            <img
+              className="ref-hero-web"
+              src="/images/seasonal/web.webp"
+              width="282"
+              height="167"
+              alt=""
+            />
+            <img
+              className="ref-hero-pumpkins"
+              src="/images/seasonal/pumpkins.webp"
+              width="941"
+              height="482"
+              alt=""
+            />
+            <img
+              className="ref-hero-coffin"
+              src="/images/seasonal/coffin.webp"
+              width="277"
+              height="227"
+              alt=""
+            />
+          </div>
         </motion.section>
 
         <motion.section

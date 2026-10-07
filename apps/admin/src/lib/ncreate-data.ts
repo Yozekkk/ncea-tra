@@ -83,6 +83,16 @@ export async function saveNCreateSection(
   if (error) fail("Could not save NCreate section", error);
 }
 
+export async function deleteNCreateSection(id: number) {
+  const { error } = await getSupabase()
+    .from("ncreate_home_sections")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .single();
+  if (error) fail("Could not delete NCreate section", error);
+}
+
 export async function getNCreateCards(): Promise<NCreateCard[]> {
   const { data, error } = await getSupabase()
     .from("ncreate_home_cards")
@@ -102,6 +112,16 @@ export async function saveNCreateCard(
     : getSupabase().from("ncreate_home_cards").insert(values);
   const { error } = await query.select("id").single();
   if (error) fail("Could not save NCreate card", error);
+}
+
+export async function deleteNCreateCard(id: number) {
+  const { error } = await getSupabase()
+    .from("ncreate_home_cards")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .single();
+  if (error) fail("Could not delete NCreate card", error);
 }
 
 export async function getNCreateCategories(): Promise<NCreateForumCategory[]> {

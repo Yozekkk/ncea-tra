@@ -157,7 +157,7 @@ export function ConfirmButton({
     if (window.confirm(confirmLabel)) void onConfirm();
   };
   return (
-    <Button className="button-danger button-small" onClick={handleClick} disabled={disabled}>
+    <Button className="button-danger button-small" type="button" aria-label={confirmLabel} onClick={handleClick} disabled={disabled}>
       {children}
     </Button>
   );

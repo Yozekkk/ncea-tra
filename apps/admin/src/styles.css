@@ -54,6 +54,8 @@ p {
   width: 248px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 24px 16px;
   background: #0d0d0f;
   border-right: 1px solid var(--border);
@@ -411,6 +413,11 @@ textarea {
 .table-wrap {
   overflow: auto;
   animation: rise 220ms ease both;
+}
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 table {
   width: 100%;

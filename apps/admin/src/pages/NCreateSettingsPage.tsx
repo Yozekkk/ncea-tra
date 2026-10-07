@@ -1,11 +1,12 @@
 import { CollectionTools } from "../components/CollectionTools";
 import { useMutation } from "../lib/useMutation";
 import { useState, type FormEvent } from "react";
-import { Edit3, Plus } from "lucide-react";
+import { Edit3, Plus, Trash2 } from "lucide-react";
 import { useAdminAccess } from "../components/AdminAccess";
 import {
   Badge,
   Button,
+  ConfirmButton,
   EmptyState,
   ErrorState,
   IconButton,
@@ -17,6 +18,8 @@ import {
   getNCreateCards,
   getNCreateSections,
   getNCreateSettings,
+  deleteNCreateCard,
+  deleteNCreateSection,
   saveNCreateCard,
   saveNCreateSection,
   saveNCreateSettings,
@@ -262,13 +265,25 @@ export function NCreateSettingsPage() {
                         </td>
                         <td>
                           {canWrite && (
-                            <IconButton
-                              disabled={mutation.busy}
-                              aria-label="Edit section"
-                              onClick={() => setEditingSection(item)}
-                            >
-                              <Edit3 size={17} />
-                            </IconButton>
+                            <div className="table-actions">
+                              <IconButton
+                                disabled={mutation.busy}
+                                aria-label="Edit section"
+                                onClick={() => setEditingSection(item)}
+                              >
+                                <Edit3 size={17} />
+                              </IconButton>
+                              <ConfirmButton
+                                disabled={mutation.busy}
+                                confirmLabel={`Удалить секцию «${item.title ?? item.section_key}» и все её карточки? Это действие нельзя отменить.`}
+                                onConfirm={() => perform(
+                                  () => deleteNCreateSection(item.id),
+                                  async () => { await Promise.all([sections.reload(), cards.reload()]); },
+                                )}
+                              >
+                                <Trash2 size={15} />
+                              </ConfirmButton>
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -320,13 +335,22 @@ export function NCreateSettingsPage() {
                         </td>
                         <td>
                           {canWrite && (
-                            <IconButton
-                              disabled={mutation.busy}
-                              aria-label="Edit card"
-                              onClick={() => setEditingCard(item)}
-                            >
-                              <Edit3 size={17} />
-                            </IconButton>
+                            <div className="table-actions">
+                              <IconButton
+                                disabled={mutation.busy}
+                                aria-label="Edit card"
+                                onClick={() => setEditingCard(item)}
+                              >
+                                <Edit3 size={17} />
+                              </IconButton>
+                              <ConfirmButton
+                                disabled={mutation.busy}
+                                confirmLabel={`Удалить карточку «${item.title}»? Это действие нельзя отменить.`}
+                                onConfirm={() => perform(() => deleteNCreateCard(item.id), cards.reload)}
+                              >
+                                <Trash2 size={15} />
+                              </ConfirmButton>
+                            </div>
                           )}
                         </td>
                       </tr>

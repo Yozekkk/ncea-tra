@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/features/auth/AuthProvider";
+import "@/styles-ncea-redesign.css";
 import type { MarketplaceCategory, MarketplaceListing } from "@/features/community/types";
 import { LoginPrompt, formatCommunityDate } from "@/features/forum/components";
 import {
@@ -112,66 +113,40 @@ export function ListingCard({
       params={{ slug: listing.slug }}
       className={`listing-card ${isAgency ? "listing-card-agency" : "listing-card-user"}`}
     >
-      {isAgency ? (
-        <>
-          <span className="listing-agency-geometry" aria-hidden="true" />
-          <div className="listing-card-body">
-            <div className="listing-card-kicker">
-              <span className="listing-agency-badge">От агентства</span>
-              <span>{listing.marketplace_categories?.name}</span>
-              {ownerView ? <StatusBadge status={listing.status} /> : null}
-            </div>
-            <h2>{listing.title}</h2>
-            <p>{listing.short_description}</p>
-            <ListingArtwork listing={listing} className="listing-agency-media" />
-            <div className="listing-card-footer">
-              <strong>
-                {formatListingPrice(
-                  listing.price_amount,
-                  listing.currency_code,
-                  listing.price_text,
-                )}
-              </strong>
-              <span className="listing-card-action">Подробнее →</span>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="listing-user-preview">
-            <span className="listing-category-pill">{listing.marketplace_categories?.name}</span>
-            <ListingArtwork listing={listing} />
-          </div>
-          <div className="listing-card-body">
-            <div className="listing-card-kicker">
-              {listing.promotion_eligible ? (
-                <span className="listing-promotion">
-                  <Flame aria-hidden="true" /> Серия {listing.effective_streak}
-                </span>
-              ) : (
-                <span>От пользователя</span>
-              )}
-              {ownerView ? <StatusBadge status={listing.status} /> : null}
-            </div>
-            <h2>{listing.title}</h2>
-            <p>{listing.short_description}</p>
-            <div className="listing-card-footer">
-              <strong>
-                {formatListingPrice(
-                  listing.price_amount,
-                  listing.currency_code,
-                  listing.price_text,
-                )}
-              </strong>
-              <span>
-                {listing.profiles?.username ?? "Участник NCEA"} ·{" "}
-                {formatCommunityDate(listing.created_at)}
-              </span>
-              <span className="listing-card-action">Подробнее →</span>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="listing-user-preview">
+        <ListingArtwork listing={listing} />
+        <span className="listing-category-pill">{listing.marketplace_categories?.name}</span>
+      </div>
+      <div className="listing-card-body">
+        <div className="listing-card-kicker">
+          {isAgency ? (
+            <span className="listing-agency-badge">NCEA Studio</span>
+          ) : listing.promotion_eligible ? (
+            <span className="listing-promotion">
+              <Flame aria-hidden="true" /> Серия {listing.effective_streak}
+            </span>
+          ) : (
+            <span>От пользователя</span>
+          )}
+          {ownerView ? <StatusBadge status={listing.status} /> : null}
+        </div>
+        <h2>{listing.title}</h2>
+        <p>{listing.short_description}</p>
+        <div className="listing-card-footer">
+          <strong>
+            {formatListingPrice(listing.price_amount, listing.currency_code, listing.price_text)}
+          </strong>
+          {!isAgency ? (
+            <span>
+              {listing.profiles?.username ?? "Участник NCEA"} ·{" "}
+              {formatCommunityDate(listing.created_at)}
+            </span>
+          ) : null}
+          <span className="listing-card-action">
+            Открыть <span aria-hidden="true">↗</span>
+          </span>
+        </div>
+      </div>
     </Link>
   );
 }

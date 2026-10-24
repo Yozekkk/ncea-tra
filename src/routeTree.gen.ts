@@ -29,6 +29,8 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as WebsitesRouteImport } from './routes/websites'
 import { Route as WorkersRouteImport } from './routes/workers'
 import { Route as ForumIndexRouteImport } from './routes/forum.index'
+import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
+import { Route as KnowledgeSlugRouteImport } from './routes/knowledge.$slug'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as MarketplaceMyRouteImport } from './routes/marketplace.my'
@@ -137,6 +139,16 @@ const ForumIndexRoute = ForumIndexRouteImport.update({
   path: '/forum/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
+  id: '/knowledge/',
+  path: '/knowledge/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeSlugRoute = KnowledgeSlugRouteImport.update({
+  id: '/knowledge/$slug',
+  path: '/knowledge/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
   id: '/marketplace/',
   path: '/marketplace/',
@@ -193,10 +205,12 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/knowledge/$slug': typeof KnowledgeSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum/': typeof ForumIndexRoute
+  '/knowledge/': typeof KnowledgeIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/forum/category/$slug': typeof ForumCategorySlugRoute
   '/forum/topic/$slug': typeof ForumTopicSlugRoute
@@ -222,10 +236,12 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/knowledge/$slug': typeof KnowledgeSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum': typeof ForumIndexRoute
+  '/knowledge': typeof KnowledgeIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/forum/category/$slug': typeof ForumCategorySlugRoute
   '/forum/topic/$slug': typeof ForumTopicSlugRoute
@@ -252,10 +268,12 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/websites': typeof WebsitesRoute
   '/workers': typeof WorkersRoute
+  '/knowledge/$slug': typeof KnowledgeSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/marketplace/my': typeof MarketplaceMyRoute
   '/marketplace/new': typeof MarketplaceNewRoute
   '/forum/': typeof ForumIndexRoute
+  '/knowledge/': typeof KnowledgeIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/forum/category/$slug': typeof ForumCategorySlugRoute
   '/forum/topic/$slug': typeof ForumTopicSlugRoute
@@ -283,10 +301,12 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/knowledge/$slug'
     | '/marketplace/$slug'
     | '/marketplace/my'
     | '/marketplace/new'
     | '/forum/'
+    | '/knowledge/'
     | '/marketplace/'
     | '/forum/category/$slug'
     | '/forum/topic/$slug'
@@ -312,10 +332,12 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/knowledge/$slug'
     | '/marketplace/$slug'
     | '/marketplace/my'
     | '/marketplace/new'
     | '/forum'
+    | '/knowledge'
     | '/marketplace'
     | '/forum/category/$slug'
     | '/forum/topic/$slug'
@@ -341,10 +363,12 @@ export interface FileRouteTypes {
     | '/support'
     | '/websites'
     | '/workers'
+    | '/knowledge/$slug'
     | '/marketplace/$slug'
     | '/marketplace/my'
     | '/marketplace/new'
     | '/forum/'
+    | '/knowledge/'
     | '/marketplace/'
     | '/forum/category/$slug'
     | '/forum/topic/$slug'
@@ -371,10 +395,12 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   WebsitesRoute: typeof WebsitesRoute
   WorkersRoute: typeof WorkersRoute
+  KnowledgeSlugRoute: typeof KnowledgeSlugRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   MarketplaceMyRoute: typeof MarketplaceMyRoute
   MarketplaceNewRoute: typeof MarketplaceNewRoute
   ForumIndexRoute: typeof ForumIndexRoute
+  KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   ForumCategorySlugRoute: typeof ForumCategorySlugRoute
   ForumTopicSlugRoute: typeof ForumTopicSlugRoute
@@ -523,6 +549,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForumIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/knowledge/': {
+      id: '/knowledge/'
+      path: '/knowledge'
+      fullPath: '/knowledge/'
+      preLoaderRoute: typeof KnowledgeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge/$slug': {
+      id: '/knowledge/$slug'
+      path: '/knowledge/$slug'
+      fullPath: '/knowledge/$slug'
+      preLoaderRoute: typeof KnowledgeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace/': {
       id: '/marketplace/'
       path: '/marketplace'
@@ -595,10 +635,12 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   WebsitesRoute: WebsitesRoute,
   WorkersRoute: WorkersRoute,
+  KnowledgeSlugRoute: KnowledgeSlugRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
   MarketplaceMyRoute: MarketplaceMyRoute,
   MarketplaceNewRoute: MarketplaceNewRoute,
   ForumIndexRoute: ForumIndexRoute,
+  KnowledgeIndexRoute: KnowledgeIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   ForumCategorySlugRoute: ForumCategorySlugRoute,
   ForumTopicSlugRoute: ForumTopicSlugRoute,

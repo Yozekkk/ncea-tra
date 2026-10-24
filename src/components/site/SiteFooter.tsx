@@ -49,7 +49,7 @@ export function SiteFooter() {
               <a href="/workers">Сотрудники</a>
             </li>
             <li>
-              <Link to="/forum">Форум</Link>
+              <Link to="/knowledge">База знаний</Link>
             </li>
             <li>
               <Link to="/marketplace">Маркетплейс</Link>

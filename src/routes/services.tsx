@@ -1,50 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "iconoir-react";
 import { motion } from "motion/react";
-import { ServiceGroupCard } from "@/components/site/ServiceGroupCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { SERVICE_ART } from "@/lib/service-art";
+import { ServiceReviews } from "@/components/site/ServiceReviews";
+import { BrandMarquee } from "@/components/site/BrandMarquee";
 import { GROUPS, SERVICES } from "@/lib/services";
-import {
-  WORKERS_MOTION_VIEWPORT,
-  workersHeadingReveal,
-  workersItemReveal,
-  workersStaggerContainer,
-} from "@/lib/motion";
+import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
+import "@/styles-ncea-redesign.css";
 
-const GROUP_PRESENTATIONS = [
-  {
-    variant: "primary" as const,
-    label: "Minecraft development",
-    title: ["MINECRAFT", "РАЗРАБОТКА"] as const,
-    description:
-      "Серверная инженерия, игровые механики и техническая основа проекта — от идеи до стабильного запуска.",
-    art: SERVICE_ART.plugins,
-    ctaTitle: "Нужна своя механика?",
-    ctaCopy: "Опишите задачу — предложим технический формат.",
-  },
-  {
-    variant: "creative" as const,
-    label: "Content & identity",
-    title: ["КОНТЕНТ", "& ДИЗАЙН"] as const,
-    description:
-      "Создаём визуальный язык и игровой контент, которые помогают Minecraft-проекту запомниться.",
-    art: SERVICE_ART.design,
-    ctaTitle: "Нужен цельный образ?",
-    ctaCopy: "Соберём задачу в понятное творческое направление.",
-  },
-  {
-    variant: "compact" as const,
-    label: "Special projects",
-    title: ["ДРУГИЕ", "УСЛУГИ"] as const,
-    description:
-      "Ивенты, сайты и сопровождение — всё, что соединяет проект с аудиторией и поддерживает его рост.",
-    art: SERVICE_ART.events,
-    ctaTitle: "Задача вне списка?",
-    ctaCopy: "Расскажите о ней напрямую менеджеру NCEA.",
-  },
-] as const;
+const ticker = "ПЛАГИНЫ • СЕРВЕРЫ • ДИЗАЙН • СБОРКИ • ОПТИМИЗАЦИЯ • РЕСУРСПАКИ • ";
+
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
@@ -55,106 +21,81 @@ export const Route = createFileRoute("/services")({
   }),
   component: ServicesPage,
 });
+
 function ServicesPage() {
   return (
-    <div className="ref-site services-experience">
+    <div className="ref-site ncea-services-page">
       <a className="services-skip-link" href="#main-content">
         Перейти к каталогу
       </a>
       <SiteHeader />
-      <main className="services-catalog" id="main-content">
-        <span className="services-atmosphere services-atmosphere--one" aria-hidden="true" />
-        <span className="services-atmosphere services-atmosphere--two" aria-hidden="true" />
-        <motion.section
-          className="services-hero"
-          aria-labelledby="services-title"
-          variants={workersStaggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div className="services-hero-meta" variants={workersItemReveal}>
-            <span>12 направлений</span>
-            <span>NCEA / Service atlas</span>
-          </motion.div>
-          <div className="services-hero-copy">
-            <motion.h1 id="services-title" aria-label="Услуги NCEA" variants={workersHeadingReveal}>
-              <span>УСЛУГИ</span>
-              <span>NCEA</span>
-            </motion.h1>
-            <motion.div variants={workersItemReveal}>
-              <p>
-                Разработка, контент и сопровождение Minecraft-проектов. Выберите направление —
-                детали и формат обсудим напрямую.
-              </p>
-              <a href="#service-groups">
-                Смотреть каталог
-                <span className="services-inline-arrow" aria-hidden="true">
-                  <ArrowDownRight />
-                </span>
-              </a>
-            </motion.div>
+      <main id="main-content" className="ncea-services-main">
+        <section className="ncea-services-hero">
+          <p className="ncea-section-label">NCEA / НАПРАВЛЕНИЯ</p>
+          <h1>
+            ТОВАРЫ <span>И УСЛУГИ</span>
+          </h1>
+          <p>
+            Разработка, визуальный контент и сопровождение Minecraft-проектов. Выберите направление
+            — детали и формат обсудим напрямую.
+          </p>
+          <div className="ncea-services-stat" aria-label={`${SERVICES.length} направлений услуг`}>
+            <strong>{SERVICES.length}</strong>
+            <span>направлений в каталоге</span>
           </div>
-          <motion.div
-            className="services-hero-line"
-            aria-hidden="true"
-            variants={workersItemReveal}
+        </section>
+        <BrandMarquee text={ticker} />
+        {GROUPS.map((group) => (
+          <section
+            className="ncea-service-section"
+            key={group.id}
+            aria-labelledby={`group-${group.id}`}
           >
-            <span>DESIGN / CODE / CONTENT / SUPPORT</span>
-            <i />
-            <b>2026</b>
-          </motion.div>
-        </motion.section>
-
-        <motion.section
-          className="services-groups"
-          id="service-groups"
-          aria-label="Каталог услуг NCEA"
-          variants={workersStaggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
-          <span className="services-voxel-ribbon" aria-hidden="true">
-            <i />
-            <b />
-            <em />
-          </span>
-          {GROUPS.map((group, index) => {
-            const presentation = GROUP_PRESENTATIONS[index];
-            const services = SERVICES.filter((service) => service.group === group.id);
-            return (
-              <ServiceGroupCard
-                key={group.id}
-                number={`0${index + 1}`}
-                label={presentation.label}
-                title={presentation.title}
-                description={presentation.description}
-                services={services}
-                variant={presentation.variant}
-                art={presentation.art}
-                ctaTitle={presentation.ctaTitle}
-                ctaCopy={presentation.ctaCopy}
-              />
-            );
-          })}
-        </motion.section>
-
-        <motion.section
-          className="services-bottom"
-          variants={workersItemReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
-          <span>Не нашли точное направление?</span>
-          <h2>Соберём решение вокруг вашей задачи.</h2>
+            <div className="ncea-service-section-heading">
+              <p className="ncea-section-label">NCEA STUDIO / УСЛУГИ</p>
+              <h2 id={`group-${group.id}`}>{group.label}</h2>
+            </div>
+            <div className="ncea-service-grid">
+              {SERVICES.filter((service) => service.group === group.id).map((service) => {
+                const globalIndex = SERVICES.findIndex((item) => item.id === service.id);
+                return (
+                  <motion.article className="ncea-service-card" key={service.id}>
+                    <Link to={service.path} aria-label={`Подробнее: ${service.title}`}>
+                      <div className="ncea-service-art">
+                        <img
+                          src={SERVICE_MAIN_ASSETS[globalIndex % SERVICE_MAIN_ASSETS.length]}
+                          alt=""
+                          width="280"
+                          height="280"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="ncea-service-card-copy">
+                        <span className="ncea-service-card-category">{group.label}</span>
+                        <h3>{service.title}</h3>
+                        <p>{service.short}</p>
+                        <span className="ncea-service-card-action">
+                          Подробнее <ArrowUpRight aria-hidden="true" />
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+        <ServiceReviews />
+        <section className="ncea-services-contact">
+          <div>
+            <p className="ncea-section-label">ОБСУДИМ ПРОЕКТ</p>
+            <h2>Нужна помощь с выбором?</h2>
+            <p>Расскажите менеджеру о задаче — подберём подходящее направление.</p>
+          </div>
           <a href="https://t.me/lisiy_bob" target="_blank" rel="noreferrer">
-            Написать менеджеру
-            <span className="services-inline-arrow" aria-hidden="true">
-              <ArrowUpRight />
-            </span>
+            Написать менеджеру <ArrowUpRight aria-hidden="true" />
           </a>
-        </motion.section>
+        </section>
       </main>
       <SiteFooter />
     </div>

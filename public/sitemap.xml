@@ -16,5 +16,9 @@
   <url><loc>https://www.ncea-studio.com/resourcepacks</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.ncea-studio.com/fancymenu</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.ncea-studio.com/forum</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.ncea-studio.com/knowledge</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ncea-studio.com/knowledge/server-launch-checklist</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.ncea-studio.com/knowledge/minecraft-server-performance</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.ncea-studio.com/knowledge/minecraft-server-access</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ncea-studio.com/marketplace</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
 </urlset>

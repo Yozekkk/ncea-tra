@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import {
-  BriefcaseBusiness,
-  Home,
-  MessageCircle,
-  MessageSquareQuote,
-  Send,
-  ShoppingBag,
-  UsersRound,
-} from "lucide-react";
+import { Book, Home, Quote, Send, ShoppingBag, Group, Code } from "iconoir-react";
 import { LOGO_MARK } from "@/components/site/ui";
 import { CHROME_MOTION_DURATION, CHROME_MOTION_EASE, CHROME_MOTION_SPRING } from "@/lib/motion";
 import { AccountMenu } from "@/features/auth/AccountMenu";
@@ -17,11 +9,11 @@ import { PublicAnnouncement } from "../PublicAnnouncement";
 
 const links = [
   { label: "Главная", href: "/", icon: Home },
-  { label: "Услуги", href: "/services", icon: BriefcaseBusiness },
-  { label: "Сотрудники", href: "/workers", icon: UsersRound },
-  { label: "Форум", href: "/forum", icon: MessageCircle },
+  { label: "Услуги", href: "/services", icon: Code },
+  { label: "Сотрудники", href: "/workers", icon: Group },
+  { label: "База знаний", href: "/knowledge", icon: Book },
   { label: "Маркетплейс", href: "/marketplace", icon: ShoppingBag },
-  { label: "Отзывы", href: "/#reviews", icon: MessageSquareQuote },
+  { label: "Отзывы", href: "/#reviews", icon: Quote },
   { label: "Контакты", href: "/#contacts", icon: Send },
 ] as const;
 
@@ -40,7 +32,7 @@ export function Navbar() {
   const isActive = (href: (typeof links)[number]["href"]) => {
     if (href === "/") return currentLocation === "/";
     if (href.startsWith("/#")) return currentLocation === href;
-    return pathname === href;
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   return (
@@ -104,7 +96,7 @@ export function Navbar() {
         </Link>
         <div className="ref-mobile-tabbar-links">
           {links
-            .filter(({ href }) => ["/", "/services", "/forum", "/marketplace"].includes(href))
+            .filter(({ href }) => ["/", "/services", "/knowledge", "/marketplace"].includes(href))
             .map(({ label, href, icon: Icon }) => {
               const active = isActive(href);
               const content = (

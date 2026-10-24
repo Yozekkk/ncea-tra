@@ -8,7 +8,7 @@ import {
   workersStaggerContainer,
 } from "@/lib/motion";
 
-const REVIEWS = [
+export const REVIEWS = [
   {
     nick: "ArseniyInvesto",
     text: "заказывал плагин на заряд ветра для ранних версий, все четинька , ставлю пять звезд (хотелось бы 100/5)",

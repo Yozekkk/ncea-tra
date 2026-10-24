@@ -1,0 +1,1171 @@
+/* Internal pages only: the home layout and brand tokens are intentionally untouched. */
+.marketplace-experience,
+.ncea-services-page,
+.ncea-knowledge-page {
+  --ncea-ink: #18181b;
+  --ncea-line: #e7e7e9;
+  --ncea-primary: #ff5a17;
+  color: var(--ncea-ink);
+}
+.marketplace-experience :is(h1, h2, h3),
+.ncea-services-page :is(h1, h2, h3),
+.ncea-knowledge-page :is(h1, h2, h3) {
+  font-family: Manrope, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+.marketplace-experience :is(a, button, input, select):focus-visible,
+.ncea-services-page :is(a, button):focus-visible,
+.ncea-knowledge-page :is(a, button, input):focus-visible {
+  outline: 3px solid var(--ncea-primary);
+  outline-offset: 3px;
+}
+.ncea-section-label {
+  margin: 0;
+  color: #ff5a17;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ncea-marquee,
+.marketplace-ticker {
+  overflow: hidden;
+  width: 100%;
+  padding: 18px 0;
+  border-block: 1px solid var(--ncea-line, #e7e7e9);
+  white-space: nowrap;
+  color: #71717a;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+}
+.ncea-marquee span,
+.marketplace-ticker span {
+  display: inline-block;
+  width: max-content;
+  animation: ncea-marquee 28s linear infinite;
+  animation-play-state: paused;
+}
+.ncea-marquee.is-visible span,
+.marketplace-ticker.is-visible span {
+  animation-play-state: running;
+}
+@keyframes ncea-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ncea-marquee span,
+  .marketplace-ticker span {
+    animation: none;
+  }
+}
+
+/* Marketplace */
+.marketplace-experience {
+  width: min(1640px, 100%);
+}
+.marketplace-experience .community-hero {
+  margin-bottom: 26px;
+}
+.marketplace-experience .community-hero h1 {
+  font-size: clamp(42px, 6vw, 82px);
+}
+.marketplace-ticker {
+  margin: 22px 0 30px;
+}
+.marketplace-experience .marketplace-source-filters {
+  margin: 24px 0 8px;
+}
+.marketplace-experience .marketplace-source-filters a:hover {
+  color: #ff5a17;
+  background: #fff4ed;
+}
+.marketplace-experience .marketplace-source-filters a.is-active {
+  color: #fff;
+  background: #ff5a17;
+  box-shadow: 0 8px 20px rgba(255, 90, 23, 0.2);
+}
+.marketplace-layout {
+  display: grid;
+  grid-template-columns: minmax(210px, 250px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.marketplace-sidebar {
+  position: sticky;
+  top: 20px;
+  padding: 22px;
+  border: 1px solid #e7e7e9;
+  border-radius: 24px;
+  background: #f5f5f4;
+}
+.marketplace-sidebar h2,
+.marketplace-sidebar h3 {
+  margin: 0 0 16px;
+  font-size: 19px;
+}
+.marketplace-sidebar .marketplace-filters {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.marketplace-sidebar .marketplace-filters a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #18181b;
+  font-size: 13px;
+  font-weight: 700;
+}
+.marketplace-sidebar .marketplace-filters a:hover,
+.marketplace-sidebar .marketplace-filters a.is-active {
+  border-color: #ff5a17;
+  background: #fff;
+  color: #ff5a17;
+}
+.marketplace-price-filter {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #e7e7e9;
+}
+.marketplace-price-filter label {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #71717a;
+}
+.marketplace-price-filter select,
+.marketplace-price-filter input {
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #e7e7e9;
+  border-radius: 10px;
+  background: #fff;
+  color: #18181b;
+  font:
+    700 13px Manrope,
+    sans-serif;
+}
+.marketplace-price-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.marketplace-price-filter button {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #e7e7e9;
+  border-radius: 10px;
+  background: #fff;
+  color: #18181b;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.marketplace-price-filter button:hover {
+  border-color: #ff5a17;
+  color: #ff5a17;
+}
+.marketplace-price-hint {
+  margin: 2px 0 12px;
+  color: #71717a;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.marketplace-price-filter input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.marketplace-results {
+  min-width: 0;
+}
+.marketplace-results .community-subheading {
+  margin-top: 0;
+}
+.marketplace-search,
+.ncea-knowledge-search {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 0 15px;
+  border: 1px solid #e7e7e9;
+  border-radius: 13px;
+  background: #fff;
+}
+.marketplace-search svg,
+.ncea-knowledge-search svg {
+  width: 19px;
+  height: 19px;
+  color: #71717a;
+}
+.marketplace-search input,
+.ncea-knowledge-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #18181b;
+  font:
+    600 13px Manrope,
+    sans-serif;
+}
+.marketplace-results .listing-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.listing-grid .listing-card {
+  display: flex;
+  min-width: 0;
+  min-height: 390px;
+  padding: 8px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e7e7e9;
+  border-radius: 22px;
+  color: #18181b;
+  background: #fff;
+  box-shadow: 0 8px 26px rgba(24, 24, 27, 0.035);
+  text-decoration: none;
+}
+.listing-grid .listing-card:hover {
+  border-color: #ff8a22;
+  box-shadow: 0 20px 38px rgba(24, 24, 27, 0.1);
+}
+.listing-grid .listing-user-preview {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1 / 0.86;
+  flex: 0 0 auto;
+  border-radius: 16px;
+  background: #f5f5f4;
+}
+.listing-grid .listing-user-preview::after {
+  display: none;
+}
+.listing-grid .listing-user-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.listing-grid .listing-card:hover img {
+  transform: scale(1.04);
+}
+.listing-grid .listing-category-pill {
+  top: 10px;
+  left: 10px;
+  color: #18181b;
+  background: rgba(255, 255, 255, 0.94);
+  font-size: 10px;
+}
+.listing-grid .listing-placeholder-copy {
+  color: #71717a;
+}
+.listing-grid .listing-card-body {
+  min-height: 0;
+  padding: 14px 9px 8px;
+  flex: 1;
+}
+.listing-grid .listing-card-kicker {
+  color: #71717a;
+  font-size: 10px;
+}
+.listing-grid .listing-agency-badge {
+  border-color: rgba(255, 90, 23, 0.2);
+  color: #ff5a17;
+  background: #fff4ed;
+}
+.listing-grid .listing-card h2 {
+  margin: 10px 0 8px;
+  color: #18181b;
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.2;
+}
+.listing-grid .listing-card-body > p {
+  color: #71717a;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-line-clamp: 3;
+}
+.listing-grid .listing-card-footer {
+  display: flex;
+  margin-top: auto;
+  padding-top: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+}
+.listing-grid .listing-card-footer strong {
+  color: #18181b;
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+}
+.listing-grid .listing-card-footer > span:not(.listing-card-action) {
+  color: #71717a;
+  font-size: 10px;
+}
+.listing-grid .listing-card-action {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 11px;
+  background: #ff5a17;
+  color: #fff !important;
+  font-size: 12px !important;
+}
+.listing-grid .listing-card-action span {
+  color: inherit;
+  font-size: 16px;
+}
+.marketplace-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.marketplace-skeleton-grid span {
+  height: 390px;
+  border-radius: 22px;
+  background: linear-gradient(100deg, #f5f5f4 20%, #fff 45%, #f5f5f4 70%);
+  background-size: 200% 100%;
+  animation: ncea-shimmer 1.5s linear infinite;
+}
+@keyframes ncea-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-skeleton-grid span {
+    animation: none;
+  }
+}
+
+/* Service catalog */
+.ncea-services-page {
+  background: #fff;
+}
+.ncea-services-main {
+  overflow: hidden;
+}
+.ncea-services-hero {
+  position: relative;
+  display: grid;
+  min-height: 420px;
+  padding: 130px max(24px, calc((100vw - 1440px) / 2)) 70px;
+  align-content: center;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(255, 138, 34, 0.12), transparent 35%),
+    linear-gradient(#e7e7e9 1px, transparent 1px),
+    linear-gradient(90deg, #e7e7e9 1px, transparent 1px), #fff;
+  background-size:
+    auto,
+    80px 80px,
+    80px 80px,
+    auto;
+}
+.ncea-services-hero h1 {
+  max-width: 1000px;
+  margin: 14px 0 18px;
+  font-size: clamp(46px, 8vw, 112px);
+  line-height: 0.94;
+}
+.ncea-services-hero h1 span,
+.ncea-knowledge-hero h1 span {
+  color: #ff5a17;
+}
+.ncea-services-hero > p:not(.ncea-section-label) {
+  max-width: 630px;
+  margin: 0;
+  color: #71717a;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.ncea-services-stat {
+  position: absolute;
+  right: max(24px, calc((100vw - 1440px) / 2));
+  bottom: 70px;
+  display: grid;
+  gap: 0;
+}
+.ncea-services-stat strong {
+  color: #ff5a17;
+  font-size: 58px;
+  line-height: 1;
+}
+.ncea-services-stat span {
+  color: #71717a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ncea-service-section {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 85px 0 10px;
+}
+.ncea-service-section-heading {
+  margin-bottom: 28px;
+}
+.ncea-service-section-heading h2 {
+  margin: 10px 0 0;
+  font-size: clamp(32px, 4vw, 56px);
+}
+.ncea-service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.ncea-service-card {
+  min-width: 0;
+  border: 1px solid #e7e7e9;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(24, 24, 27, 0.04);
+  transition:
+    border-color 0.25s,
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+.ncea-service-card:hover {
+  transform: translateY(-4px);
+  border-color: #ff8a22;
+  box-shadow: 0 24px 45px rgba(24, 24, 27, 0.1);
+}
+.ncea-service-card a {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+.ncea-service-art {
+  display: grid;
+  min-height: 230px;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 138, 34, 0.22), transparent 55%),
+    linear-gradient(135deg, #f5f5f4, #fff);
+}
+.ncea-service-art img {
+  width: min(74%, 220px);
+  height: 200px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 20px 12px rgba(24, 24, 27, 0.17));
+  transition: transform 0.3s ease;
+}
+.ncea-service-card:hover img {
+  transform: scale(1.06) translateY(-3px);
+}
+.ncea-service-card-copy {
+  display: flex;
+  min-height: 215px;
+  padding: 22px;
+  flex: 1;
+  flex-direction: column;
+}
+.ncea-service-card-category {
+  width: max-content;
+  max-width: 100%;
+  padding: 6px 9px;
+  border-radius: 8px;
+  color: #ff5a17;
+  background: #fff4ed;
+  font-size: 10px;
+  font-weight: 800;
+}
+.ncea-service-card h3 {
+  margin: 14px 0 8px;
+  font-size: 21px;
+  line-height: 1.15;
+}
+.ncea-service-card p {
+  margin: 0;
+  color: #71717a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ncea-service-card-action {
+  display: flex;
+  min-height: 42px;
+  margin-top: auto;
+  padding-top: 14px;
+  align-items: center;
+  gap: 8px;
+  color: #ff5a17;
+  font-size: 12px;
+  font-weight: 800;
+}
+.ncea-service-card-action svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s;
+}
+.ncea-service-card:hover .ncea-service-card-action svg {
+  transform: translate(3px, -3px);
+}
+.ncea-services-contact {
+  display: flex;
+  width: min(1440px, calc(100% - 48px));
+  margin: 95px auto;
+  padding: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid #e7e7e9;
+  border-radius: 26px;
+  background: #f5f5f4;
+}
+.ncea-services-contact h2 {
+  margin: 6px 0;
+  font-size: clamp(28px, 3vw, 42px);
+}
+.ncea-services-contact p:last-child {
+  margin: 0;
+  color: #71717a;
+  font-size: 13px;
+}
+.ncea-services-contact a,
+.ncea-knowledge-hero a {
+  display: inline-flex;
+  min-height: 48px;
+  padding: 0 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 12px;
+  color: #fff;
+  background: #ff5a17;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ncea-services-contact a svg,
+.ncea-knowledge-hero a svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Knowledge */
+.ncea-knowledge-hero {
+  display: flex;
+  min-height: 510px;
+  padding: 125px 24px 76px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 90, 23, 0.11), transparent 42%), #fff;
+}
+.ncea-knowledge-hero h1 {
+  margin: 12px 0 20px;
+  font-size: clamp(48px, 8vw, 108px);
+  line-height: 0.95;
+}
+.ncea-knowledge-hero > p:not(.ncea-section-label) {
+  max-width: 630px;
+  margin: 0 0 25px;
+  color: #71717a;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.ncea-knowledge-catalog {
+  width: min(1380px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 75px 0 110px;
+}
+.ncea-knowledge-heading h2 {
+  margin: 8px 0 25px;
+  font-size: clamp(34px, 4vw, 56px);
+}
+.ncea-knowledge-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.ncea-knowledge-search {
+  width: min(340px, 100%);
+  flex: 0 0 auto;
+}
+.ncea-knowledge-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.ncea-knowledge-categories button {
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid #e7e7e9;
+  border-radius: 12px;
+  color: #18181b;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.ncea-knowledge-categories button:hover,
+.ncea-knowledge-categories button.is-active {
+  border-color: #ff5a17;
+  color: #fff;
+  background: #ff5a17;
+}
+.ncea-article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.ncea-article-card {
+  overflow: hidden;
+  border: 1px solid #e7e7e9;
+  border-radius: 22px;
+  background: #fff;
+  transition:
+    transform 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.ncea-article-card:hover {
+  transform: translateY(-4px);
+  border-color: #ff8a22;
+  box-shadow: 0 20px 40px rgba(24, 24, 27, 0.09);
+}
+.ncea-article-card a {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+.ncea-article-art {
+  position: relative;
+  display: flex;
+  min-height: 220px;
+  padding: 24px;
+  align-items: flex-end;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(135deg, #ff1738, #ff4d1f, #ff8a22);
+}
+.ncea-article-art::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+  background-size: 34px 34px;
+  content: "";
+  transform: rotate(-8deg) scale(1.3);
+}
+.ncea-article-art-1 {
+  background: linear-gradient(135deg, #18181b, #ff4d1f);
+}
+.ncea-article-art-2 {
+  background: linear-gradient(135deg, #ff8a22, #ff1738);
+}
+.ncea-article-art > span {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 100px;
+  font-weight: 800;
+  line-height: 1;
+}
+.ncea-article-art strong {
+  position: relative;
+  max-width: 80%;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.ncea-article-copy {
+  display: flex;
+  min-height: 238px;
+  padding: 24px;
+  flex: 1;
+  flex-direction: column;
+}
+.ncea-article-copy > span:first-child {
+  color: #ff5a17;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ncea-article-copy h3 {
+  margin: 13px 0 9px;
+  font-size: 22px;
+  line-height: 1.18;
+}
+.ncea-article-copy p {
+  margin: 0;
+  color: #71717a;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.ncea-article-link {
+  display: inline-flex;
+  min-height: 40px;
+  margin-top: auto;
+  padding-top: 14px;
+  align-items: center;
+  gap: 8px;
+  color: #ff5a17;
+  font-size: 12px;
+  font-weight: 800;
+}
+.ncea-article-link svg {
+  width: 17px;
+  height: 17px;
+}
+.ncea-knowledge-empty {
+  padding: 50px;
+  border: 1px dashed #e7e7e9;
+  border-radius: 20px;
+  text-align: center;
+}
+.ncea-knowledge-empty strong {
+  font-size: 22px;
+}
+.ncea-knowledge-empty p {
+  color: #71717a;
+}
+.ncea-knowledge-empty button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #ff5a17;
+  border-radius: 10px;
+  color: #ff5a17;
+  background: #fff;
+  cursor: pointer;
+}
+.ncea-article-page {
+  width: min(1000px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 120px 0 110px;
+}
+.ncea-article-page nav a,
+.ncea-article-back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  color: #ff5a17;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.ncea-article-page nav svg,
+.ncea-article-back svg {
+  width: 18px;
+  height: 18px;
+}
+.ncea-article-page article header {
+  padding: 48px 0;
+  border-bottom: 1px solid #e7e7e9;
+}
+.ncea-article-page h1 {
+  margin: 16px 0;
+  font-size: clamp(42px, 6vw, 78px);
+  line-height: 1.02;
+}
+.ncea-article-page article header p {
+  max-width: 700px;
+  color: #71717a;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.ncea-article-content {
+  max-width: 760px;
+  padding: 24px 0 50px;
+}
+.ncea-article-content h2 {
+  margin: 35px 0 16px;
+  font-size: 30px;
+}
+.ncea-article-content p {
+  color: #3f3f46;
+  font-size: 16px;
+  line-height: 1.85;
+}
+.ncea-related-articles {
+  display: grid;
+  gap: 10px;
+  padding: 28px 0;
+  border-top: 1px solid #e7e7e9;
+}
+.ncea-related-articles h2 {
+  margin: 0;
+  font-size: 25px;
+}
+.ncea-related-articles a {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #18181b;
+  text-decoration: none;
+}
+.ncea-related-articles a:hover {
+  color: #ff5a17;
+}
+.ncea-related-articles svg {
+  width: 18px;
+  height: 18px;
+}
+@media (max-width: 1200px) {
+  .marketplace-results .listing-grid,
+  .marketplace-skeleton-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ncea-service-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .marketplace-layout {
+    grid-template-columns: 1fr;
+  }
+  .marketplace-sidebar {
+    position: static;
+  }
+  .marketplace-sidebar .marketplace-filters {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .marketplace-sidebar .marketplace-filters a {
+    border-color: #e7e7e9;
+    background: #fff;
+  }
+  .marketplace-price-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px;
+  }
+  .marketplace-price-filter h3 {
+    width: 100%;
+    margin: 0;
+  }
+  .marketplace-price-filter label {
+    min-width: 110px;
+    margin: 0;
+  }
+  .marketplace-price-filter button {
+    width: auto;
+    padding: 0 14px;
+  }
+  .ncea-services-stat {
+    display: none;
+  }
+  .ncea-knowledge-controls {
+    flex-direction: column;
+  }
+  .ncea-knowledge-search {
+    width: 100%;
+  }
+}
+@media (max-width: 700px) {
+  .marketplace-results .listing-grid,
+  .marketplace-skeleton-grid,
+  .ncea-service-grid,
+  .ncea-article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ncea-service-art {
+    min-height: 180px;
+  }
+  .ncea-service-art img {
+    height: 155px;
+  }
+  .ncea-service-card-copy {
+    padding: 16px;
+  }
+  .ncea-service-card h3 {
+    font-size: 18px;
+  }
+  .ncea-services-contact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ncea-services-contact a {
+    width: 100%;
+  }
+}
+@media (max-width: 520px) {
+  .marketplace-results .listing-grid,
+  .marketplace-skeleton-grid,
+  .ncea-service-grid,
+  .ncea-article-grid {
+    grid-template-columns: 1fr;
+  }
+  .marketplace-results .community-subheading {
+    display: block;
+  }
+  .marketplace-experience .marketplace-source-filters {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .marketplace-experience .marketplace-source-filters a {
+    padding-inline: 10px;
+  }
+  .ncea-services-hero {
+    min-height: 350px;
+    padding: 75px 20px 55px;
+  }
+  .ncea-services-hero h1 {
+    font-size: clamp(46px, 12vw, 66px);
+  }
+  .ncea-service-section,
+  .ncea-services-contact,
+  .ncea-knowledge-catalog,
+  .ncea-article-page {
+    width: calc(100% - 36px);
+  }
+  .ncea-service-section {
+    padding-top: 58px;
+  }
+  .ncea-knowledge-hero {
+    min-height: 430px;
+    padding: 80px 20px 60px;
+  }
+  .ncea-knowledge-hero h1 {
+    font-size: clamp(45px, 12vw, 64px);
+  }
+  .ncea-article-art {
+    min-height: 185px;
+  }
+  .ncea-article-page {
+    padding-top: 60px;
+  }
+}
+
+/* The service review cards reuse the published review text. */
+.ncea-service-reviews {
+  width: min(1440px, calc(100% - 48px));
+  margin: 95px auto 0;
+}
+.ncea-service-reviews-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.ncea-service-reviews-heading h2 {
+  margin: 8px 0;
+  font-size: clamp(32px, 4vw, 56px);
+}
+.ncea-service-reviews-heading p:last-child {
+  margin: 0;
+  color: #71717a;
+  font-size: 14px;
+}
+.ncea-review-controls {
+  display: flex;
+  gap: 8px;
+}
+.ncea-review-controls button {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid #e7e7e9;
+  border-radius: 13px;
+  background: #fff;
+  color: #18181b;
+  cursor: pointer;
+}
+.ncea-review-controls button:hover {
+  border-color: #ff5a17;
+  color: #ff5a17;
+}
+.ncea-review-controls svg {
+  width: 20px;
+  height: 20px;
+}
+.ncea-review-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 2px 2px 18px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: #ff8a22 #f5f5f4;
+  -webkit-overflow-scrolling: touch;
+}
+.ncea-review-card {
+  display: flex;
+  min-height: 250px;
+  min-width: min(360px, 85vw);
+  max-width: 360px;
+  padding: 25px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 26px;
+  border: 1px solid #e7e7e9;
+  border-radius: 22px;
+  background: #fff;
+  scroll-snap-align: start;
+}
+.ncea-review-card header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ncea-review-avatar {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff4ed;
+  color: #ff5a17;
+  font-size: 18px;
+  font-weight: 800;
+}
+.ncea-review-card strong {
+  font-size: 15px;
+}
+.ncea-review-card blockquote {
+  margin: 0;
+  color: #3f3f46;
+  font-size: 14px;
+  line-height: 1.7;
+}
+@media (max-width: 520px) {
+  .ncea-service-reviews {
+    width: calc(100% - 36px);
+    margin-top: 65px;
+  }
+  .ncea-service-reviews-heading {
+    align-items: flex-start;
+  }
+  .ncea-review-controls button {
+    width: 44px;
+    height: 44px;
+  }
+  .ncea-review-card {
+    min-width: min(320px, 85vw);
+  }
+}
+@media (max-width: 420px) {
+  .ref-mobile-tabbar .ref-mobile-tabbar-brand {
+    display: none;
+  }
+  .ref-mobile-tabbar .ref-mobile-tabbar-label {
+    font-size: 9px;
+  }
+}
+
+/* Public service detail pages */
+.ncea-service-detail-page :is(h1, h2, h3) {
+  font-family: Manrope, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+.ncea-service-detail-page .ref-service-page {
+  width: min(1320px, calc(100% - 48px));
+}
+.ncea-service-detail-page .ref-service-hero {
+  min-height: 570px;
+}
+.ncea-service-detail-page .ref-service-hero h1 {
+  font-size: clamp(48px, 6.5vw, 94px);
+}
+.ncea-service-detail-page .ref-service-hero-art {
+  display: grid;
+  min-height: 440px;
+  place-items: center;
+  border: 1px solid #e7e7e9;
+  border-radius: 28px;
+  background: radial-gradient(circle at center, rgba(255, 138, 34, 0.2), transparent 60%), #f5f5f4;
+}
+.ncea-service-detail-page .ref-service-hero-art img {
+  width: min(80%, 360px);
+  height: 360px;
+  object-fit: contain;
+}
+.ncea-service-detail-page .ref-service-actions a:first-child {
+  border-color: #ff5a17;
+  background: #ff5a17;
+}
+.ncea-service-detail-page .ref-service-details {
+  border-color: #e7e7e9;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(24, 24, 27, 0.06);
+}
+.ncea-service-detail-page .ref-order-banner {
+  border-radius: 24px;
+  background: linear-gradient(110deg, #ff1738, #ff4d1f, #ff8a22);
+}
+.ncea-service-detail-page .ref-related > div:last-child > a {
+  border-color: #e7e7e9;
+  border-radius: 18px;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.ncea-service-detail-page .ref-related > div:last-child > a:hover {
+  transform: translateY(-3px);
+  border-color: #ff8a22;
+}
+@media (max-width: 700px) {
+  .ncea-service-detail-page .ref-service-page {
+    width: calc(100% - 36px);
+    padding-top: 68px;
+  }
+  .ncea-service-detail-page .ref-service-hero {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 34px 0;
+  }
+  .ncea-service-detail-page .ref-service-hero-art {
+    min-height: 250px;
+  }
+  .ncea-service-detail-page .ref-service-hero-art img {
+    height: 230px;
+  }
+  .ncea-service-detail-page .ref-service-details {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 25px;
+  }
+  .ncea-service-detail-page .ref-order-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .ncea-service-detail-page .ref-related > div:last-child {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,15 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowUpRight, Check, MessageCircle, Send } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, ChatBubble, Send } from "iconoir-react";
 import { motion } from "motion/react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SERVICE_MAIN_ASSETS } from "@/lib/service-art";
 import { SERVICES, getService } from "@/lib/services";
+import "@/styles-ncea-redesign.css";
 import {
-  WORKERS_MOTION_VIEWPORT,
   workersDirectionalReveal,
   workersHeadingReveal,
-  workersItemReveal,
   workersStaggerContainer,
 } from "@/lib/motion";
 const ORDER = "https://t.me/lisiy_bob",
@@ -23,7 +22,7 @@ export function ServicePage({ id }: { id: string }) {
   const related = SERVICES.filter((s) => s.id !== id).slice(index % 5, (index % 5) + 3);
   const deliverables = service.steps.slice(0, 4).map((s) => s.title);
   return (
-    <div className="ref-site">
+    <div className="ref-site ncea-service-detail-page">
       <SiteHeader />
       <main className="ref-service-page">
         <motion.nav
@@ -50,7 +49,7 @@ export function ServicePage({ id }: { id: string }) {
             <p>{service.desc}</p>
             <div className="ref-service-actions">
               <a href={ORDER} target="_blank" rel="noreferrer">
-                <MessageCircle /> Заказать <ArrowUpRight />
+                <ChatBubble /> Заказать <ArrowUpRight />
               </a>
               <a href={CHANNEL} target="_blank" rel="noreferrer">
                 <Send /> Telegram-канал
@@ -58,16 +57,15 @@ export function ServicePage({ id }: { id: string }) {
             </div>
           </motion.div>
           <motion.div className="ref-service-hero-art" variants={workersDirectionalReveal("right")}>
-            <img src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]} alt="" />
+            <img
+              src={SERVICE_MAIN_ASSETS[index % SERVICE_MAIN_ASSETS.length]}
+              alt=""
+              width={440}
+              height={440}
+            />
           </motion.div>
         </motion.section>
-        <motion.section
-          className="ref-service-details"
-          variants={workersItemReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
+        <motion.section className="ref-service-details">
           <div>
             <p className="ref-eyebrow">ЧТО ВХОДИТ</p>
             <h2>Работа под вашу задачу</h2>
@@ -89,13 +87,7 @@ export function ServicePage({ id }: { id: string }) {
             </div>
           </div>
         </motion.section>
-        <motion.section
-          className="ref-order-banner"
-          variants={workersDirectionalReveal("left")}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
+        <motion.section className="ref-order-banner">
           <div>
             <p>ГОТОВЫ ОБСУДИТЬ?</p>
             <h2>Расскажите о вашем проекте</h2>
@@ -105,13 +97,7 @@ export function ServicePage({ id }: { id: string }) {
             Написать в ЛС <ArrowUpRight />
           </a>
         </motion.section>
-        <motion.section
-          className="ref-related"
-          variants={workersItemReveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={WORKERS_MOTION_VIEWPORT}
-        >
+        <motion.section className="ref-related">
           <div className="ref-related-heading">
             <div>
               <p className="ref-eyebrow">ЕЩЁ УСЛУГИ</p>

@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "./AuthProvider";
+import { StreakDetails, StreakIndicator } from "@/features/streak/components";
 
 export function AccountMenu({ compact = false }: { compact?: boolean }) {
   const auth = useAuth();
@@ -34,15 +35,24 @@ export function AccountMenu({ compact = false }: { compact?: boolean }) {
   const username = auth.profile?.username ?? "Аккаунт";
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="account-trigger" aria-label={`Меню аккаунта ${username}`}>
-        <Avatar className="h-9 w-9">
-          <AvatarImage src={auth.profile?.avatar_url ?? undefined} alt="" />
-          <AvatarFallback>{username.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
+      <DropdownMenuTrigger
+        className="account-trigger"
+        aria-label={`Меню аккаунта ${username} и ударный режим`}
+      >
+        {!compact ? (
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={auth.profile?.avatar_url ?? undefined} alt="" />
+            <AvatarFallback>{username.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        ) : null}
         {!compact ? <span>{username}</span> : null}
+        <StreakIndicator />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
+      <DropdownMenuContent align="end" className="account-dropdown w-72 rounded-2xl p-2">
         <DropdownMenuLabel className="truncate">{auth.user.email}</DropdownMenuLabel>
+        <div className="account-streak-details">
+          <StreakDetails compact />
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to="/profile">

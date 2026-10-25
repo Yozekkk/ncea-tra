@@ -1,8 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Flame } from "lucide-react";
+import { Flame, Snowflake } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { getStreakPresentation, PROMOTION_STREAK_DAYS } from "./model";
+import {
+  getStreakIndicatorPresentation,
+  getStreakPresentation,
+  PROMOTION_STREAK_DAYS,
+} from "./model";
 
 function dayLabel(days: number) {
   const mod100 = days % 100;
@@ -14,6 +18,40 @@ function dayLabel(days: number) {
 }
 
 export function StreakCard({ compact = false }: { compact?: boolean }) {
+  return <StreakDetails compact={compact} />;
+}
+
+export function StreakIndicator() {
+  const auth = useAuth();
+  const presentation = getStreakIndicatorPresentation(auth.streak);
+  if (presentation.state === "unavailable") {
+    return (
+      <span
+        className="account-streak account-streak-loading"
+        title="Статус ударного режима недоступен"
+      >
+        <Flame aria-hidden="true" />
+        <span className="sr-only">Статус ударного режима недоступен</span>
+      </span>
+    );
+  }
+  const { days, state } = presentation;
+  const description =
+    state === "zero"
+      ? "Начните ударный режим"
+      : state === "frozen"
+        ? "Сегодня серия ещё не продлена"
+        : `Ударный режим продлён сегодня: ${days} ${dayLabel(days)}`;
+  return (
+    <span className={`account-streak account-streak-${state}`} title={description}>
+      {state === "frozen" ? <Snowflake aria-hidden="true" /> : <Flame aria-hidden="true" />}
+      <span>{days}</span>
+      <span className="sr-only">{description}</span>
+    </span>
+  );
+}
+
+export function StreakDetails({ compact = false }: { compact?: boolean }) {
   const auth = useAuth();
   const queryClient = useQueryClient();
   const [isRenewing, setIsRenewing] = useState(false);

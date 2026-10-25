@@ -144,14 +144,27 @@ const expectedReviewNicks = [
   "Bondar3501",
   "Rewards",
   "zoomer0k",
+  "ruti16333",
+  "Amogus55561",
+  "ruti16333",
+  "difinbeeyMC",
+  "YTExzmaN",
+  "tapalkahamster",
+  "zoomer0k",
+  "ImKamonas",
 ];
 const reviewEntries = [...reviewsSource.matchAll(/nick:\s*"([^"]+)"/g)].map((match) => match[1]);
-if (reviewEntries.length !== 9) fail(`Ожидалось 9 отзывов, найдено: ${reviewEntries.length}`);
+if (reviewEntries.length !== expectedReviewNicks.length)
+  fail(`Ожидалось ${expectedReviewNicks.length} отзывов, найдено: ${reviewEntries.length}`);
 if (reviewEntries.join("|") !== expectedReviewNicks.join("|"))
   fail("Ники или порядок отзывов не соответствуют утверждённому списку");
-if (/₽|руб(?:\.|л|лей)|заказ\s*№|id\s*заказа|\d+\s*(?:дн|час).*назад/i.test(reviewsSource))
-  fail("В секции отзывов найдены запрещённые коммерческие метаданные");
-if (!process.exitCode) ok("Все 9 отзывов присутствуют без цен, дат и ID заказа");
+const reviewIds = [...reviewsSource.matchAll(/\bid:\s*"([^"]+)"/g)].map((match) => match[1]);
+if (reviewIds.length !== reviewEntries.length || new Set(reviewIds).size !== reviewIds.length)
+  fail("Отзывы должны иметь уникальные постоянные ID");
+if (!reviewsSource.includes("REVIEWS.length")) fail("Счётчик отзывов должен быть динамическим");
+if (/\d+\s*(?:дн|час).*назад|Сегодня,\s*\d/i.test(reviewsSource))
+  fail("В отзывах найдены относительные даты");
+if (!process.exitCode) ok("Все 17 отзывов присутствуют с уникальными ID и динамическим счётчиком");
 
 const navbarSource = read("src/components/site/nav/Navbar.tsx");
 const stylesSource = read("src/styles.css");

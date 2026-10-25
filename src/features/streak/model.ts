@@ -1,5 +1,21 @@
 export const PROMOTION_STREAK_DAYS = 3;
 
+export function getStreakIndicatorPresentation(
+  streak: { current_streak: number; renewed_today: boolean } | null,
+) {
+  if (!streak) return { state: "unavailable" as const, days: null };
+  const days = getStreakPresentation(streak.current_streak).days;
+  return {
+    state:
+      days === 0
+        ? ("zero" as const)
+        : streak.renewed_today
+          ? ("active" as const)
+          : ("frozen" as const),
+    days,
+  };
+}
+
 export interface StreakPresentation {
   days: number;
   progress: number;

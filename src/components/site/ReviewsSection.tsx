@@ -10,40 +10,119 @@ import {
 
 export const REVIEWS = [
   {
+    id: "existing-1",
     nick: "ArseniyInvesto",
     text: "заказывал плагин на заряд ветра для ранних версий, все четинька , ставлю пять звезд (хотелось бы 100/5)",
   },
   {
+    id: "existing-2",
     nick: "jofi8k",
     text: "Все прекрасно сделал, было много правок, сделал оперативно! Советую!",
   },
   {
+    id: "existing-3",
     nick: "Bondar3501",
     text: "Нужен был анализ сервера, нашёл все минусы и подробно описал проблемы, в кратчайшие сроки всё исправил и скинул готовый результат",
   },
   {
+    id: "existing-4",
     nick: "Rewards",
     text: "Топчик берите не пожелеете",
   },
   {
+    id: "existing-5",
     nick: "Hinti22",
     text: "советую покупать плагины,лучший в своем деле",
   },
   {
+    id: "existing-6",
     nick: "momoakk1",
     text: "Все прекрасно, отлично все объясняет",
   },
   {
+    id: "existing-7",
     nick: "Bondar3501",
     text: "Вай ваще топ чел делает грязюку конкретную, я его руки целовал",
   },
   {
+    id: "existing-8",
     nick: "Rewards",
     text: "Отличный продавец! Плагин именно такой, как в описании, работает без косяков. Связь быстрая, все вопросы решались мгновенно. Документация прилагалась. Рекомендую, буду брать еще.",
   },
   {
+    id: "existing-9",
     nick: "zoomer0k",
     text: "Все сделал четко и быстро, как всегда. Даже настроил текстурпак и не взял за это деньги, всем советую!!!",
+  },
+  {
+    id: "UT3KKQZA",
+    nick: "ruti16333",
+    text: "ТИИИГРРРРР",
+    category: "Minecraft",
+    price: "1 000 ₽",
+    order: "#UT3KKQZA",
+    date: "15 мая, 17:53",
+  },
+  {
+    id: "H968B5D6",
+    nick: "Amogus55561",
+    text: "Все очень супер, быстрое обслуживание",
+    category: "Minecraft",
+    price: "600 ₽",
+    order: "#H968B5D6",
+    date: "16 мая, 15:05",
+  },
+  {
+    id: "Y14R1X85",
+    nick: "ruti16333",
+    text: "👍👍👍👍👍👍",
+    category: "Minecraft",
+    price: "300 ₽",
+    order: "#Y14R1X85",
+  },
+  {
+    id: "XK9GEHY5",
+    nick: "difinbeeyMC",
+    text: "Всё сделал чотенько",
+    category: "Minecraft",
+    price: "1 000 ₽",
+    order: "#XK9GEHY5",
+    date: "14 апреля, 11:28",
+  },
+  {
+    id: "BRW4TGQ",
+    nick: "YTExzmaN",
+    text: "как обычно все имбуля",
+    category: "Minecraft",
+    price: "800 ₽",
+    order: "#BRW4TGQ",
+    date: "2 апреля, 20:48",
+  },
+  {
+    id: "F8GSZMS3",
+    nick: "tapalkahamster",
+    text: "продавец хороший, уступил в цене, и помог с настройкой плагина",
+    category: "Minecraft",
+    price: "600 ₽",
+    order: "#F8GSZMS3",
+  },
+  {
+    id: "T92CNADJ",
+    nick: "zoomer0k",
+    text: "Как всегда все быстро, четко, иба чотка, круто и тд",
+    category: "Minecraft",
+    price: "500 ₽",
+    order: "#T92CNADJ",
+    date: "1 апреля, 19:56",
+  },
+  {
+    id: "BS3JNX47",
+    nick: "ImKamonas",
+    text: "Впервые такую студию вижу, вы лучшие! Теперь только у вас заказывать буду)) Жду ролик в тт)",
+    category: "Minecraft",
+    price: "1 000 ₽",
+    order: "#BS3JNX47",
+    date: "21 марта, 18:52",
   },
 ] as const;
 
@@ -71,8 +150,8 @@ export function ReviewsSection() {
           <p>CLIENT REVIEWS / NCEA</p>
           <h2 id="reviews-title">Отзывы нашей студии</h2>
           <span>Что говорят клиенты после работы с NCEA.</span>
-          <div className="ref-reviews-count" aria-label="Девять отзывов клиентов">
-            <strong>9</strong>
+          <div className="ref-reviews-count" aria-label={`${REVIEWS.length} отзывов клиентов`}>
+            <strong>{REVIEWS.length}</strong>
             <small>
               реальных
               <br />
@@ -93,18 +172,15 @@ export function ReviewsSection() {
         </motion.figure>
       </motion.div>
 
-      <motion.div
-        className="ref-review-grid"
-        variants={workersStaggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={WORKERS_MOTION_VIEWPORT}
-      >
+      <div className="ref-review-grid">
         {REVIEWS.map((review, index) => (
           <motion.div
             className="ref-review-card-motion"
             variants={workersItemReveal}
-            key={`${review.nick}-${index}`}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            key={review.id}
           >
             <article className="ref-review-card">
               <header>
@@ -115,6 +191,11 @@ export function ReviewsSection() {
               <blockquote>
                 <p>{review.text}</p>
               </blockquote>
+              {"category" in review ? (
+                <p className="ref-review-meta">
+                  {review.category} · {review.price}
+                </p>
+              ) : null}
               <footer>
                 <span aria-hidden="true" />
                 NCEA / CLIENT REVIEW
@@ -122,7 +203,7 @@ export function ReviewsSection() {
             </article>
           </motion.div>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }

@@ -66,18 +66,19 @@
 /* Marketplace */
 .marketplace-experience {
   width: min(1640px, 100%);
+  margin-top: -28px;
 }
 .marketplace-experience .community-hero {
-  margin-bottom: 26px;
+  margin-bottom: 12px;
 }
 .marketplace-experience .community-hero h1 {
-  font-size: clamp(42px, 6vw, 82px);
+  font-size: clamp(42px, 4.8vw, 68px);
 }
 .marketplace-ticker {
-  margin: 22px 0 30px;
+  margin: 10px 0 12px;
 }
 .marketplace-experience .marketplace-source-filters {
-  margin: 24px 0 8px;
+  margin: 8px 0 6px;
 }
 .marketplace-experience .marketplace-source-filters a:hover {
   color: #ff5a17;
@@ -90,39 +91,44 @@
 }
 .marketplace-layout {
   display: grid;
-  grid-template-columns: minmax(210px, 250px) minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(270px, 290px) minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
 }
 .marketplace-sidebar {
   position: sticky;
   top: 20px;
-  padding: 22px;
+  padding: 16px;
   border: 1px solid #e7e7e9;
   border-radius: 24px;
   background: #f5f5f4;
 }
 .marketplace-sidebar h2,
 .marketplace-sidebar h3 {
-  margin: 0 0 16px;
-  font-size: 19px;
+  margin: 0 0 8px;
+  font-size: 17px;
 }
 .marketplace-sidebar .marketplace-filters {
   display: grid;
-  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
   margin: 0;
+}
+.marketplace-sidebar .marketplace-filters a:first-child {
+  grid-column: 1 / -1;
 }
 .marketplace-sidebar .marketplace-filters a {
   display: flex;
-  min-height: 44px;
+  min-height: 34px;
   align-items: center;
-  padding: 9px 12px;
+  padding: 5px 8px;
   border: 1px solid transparent;
   border-radius: 12px;
   background: transparent;
   color: #18181b;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1.25;
 }
 .marketplace-sidebar .marketplace-filters a:hover,
 .marketplace-sidebar .marketplace-filters a.is-active {
@@ -131,14 +137,14 @@
   color: #ff5a17;
 }
 .marketplace-price-filter {
-  margin-top: 22px;
-  padding-top: 20px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid #e7e7e9;
 }
 .marketplace-price-filter label {
   display: grid;
   gap: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   font-size: 11px;
   font-weight: 800;
   color: #71717a;
@@ -147,7 +153,7 @@
 .marketplace-price-filter input {
   min-width: 0;
   width: 100%;
-  min-height: 42px;
+  min-height: 36px;
   padding: 8px 10px;
   border: 1px solid #e7e7e9;
   border-radius: 10px;
@@ -164,7 +170,7 @@
 }
 .marketplace-price-filter button {
   width: 100%;
-  min-height: 42px;
+  min-height: 36px;
   border: 1px solid #e7e7e9;
   border-radius: 10px;
   background: #fff;
@@ -172,6 +178,9 @@
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
+}
+.marketplace-filter-toggle {
+  display: none;
 }
 .marketplace-price-filter button:hover {
   border-color: #ff5a17;
@@ -856,32 +865,52 @@
   }
   .marketplace-sidebar {
     position: static;
+    padding: 12px;
+  }
+  .marketplace-filter-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    border: 0;
+    background: transparent;
+    color: #18181b;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .marketplace-filter-content {
+    display: none;
+  }
+  .marketplace-filter-content.is-open {
+    display: block;
+    padding-top: 8px;
   }
   .marketplace-sidebar .marketplace-filters {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
   }
   .marketplace-sidebar .marketplace-filters a {
+    min-height: 44px;
     border-color: #e7e7e9;
     background: #fff;
   }
   .marketplace-price-filter {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: 10px;
+    display: block;
   }
   .marketplace-price-filter h3 {
-    width: 100%;
-    margin: 0;
+    margin: 0 0 10px;
   }
   .marketplace-price-filter label {
-    min-width: 110px;
-    margin: 0;
+    margin-bottom: 7px;
   }
   .marketplace-price-filter button {
-    width: auto;
-    padding: 0 14px;
+    width: 100%;
+  }
+  .marketplace-price-filter select,
+  .marketplace-price-filter input,
+  .marketplace-price-filter button {
+    min-height: 44px;
   }
   .ncea-services-stat {
     display: none;

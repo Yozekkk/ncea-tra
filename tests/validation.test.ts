@@ -7,7 +7,11 @@ import {
   listingSchema,
   validateMarketplaceImage,
 } from "../src/features/marketplace/schemas.ts";
-import { getStreakPresentation, rankMarketplaceListings } from "../src/features/streak/model.ts";
+import {
+  getStreakIndicatorPresentation,
+  getStreakPresentation,
+  rankMarketplaceListings,
+} from "../src/features/streak/model.ts";
 
 describe("account validation", () => {
   it("accepts a trimmed username and rejects unsafe or short values", () => {
@@ -85,6 +89,21 @@ describe("marketplace validation", () => {
 });
 
 describe("activity streak presentation and promotion order", () => {
+  it("distinguishes renewed, pending, zero and unavailable streaks without inventing days", () => {
+    assert.deepEqual(getStreakIndicatorPresentation(null), { state: "unavailable", days: null });
+    assert.deepEqual(getStreakIndicatorPresentation({ current_streak: 0, renewed_today: false }), {
+      state: "zero",
+      days: 0,
+    });
+    assert.deepEqual(getStreakIndicatorPresentation({ current_streak: 7, renewed_today: false }), {
+      state: "frozen",
+      days: 7,
+    });
+    assert.deepEqual(getStreakIndicatorPresentation({ current_streak: 7, renewed_today: true }), {
+      state: "active",
+      days: 7,
+    });
+  });
   it("shows progress until day three and promotion afterwards", () => {
     assert.deepEqual(getStreakPresentation(0), {
       days: 0,

@@ -18,7 +18,6 @@ import {
   MarketplaceCreatePrompt,
   marketplaceKeys,
 } from "@/features/marketplace/components";
-import { StreakCard } from "@/features/streak/components";
 import { BrandMarquee } from "@/components/site/BrandMarquee";
 import "@/styles-ncea-redesign.css";
 
@@ -46,6 +45,7 @@ function MarketplacePage() {
   const [currency, setCurrency] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { category: categorySlug, source: sourceParam } = Route.useSearch();
   const source: MarketplaceSourceFilter = sourceParam ?? "all";
   const categories = useQuery({
@@ -93,7 +93,6 @@ function MarketplacePage() {
           }
         />
         <BrandMarquee text="ПЛАГИНЫ • СЕРВЕРЫ • ДИЗАЙН • СБОРКИ • РЕСУРСПАКИ • " compact />
-        <StreakCard compact />
         <nav className="marketplace-source-filters" aria-label="Источник предложений">
           {(
             [
@@ -118,90 +117,104 @@ function MarketplacePage() {
         </nav>
         <div className="marketplace-layout">
           <aside className="marketplace-sidebar" aria-label="Фильтры каталога">
-            <h2>Категории</h2>
-            {categories.isLoading ? (
-              <LoadingPanel />
-            ) : categories.error ? (
-              <ErrorPanel message={categories.error.message} />
-            ) : (
-              <nav className="marketplace-filters" aria-label="Категории">
-                <Link
-                  to="/marketplace"
-                  search={{ category: undefined, source: sourceParam }}
-                  className={!categoryId ? "is-active" : ""}
-                >
-                  Все категории
-                </Link>
-                {categories.data?.map((category) => (
+            <button
+              type="button"
+              className="marketplace-filter-toggle"
+              aria-controls="marketplace-filter-content"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((open) => !open)}
+            >
+              Категории и цена <span aria-hidden="true">{filtersOpen ? "−" : "+"}</span>
+            </button>
+            <div
+              id="marketplace-filter-content"
+              className={`marketplace-filter-content${filtersOpen ? " is-open" : ""}`}
+            >
+              <h2>Категории</h2>
+              {categories.isLoading ? (
+                <LoadingPanel />
+              ) : categories.error ? (
+                <ErrorPanel message={categories.error.message} />
+              ) : (
+                <nav className="marketplace-filters" aria-label="Категории">
                   <Link
                     to="/marketplace"
-                    search={{ category: category.slug, source: sourceParam }}
-                    className={categoryId === category.id ? "is-active" : ""}
-                    key={category.id}
+                    search={{ category: undefined, source: sourceParam }}
+                    className={!categoryId ? "is-active" : ""}
                   >
-                    {category.name}
+                    Все категории
                   </Link>
-                ))}
-              </nav>
-            )}
-            <div className="marketplace-price-filter">
-              <h3>Цена</h3>
-              <label>
-                Валюта
-                <select
-                  value={currency}
-                  onChange={(event) => {
-                    setCurrency(event.target.value);
+                  {categories.data?.map((category) => (
+                    <Link
+                      to="/marketplace"
+                      search={{ category: category.slug, source: sourceParam }}
+                      className={categoryId === category.id ? "is-active" : ""}
+                      key={category.id}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </nav>
+              )}
+              <div className="marketplace-price-filter">
+                <h3>Цена</h3>
+                <label>
+                  Валюта
+                  <select
+                    value={currency}
+                    onChange={(event) => {
+                      setCurrency(event.target.value);
+                      setMinPrice("");
+                      setMaxPrice("");
+                    }}
+                  >
+                    <option value="">Все валюты</option>
+                    {currencies.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="marketplace-price-fields">
+                  <label>
+                    От
+                    <input
+                      type="number"
+                      min="0"
+                      inputMode="decimal"
+                      disabled={!currency}
+                      value={minPrice}
+                      onChange={(event) => setMinPrice(event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    До
+                    <input
+                      type="number"
+                      min="0"
+                      inputMode="decimal"
+                      disabled={!currency}
+                      value={maxPrice}
+                      onChange={(event) => setMaxPrice(event.target.value)}
+                    />
+                  </label>
+                </div>
+                {!currency ? (
+                  <p className="marketplace-price-hint">Выберите валюту для диапазона.</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency("");
                     setMinPrice("");
                     setMaxPrice("");
+                    setSearch("");
                   }}
                 >
-                  <option value="">Все валюты</option>
-                  {currencies.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="marketplace-price-fields">
-                <label>
-                  От
-                  <input
-                    type="number"
-                    min="0"
-                    inputMode="decimal"
-                    disabled={!currency}
-                    value={minPrice}
-                    onChange={(event) => setMinPrice(event.target.value)}
-                  />
-                </label>
-                <label>
-                  До
-                  <input
-                    type="number"
-                    min="0"
-                    inputMode="decimal"
-                    disabled={!currency}
-                    value={maxPrice}
-                    onChange={(event) => setMaxPrice(event.target.value)}
-                  />
-                </label>
+                  Сбросить фильтры
+                </button>
               </div>
-              {!currency ? (
-                <p className="marketplace-price-hint">Выберите валюту для диапазона.</p>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => {
-                  setCurrency("");
-                  setMinPrice("");
-                  setMaxPrice("");
-                  setSearch("");
-                }}
-              >
-                Сбросить фильтры
-              </button>
             </div>
           </aside>
           <div className="marketplace-results">
